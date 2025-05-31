@@ -1,10 +1,10 @@
 package utils;
 
+import interfaces.GameObject;
 import org.json.JSONObject;
 import javafx.scene.image.Image;
 import javafx.scene.media.AudioClip;
 import java.util.List;
-import interfaces.GameObject;
 import utils.Vector2D;
 
 // Завантажує JSON, зображення, звуки, парсить Tiled JSON, створює дефолтні файли
@@ -16,12 +16,12 @@ public class GameLoader {
 
     // Парсить Tiled JSON, створює об’єкти гри
     // Отримує tiledData з /data/levels/level_X.json
-    // Повертає список GameObject (Player, Police, Camera, тощо) в LevelManager
+    // Передає список GameObject в LevelManager
     public List<GameObject> parseTiledJSON(JSONObject tiledData) { return null; }
 
     // Створює дефолтні файли для об’єктів (/data/defaults/[type]_level_X.json)
     // Отримує tiledData і levelId (наприклад, 1 для level_1)
-    // Парсить масиви (patrolRoute, spritePaths) і зберігає в /data/defaults/player/, /data/defaults/police/, тощо
+    // Зберігає в /data/defaults/player/, /data/defaults/police/, тощо
     public void createDefaultFiles(JSONObject tiledData, int levelId) {}
 
     // Завантажує зображення

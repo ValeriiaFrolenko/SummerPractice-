@@ -12,7 +12,7 @@ import javafx.scene.shape.Polygon;
 import org.json.JSONObject;
 
 // Камера спостереження, реалізує необхідні інтерфейси
-public class SecurityCamera implements GameObject {
+public class SecurityCamera implements GameObject{
     // Поля
     private Vector2D position; // Позиція, з defaultData/saveData (x, y)
     private CameraDirection direction; // Напрямок (LEFT, RIGHT, DOWN), з defaultData/saveData
