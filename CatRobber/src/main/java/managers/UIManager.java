@@ -50,13 +50,6 @@ public class UIManager implements Renderable {
     // Приховує підказку взаємодії
     public void hideInteractionPrompt() {}
 
-    // Показує UI головоломки
-    // Отримує Node від Puzzle.getUI
-    public void showPuzzleUI(Node puzzleNode) {}
-
-    // Приховує UI головоломки
-    public void hidePuzzleUI() {}
-
     // Методи Renderable
     // Малює UI, отримує GraphicsContext від GameWindow
     @Override
