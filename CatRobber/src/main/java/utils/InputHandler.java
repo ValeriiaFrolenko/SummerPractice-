@@ -27,21 +27,42 @@ public class InputHandler {
 
     // Налаштовує обробники клавіатури
     // Додає слухачі для scene
-    public void setupKeyHandlers() {}
+    public void setupKeyHandlers() {
+        scene.setOnKeyPressed(event -> {
+            KeyCode key = event.getCode();
+            pressedKeys.add(key);
+            if (inputCallbacks.containsKey(key)) {
+                inputCallbacks.get(key).run();
+            }
+        });
+
+        scene.setOnKeyReleased(event -> {
+            KeyCode key = event.getCode();
+            pressedKeys.remove(key);
+        });
+    }
 
     // Налаштовує обробники миші
     // Додає слухачі для scene
-    public void setupMouseHandlers() {}
+    public void setupMouseHandlers() {
+        scene.setOnMouseMoved(event -> {
+            mousePosition = new Point2D(event.getX(), event.getY());
+        });
+
+        scene.setOnMouseClicked(event -> {
+            mousePosition = new Point2D(event.getX(), event.getY());
+        });
+    }
 
     // Перевіряє, чи натиснута клавіша
     // Отримує key, повертає boolean в GameManager, UIManager
-    public boolean isKeyPressed(KeyCode key) { return false; }
+    public boolean isKeyPressed(KeyCode key) { return pressedKeys.contains(key);}
 
     // Повертає позицію миші
     // Передає в UIManager для UI-елементів
-    public Point2D getMousePosition() { return null; }
+    public Point2D getMousePosition() { return mousePosition; }
 
     // Реєструє колбек для клавіші
     // Отримує key і callback, зберігає в inputCallbacks
-    public void registerCallback(KeyCode key, Runnable callback) {}
+    public void registerCallback(KeyCode key, Runnable callback) {inputCallbacks.put(key, callback);}
 }
