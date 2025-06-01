@@ -24,10 +24,15 @@ public class GameManager implements Savable {
     public enum GameState { MENU, PLAYING, PAUSED, GAME_OVER }
 
     // Приватний конструктор
-    private GameManager() {}
+    public GameManager() {}
 
     // Повертає єдиний екземпляр
-    public static GameManager getInstance() { return null; }
+    public static GameManager getInstance() {
+        if (instance == null) {
+            instance = new GameManager();
+        }
+        return instance;
+    }
 
     // Завантажує рівень
     // Отримує levelId і isNewGame (true: дефолтні файли, false: збереження)
@@ -40,7 +45,14 @@ public class GameManager implements Savable {
 
     // Оновлює гру
     // Отримує deltaTime, викликає Animatable.updateAnimation
-    public void update(double deltaTime) {}
+    public void update(double deltaTime) {
+        if (gameState != GameState.PLAYING) return;
+        for (Animatable animatable : animatableObjects) {
+            animatable.updateAnimation(deltaTime);
+        }
+        checkCollisions();
+        checkInteractions();
+    }
 
     // Рендерить гру
     // Отримує GraphicsContext, сортує за Renderable.getRenderLayer
