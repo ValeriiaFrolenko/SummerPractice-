@@ -2,34 +2,52 @@ package utils;
 
 import org.json.JSONObject;
 
-// Зберігає метадані одного файлу збереження
+// Представляє метадані файлу збереження
 public class SaveFile {
     // Поля
-    private String fileName; // Шлях до файлу (/data/saves/player_current.json, тощо)
-    private int levelId; // ID рівня, пов’язаного зі збереженням
-    private String timestamp; // Дата і час створення збереження
+    private String fileName; // Шлях до файлу збереження
+    private int levelId; // ID рівня
+    private String timestamp; // Час створення збереження
 
-    // Конструктор
-    // Отримує метадані збереження
-    public SaveFile(String fileName, int levelId, String timestamp) {}
+    // Конструктор: ініціалізує файл збереження
+    public SaveFile(String fileName, int levelId, String timestamp) {
+        this.fileName = fileName;
+        this.levelId = levelId;
+        this.timestamp = timestamp;
+    }
 
-    // Повертає назву файлу
-    // Передає в SaveManager.getSaveFiles для Menu
-    public String getFileName() { return null; }
-
-    // Повертає ID рівня
-    // Передає в Menu для відображення
-    public int getLevelId() { return 0; }
-
-    // Повертає дату створення
-    // Передає в Menu для відображення
-    public String getTimestamp() { return null; }
+    // --- Серіалізація ---
 
     // Повертає JSON-метадані збереження
-    // Використовується SaveManager для збереження/завантаження
-    public JSONObject toJSON() { return null; }
+    public JSONObject toJSON() {
+        JSONObject json = new JSONObject();
+        json.put("fileName", fileName);
+        json.put("levelId", levelId);
+        json.put("timestamp", timestamp);
+        return json;
+    }
 
     // Ініціалізує з JSON
-    // Отримує дані від SaveManager
-    public void fromJSON(JSONObject data) {}
+    public void fromJSON(JSONObject data) {
+        this.fileName = data.getString("fileName");
+        this.levelId = data.getInt("levelId");
+        this.timestamp = data.getString("timestamp");
+    }
+
+    // --- Геттери ---
+
+    // Повертає назву файлу
+    public String getFileName() {
+        return fileName;
+    }
+
+    // Повертає ID рівня
+    public int getLevelId() {
+        return levelId;
+    }
+
+    // Повертає час створення
+    public String getTimestamp() {
+        return timestamp;
+    }
 }
