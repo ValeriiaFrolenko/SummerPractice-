@@ -136,7 +136,6 @@ public class GameManager implements Savable {
         for (Room room : rooms) {
             this.collisionMap.add(room.getBounds()); // Додаємо межі кімнат до карти колізій
         }
-        System.out.println("Set collision map with " + rooms.size() + " rooms"); // Логуємо кількість кімнат
     }
 
     // Завантажує рівень, викликається з GameWindow

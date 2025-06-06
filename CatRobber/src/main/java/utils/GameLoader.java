@@ -165,7 +165,6 @@ public class GameLoader {
             case "InteractiveObject":
                 return new InteractiveObject(new Vector2D(x, y), properties);
             default:
-                System.out.println("Невідомий об'єкт: " + type);
                 return null;
         }
     }
@@ -190,7 +189,6 @@ public class GameLoader {
                     JSONObject obj = objects.getJSONObject(j);
                     String type = obj.getString("type");
                     int id = obj.getInt("id");
-                    System.out.println("Обробка об’єкта: type=" + type + ", id=" + id + ", data=" + obj.toString());
                     switch (type) {
                         case "Player":
                             playerData.put("player_" + id, obj);
@@ -212,7 +210,6 @@ public class GameLoader {
                 }
             }
         }
-        System.out.println("Знайдено " + doorCount + " дверей для рівня " + levelId);
         // Видаляємо старі файли
         String[] filePaths = {
                 basePath + "player/player_level_" + levelId + ".json",
@@ -243,9 +240,6 @@ public class GameLoader {
         saveJSON(doorData, basePath + "doors/door_level_" + levelId + ".json");
         saveJSON(cameraData, basePath + "cameras/cameras_level_" + levelId + ".json");
         saveJSON(interactableData, basePath + "interactables/interactable_objects_level_" + levelId + ".json");
-        System.out.println("Створено дефолтні файли для рівня " + levelId + ": player=" + playerData.length() +
-                ", police=" + policeData.length() + ", doors=" + doorData.length() +
-                ", cameras=" + cameraData.length() + ", interactables=" + interactableData.length());
     }
 
     // Створює директорію, якщо не існує
@@ -311,7 +305,6 @@ public class GameLoader {
                 }
             }
         }
-        System.out.println("Завантажено " + rooms.size() + " кімнат для карти колізій");
         return rooms;
     }
 }

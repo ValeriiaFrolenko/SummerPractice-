@@ -31,14 +31,12 @@ public class LevelManager {
     public void loadLevel(int id, boolean isNewGame) {
         currentLevelId = id;
         String levelFile = "data/levels/level" + id + "/level" + id + ".tmj";
-        System.out.println("Loading level from file: " + levelFile);
         JSONObject levelData = gameLoader.loadJSON(levelFile);
         if (levelData == null) {
             System.out.println("Failed to load level " + id);
             return;
         }
         levels.put(id, levelData);
-        System.out.println("Level " + id + " successfully loaded");
         // Завантажуємо карту колізій
         collisionMap = gameLoader.loadCollisionMap(levelData);
         // Завантажуємо об’єкти
@@ -47,11 +45,9 @@ public class LevelManager {
         GameManager.getInstance().setCollisionMap(collisionMap);
         // Завантажуємо збереження або дефолтні дані
         if (isNewGame) {
-            System.out.println("Creating default files for new game...");
             createDefaultFiles(levelData);
             loadFromDefaults();
         } else {
-            System.out.println("Loading from save...");
             loadFromSave();
         }
     }
@@ -64,10 +60,8 @@ public class LevelManager {
     // Завантажує збереження
     public void loadFromSave() {
         String saveFile = "data/saves/save_level_" + currentLevelId + ".json";
-        System.out.println("Attempting to load save: " + saveFile);
         saveManager.loadGame(saveFile);
         if (GameManager.getInstance().getGameObjects().isEmpty()) {
-            System.out.println("Save file missing or empty, loading default files...");
             loadFromDefaults();
         }
     }
@@ -85,19 +79,16 @@ public class LevelManager {
         };
         for (String fileType : fileTypes) {
             String filePath = basePath + fileType;
-            System.out.println("Loading default file: " + filePath);
             JSONObject data = gameLoader.loadJSON(filePath);
             if (data != null) {
                 List<GameObject> typeObjects = gameLoader.createObjectsFromJSON(data);
                 objects.addAll(typeObjects);
-                System.out.println("Added " + typeObjects.size() + " objects from " + fileType);
             } else {
                 System.out.println("Failed to load default file: " + filePath);
             }
         }
         GameManager.getInstance().setGameObjects(objects);
         GameManager.getInstance().setCollisionMap(collisionMap);
-        System.out.println("Total loaded " + objects.size() + " objects from default files");
     }
 
     // --- Геттери ---

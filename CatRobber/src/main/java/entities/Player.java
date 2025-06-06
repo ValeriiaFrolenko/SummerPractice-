@@ -77,7 +77,6 @@ public class Player implements Animatable, GameObject, Interactable {
         animations.put("run", loader.splitSpriteSheet(spritePaths[1], 10));
         animations.put("hit", loader.splitSpriteSheet(spritePaths[2], 13));
         animations.put("shoot", loader.splitSpriteSheet(spritePaths[3], 2));
-        System.out.println("Player initialized with image position: (" + imageX + ", " + imageY + "), collision position: (" + collX + ", " + collY + ")");
     }
 
     // --- Ініціалізація та оновлення ---
@@ -170,7 +169,6 @@ public class Player implements Animatable, GameObject, Interactable {
                 gc.restore();
             } else {
                 gc.drawImage(frame, renderX, renderY, renderWidth, renderHeight);
-                System.out.println("Rendering object at (" + renderX + ", " + renderY + ")" + " WIDTH " + renderWidth + " height " + renderHeight);
             }
             // Малюємо червону рамку для колізійної області
             Bounds collBounds = getBounds();
