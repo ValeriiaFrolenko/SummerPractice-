@@ -1,0 +1,54 @@
+{"police_124": {
+  "gid": 12,
+  "visible": true,
+  "rotation": 0,
+  "name": "police",
+  "width": 101.948246196698,
+  "x": 173.38257947007,
+  "y": 618.528952432504,
+  "id": 124,
+  "type": "Police",
+  "properties": [
+    {
+      "name": "animationFrame",
+      "type": "int",
+      "value": 0
+    },
+    {
+      "name": "animationTime",
+      "type": "int",
+      "value": 0
+    },
+    {
+      "name": "currentAnimation",
+      "type": "string",
+      "value": "idle"
+    },
+    {
+      "name": "detectionCount",
+      "type": "int",
+      "value": 0
+    },
+    {
+      "name": "direction",
+      "type": "string",
+      "value": "RIGHT"
+    },
+    {
+      "name": "hightColl",
+      "type": "int",
+      "value": 21
+    },
+    {
+      "name": "state",
+      "type": "string",
+      "value": "IDLE"
+    },
+    {
+      "name": "widthColl",
+      "type": "int",
+      "value": 13
+    }
+  ],
+  "height": 101.948246196698
+}}

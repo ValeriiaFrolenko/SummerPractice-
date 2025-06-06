@@ -1,0 +1,15 @@
+{
+  "canMove": false,
+  "currentAnimation": "idle",
+  "collY": 65.2,
+  "collX": -528.0851,
+  "type": "Player",
+  "widthColl": 40.74,
+  "x": -552.9625639892578,
+  "width": 100.948246196698,
+  "y": 134.60076904296875,
+  "hightColl": 57.15,
+  "state": "IDLE",
+  "height": 100.948246196698,
+  "direction": "RIGHT"
+}

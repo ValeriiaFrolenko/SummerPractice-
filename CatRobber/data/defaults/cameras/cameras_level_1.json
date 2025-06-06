@@ -1,0 +1,49 @@
+{"camera_125": {
+  "gid": 29,
+  "visible": true,
+  "rotation": 0,
+  "name": "camera",
+  "width": 67.9654974644651,
+  "x": 647.20165570332,
+  "y": 62.1999105931361,
+  "id": 125,
+  "type": "Camera",
+  "properties": [
+    {
+      "name": "animationFrame",
+      "type": "int",
+      "value": 0
+    },
+    {
+      "name": "animationTime",
+      "type": "int",
+      "value": 0
+    },
+    {
+      "name": "currentAnimation",
+      "type": "string",
+      "value": "normal"
+    },
+    {
+      "name": "direction",
+      "type": "string",
+      "value": "RIGHT"
+    },
+    {
+      "name": "hightColl",
+      "type": "int",
+      "value": 13
+    },
+    {
+      "name": "isAlert",
+      "type": "bool",
+      "value": false
+    },
+    {
+      "name": "widthColl",
+      "type": "int",
+      "value": 14
+    }
+  ],
+  "height": 33.9827487322325
+}}
