@@ -1,85 +1,367 @@
 package managers;
 
-import entities.Player;
+import entities.*;
 import interfaces.*;
-import managers.SaveManager;
-import managers.SoundManager;
-import managers.LevelManager;
+import javafx.geometry.BoundingBox;
+import javafx.geometry.Bounds;
+import javafx.scene.image.Image;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.input.KeyCode;
+import main.GameWindow;
 import org.json.JSONObject;
+import puzzles.Puzzle;
+import utils.GameLoader;
+import utils.InputHandler;
+import utils.Vector2D;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
-// Керує ігровою логікою, singleton, реалізує Savable
+// Клас GameManager керує логікою гри, включаючи об'єкти, стан, колізії, взаємодії
 public class GameManager implements Savable {
     // Поля
-    private static GameManager instance; // Єдиний екземпляр
-    private JSONObject currentLevel; // Поточний рівень (Tiled JSON)
-    private List<GameObject> gameObjects; // Усі об’єкти гри
-    private List<Renderable> renderableObjects; // Об’єкти для рендерингу
-    private List<Animatable> animatableObjects; // Об’єкти з анімаціями
-    private Player player; // Гравець
-    private GameState gameState; // Стан гри
+    private static GameManager instance; // Singleton-екземпляр GameManager
+    private final LevelManager levelManager; // Менеджер рівнів (завантаження даних рівня)
+    private SaveManager saveManager; // Менеджер збереження гри, пов’язаний із SaveManager
+    private JSONObject currentLevel; // Дані поточного рівня у форматі JSON, отримані від LevelManager
+    private List<GameObject> gameObjects; // Список усіх ігрових об’єктів (Player, Police тощо)
+    private List<Renderable> renderableObjects; // Список об’єктів, які можна рендерити (реалізують Renderable)
+    private List<Animatable> animatableObjects; // Список об’єктів з анімаціями (реалізують Animatable)
+    private Player player; // Посилання на гравця (тип Player), витягується з gameObjects
+    private List<Police> police; // Список поліцейських NPC
+    private List<SecurityCamera> cameras; // Список камер спостереження
+    private List<Interactable> interactables; // Список інтерактивних об’єктів
+    private List<Puzzle> puzzles; // Список головоломок
+    private List<Bounds> collisionMap; // Карта колізій (межі кімнат)
+    private List<Room> rooms; // Список кімнат (використовується для колізій і навігації)
+    private GameState gameState; // Поточний стан гри (MENU, PLAYING, PAUSED, GAME_OVER)
+    private Image backgroundImage; // Фонове зображення рівня, завантажується через GameLoader
+    private double canvasWidth; // Ширина canvas, отримується від GameWindow
+    private double canvasHeight; // Висота canvas, отримується від GameWindow
 
-    // Енум для стану гри
-    public enum GameState { MENU, PLAYING, PAUSED, GAME_OVER }
+    // Перелік станів гри
+    public enum GameState {MENU, PLAYING, PAUSED, GAME_OVER}
 
-    // Приватний конструктор
-    public GameManager() {}
+    // Внутрішній клас Room для представлення кімнат
+    public static class Room {
+        private int id; // Унікальний ID кімнати
+        private BoundingBox bounds; // Межі кімнати (для колізій)
 
-    // Повертає єдиний екземпляр
+        public Room(int id, BoundingBox bounds) {
+            this.id = id; // Ініціалізуємо ID
+            this.bounds = bounds; // Ініціалізуємо межі
+        }
+
+        public int getId() {
+            return id; // Повертаємо ID для використання (наприклад, у логіці)
+        }
+
+        public BoundingBox getBounds() {
+            return bounds; // Повертаємо межі для перевірки колізій
+        }
+    }
+
+    // Конструктор, ініціалізує менеджери та списки
+    public GameManager() {
+        gameObjects = new ArrayList<>(); // Створюємо список для всіх ігрових об’єктів
+        renderableObjects = new ArrayList<>(); // Створюємо список для об’єктів із рендерингом
+        animatableObjects = new ArrayList<>(); // Створюємо список для об’єктів з анімаціями
+        police = new ArrayList<>(); // Створюємо список для поліцейських
+        cameras = new ArrayList<>(); // Створюємо список для камер
+        interactables = new ArrayList<>(); // Створюємо список для інтерактивних об’єктів
+        puzzles = new ArrayList<>(); // Створюємо список для головоломок
+        collisionMap = new ArrayList<>(); // Створюємо список для карти колізій
+        rooms = new ArrayList<>(); // Створюємо список для кімнат
+        levelManager = new LevelManager(); // Створюємо LevelManager для управління рівнями
+        saveManager = new SaveManager(); // Створюємо SaveManager для збереження гри
+        gameState = GameState.MENU; // Встановлюємо початковий стан MENU
+    }
+
+    // Повертає єдиний екземпляр GameManager (патерн Singleton)
     public static GameManager getInstance() {
         if (instance == null) {
-            instance = new GameManager();
+            instance = new GameManager(); // Створюємо новий екземпляр, якщо не існує
         }
-        return instance;
+        return instance; // Повертаємо екземпляр для використання в GameWindow
     }
 
-    // Завантажує рівень
-    // Отримує levelId і isNewGame (true: дефолтні файли, false: збереження)
-    // Викликає LevelManager.loadLevel, якщо збереження відсутні, використовує дефолт
-    public void loadLevel(int levelId, boolean isNewGame) {}
+    // Обробляє ввід гравця, викликається з GameWindow.update()
+    public void handleInput(InputHandler inputHandler, double deltaTime) {
+        if (player == null) return; // Виходимо, якщо гравець не ініціалізований
 
-    // Завантажує збереження
-    // Викликає SaveManager для /data/saves/, якщо збереження відсутні, повертається до дефолтних
-    public void loadFromSave() {}
+        boolean isMoving = false; // Прапорець руху гравця
 
-    // Оновлює гру
-    // Отримує deltaTime, викликає Animatable.updateAnimation
+        // Перевіряємо натиснення клавіш через InputHandler
+        if (inputHandler.isKeyPressed(KeyCode.LEFT)) {
+            player.move(Player.Direction.LEFT, deltaTime); // Рухаємо гравця ліворуч
+            isMoving = true;
+        }
+        if (inputHandler.isKeyPressed(KeyCode.RIGHT)) {
+            player.move(Player.Direction.RIGHT, deltaTime); // Рухаємо гравця праворуч
+            isMoving = true;
+        }
+        checkCollisions(); // Перевіряємо колізії після руху
+        if (!isMoving) {
+            player.stopMovement(); // Зупиняємо рух, якщо клавіші не натиснуті
+        }
+    }
+
+    // Встановлює список ігрових об’єктів, сортує їх за типами
+    public void setGameObjects(List<GameObject> objects) {
+        // Очищаємо всі списки перед новим завантаженням
+        gameObjects.clear();
+        renderableObjects.clear();
+        animatableObjects.clear();
+        police.clear();
+        cameras.clear();
+        interactables.clear();
+        // Додаємо нові об’єкти
+        gameObjects.addAll(objects);
+        for (GameObject obj : objects) {
+            // Розподіляємо об’єкти за типами
+            if (obj instanceof Renderable) renderableObjects.add((Renderable) obj); // Додаємо до рендерингу
+            if (obj instanceof Animatable) animatableObjects.add((Animatable) obj); // Додаємо до анімацій
+            if (obj instanceof Player) player = (Player) obj; // Зберігаємо гравця
+            if (obj instanceof Police) police.add((Police) obj); // Додаємо поліцейських
+            if (obj instanceof SecurityCamera) cameras.add((SecurityCamera) obj); // Додаємо камери
+            if (obj instanceof Interactable) interactables.add((Interactable) obj); // Додаємо інтерактивні об’єкти
+        }
+    }
+
+    // Встановлює карту колізій на основі списку кімнат
+    public void setCollisionMap(List<Room> rooms) {
+        this.rooms.clear(); // Очищаємо список кімнат
+        this.rooms.addAll(rooms); // Додаємо нові кімнати
+        this.collisionMap.clear(); // Очищаємо карту колізій
+        for (Room room : rooms) {
+            this.collisionMap.add(room.getBounds()); // Додаємо межі кімнат до карти колізій
+        }
+        System.out.println("Set collision map with " + rooms.size() + " rooms"); // Логуємо кількість кімнат
+    }
+
+    // Завантажує рівень, викликається з GameWindow
+    public void loadLevel(int levelId, boolean isNewGame) {
+        gameState = GameState.PLAYING; // Встановлюємо стан гри PLAYING
+        levelManager.loadLevel(levelId, isNewGame); // Завантажуємо рівень через LevelManager
+        currentLevel = levelManager.getLevelData(); // Отримуємо JSON-дані рівня від LevelManager
+        loadBackgroundImage(); // Завантажуємо фонове зображення
+    }
+
+    // Завантажує фонове зображення рівня
+    private void loadBackgroundImage() {
+        if (currentLevel == null) return; // Виходимо, якщо рівень не завантажено
+        GameLoader gameLoader = new GameLoader(); // Створюємо GameLoader для завантаження ресурсів
+        String backgroundPath = "background/level" + getCurrentLevelId() + "/rooms.png"; // Формуємо шлях до фону
+        backgroundImage = gameLoader.loadImage(backgroundPath); // Завантажуємо зображення
+        if (backgroundImage == null) {
+            System.err.println("Не вдалося завантажити фонове зображення: " + backgroundPath); // Логуємо помилку
+        }
+    }
+
+    // Оновлює масштаб фону, викликається з GameWindow
+    public void updateBackgroundScale(double canvasWidth, double canvasHeight) {
+        this.canvasWidth = canvasWidth; // Зберігаємо ширину canvas
+        this.canvasHeight = canvasHeight; // Зберігаємо висоту canvas
+    }
+
+    // Оновлює логіку гри, викликається з GameWindow.update()
     public void update(double deltaTime) {
-        if (gameState != GameState.PLAYING) return;
-        for (Animatable animatable : animatableObjects) {
-            animatable.updateAnimation(deltaTime);
+        if (gameState != GameState.PLAYING) return; // Виходимо, якщо гра не в стані PLAYING
+        if (player != null) {
+            player.updateAnimation(deltaTime); // Оновлюємо анімацію гравця
         }
-        checkCollisions();
-        checkInteractions();
+        for (Animatable animatable : animatableObjects) {
+            animatable.updateAnimation(deltaTime); // Оновлюємо анімації всіх Animatable об’єктів
+        }
+        for (Police police : police) {
+            police.update(deltaTime); // Оновлюємо логіку поліцейських
+            police.detectPlayer(player.getPosition()); // Перевіряємо, чи бачить поліцейський гравця
+        }
+        for (SecurityCamera camera : cameras) {
+            camera.detectPlayer(player.getPosition()); // Перевіряємо, чи бачить камера гравця
+            camera.updateFrame(); // Оновлюємо кадр анімації камери
+        }
+        checkCollisions(); // Перевіряємо колізії
+        checkInteractions(); // Перевіряємо взаємодії
     }
 
-    // Рендерить гру
-    // Отримує GraphicsContext, сортує за Renderable.getRenderLayer
-    public void render(GraphicsContext gc) {}
+    // Рендерить гру, викликається з GameWindow.render()
+    public void render(GraphicsContext gc) {
+        gc.setImageSmoothing(false); // Вимикаємо згладжування для піксельної графіки
+        renderBackground(gc); // Рендеримо фон
+        renderableObjects.sort(Comparator.comparingInt(Renderable::getRenderLayer)); // Сортуємо об’єкти за шаром рендерингу
+        for (Renderable renderable : renderableObjects) {
+            renderable.render(gc); // Рендеримо кожен об’єкт
+        }
+    }
 
-    // Перевіряє колізії
-    // Використовує Positioned.getBounds
-    public void checkCollisions() {}
+    // Рендерить фонове зображення
+    private void renderBackground(GraphicsContext gc) {
+        if (backgroundImage == null) return; // Виходимо, якщо фон не завантажено
+        gc.drawImage(backgroundImage, 0, 0, 1280, 640); // Малюємо фон із фіксованими розмірами
+    }
 
-    // Перевіряє взаємодії
-    // Використовує Interactable.canInteract, викликає Interactable.interact
-    public void checkInteractions() {}
+    // Малює контури кімнат (для тестування), викликається з GameWindow.render()
+    public void drawRoomOutlines(GraphicsContext gc) {
+        gc.setStroke(javafx.scene.paint.Color.RED); // Встановлюємо червоний колір для контурів
+        gc.setLineWidth(2); // Встановлюємо товщину лінії
 
-    // Завершує гру
-    // Встановлює gameState на GAME_OVER, викликає UIManager
-    public void gameOver() {}
+        for (Room room : rooms) {
+            Bounds bounds = room.getBounds(); // Отримуємо межі кімнати
+            gc.strokeRect(
+                    bounds.getMinX(),
+                    bounds.getMinY(),
+                    bounds.getWidth(),
+                    bounds.getHeight()
+            ); // Малюємо контур
+        }
+    }
 
-    // Зберігає гру
-    // Викликає SaveManager для /data/saves/
-    public void saveGame() {}
+    // Перевіряє колізії гравця з кімнатами
+    public void checkCollisions() {
+        if (player == null) return; // Виходимо, якщо гравець не ініціалізований
 
-    // Методи Savable
-    // Повертає JSON-стан (gameState, currentLevelId), передає в SaveManager
+        Bounds playerBounds = player.getBounds(); // Отримуємо межі гравця
+        double playerX = playerBounds.getMinX();
+        double playerY = playerBounds.getMinY();
+        double playerWidth = playerBounds.getWidth();
+        double playerHeight = playerBounds.getHeight();
+
+        boolean fullyInside = false; // Прапорець, чи гравець повністю в межах кімнати
+
+        for (Room room : rooms) {
+            Bounds roomBounds = room.getBounds(); // Отримуємо межі кімнати
+            double roomX = roomBounds.getMinX();
+            double roomY = roomBounds.getMinY();
+            double roomWidth = roomBounds.getWidth();
+            double roomHeight = roomBounds.getHeight();
+
+            // Перевіряємо, чи гравець повністю в межах кімнати
+            fullyInside = playerX >= roomX &&
+                    playerY >= roomY &&
+                    (playerX + playerWidth) <= (roomX + roomWidth) &&
+                    (playerY + playerHeight) <= (roomY + roomHeight);
+
+            if (fullyInside) {
+                player.allowMovement(); // Дозволяємо рух, якщо гравець у кімнаті
+                break;
+            }
+        }
+
+        if (!fullyInside) {
+            adjustPlayerPosition(playerBounds); // Коригуємо позицію, якщо гравець поза кімнатою
+        }
+    }
+
+    // Коригує позицію гравця при колізії
+    private void adjustPlayerPosition(Bounds playerBounds) {
+        Vector2D currentPosition = player.getPosition(); // Отримуємо поточну позицію гравця
+        Vector2D currentImaginePosition = player.getImaginePosition(); // Отримуємо уявну позицію
+        Player.Direction direction = player.getDirection(); // Отримуємо напрям руху
+        double adjustmentX = 0; // Зміщення по X
+        double backOffDistance = 1; // Відстань відступу
+
+        // Коригуємо позицію залежно від напрямку
+        if (direction == Player.Direction.LEFT) {
+            adjustmentX = backOffDistance; // Відступаємо праворуч
+        } else if (direction == Player.Direction.RIGHT) {
+            adjustmentX = -backOffDistance; // Відступаємо ліворуч
+        }
+
+        // Оновлюємо позицію гравця
+        Vector2D newPosition = new Vector2D(currentPosition.x + adjustmentX, currentPosition.y);
+        player.setPosition(newPosition); // Встановлюємо нову позицію
+        Vector2D newImaginePosition = new Vector2D(currentImaginePosition.x + adjustmentX, currentImaginePosition.y);
+        player.setImaginePosition(newImaginePosition); // Встановлюємо нову позицію зображення
+    }
+
+    // Перевіряє взаємодії гравця з об’єктами
+    public void checkInteractions() {
+        if (player == null) return; // Виходимо, якщо гравець не ініціалізований
+        Interactable closest = null; // Найближчий інтерактивний об’єкт
+        double minDistance = Double.MAX_VALUE; // Мінімальна відстань до об’єкта
+        Vector2D playerPos = player.getPosition(); // Отримуємо позицію гравця
+        for (Interactable interactable : interactables) {
+            if (interactable.canInteract(player)) { // Перевіряємо, чи можлива взаємодія
+                Positioned pos = (Positioned) interactable; // Приводимо до Positioned
+                double distance = Math.hypot(playerPos.x - pos.getPosition().x,
+                        playerPos.y - pos.getPosition().y); // Обчислюємо відстань
+                if (distance < minDistance) {
+                    minDistance = distance; // Оновлюємо мінімальну відстань
+                    closest = interactable; // Зберігаємо найближчий об’єкт
+                }
+            }
+        }
+        if (closest != null) {
+            // UIManager.showPrompt(closest.getInteractionPrompt()); // Закоментований виклик для UI
+        }
+    }
+
+    // Завершує гру, змінюючи стан
+    public void gameOver() {
+        gameState = GameState.GAME_OVER; // Встановлюємо стан GAME_OVER
+    }
+
+    // Зберігає гру через SaveManager
+    public void saveGame() {
+        saveManager.saveGame(gameState); // Викликаємо збереження, передаючи поточний стан
+    }
+
+    // Реалізує інтерфейс Savable: повертає дані для збереження
     @Override
-    public JSONObject getSerializableData() { return null; }
+    public JSONObject getSerializableData() {
+        JSONObject data = new JSONObject(); // Створюємо JSON-об’єкт
+        data.put("gameState", gameState.toString()); // Додаємо стан гри
+        data.put("currentLevelId", levelManager.getCurrentLevelId()); // Додаємо ID рівня
+        return data; // Повертаємо дані для SaveManager
+    }
 
-    // Ініціалізує стан із JSON, отримує з SaveManager
+    // Реалізує інтерфейс Savable: відновлює дані зі збереження
     @Override
-    public void setFromData(JSONObject data) {}
+    public void setFromData(JSONObject data) {
+        gameState = GameState.valueOf(data.getString("gameState")); // Відновлюємо стан гри
+        int levelId = data.getInt("currentLevelId"); // Отримуємо ID рівня
+        loadLevel(levelId, false); // Завантажуємо рівень як збережену гру
+    }
+
+    // Повертає ID поточного рівня
+    public int getCurrentLevelId() {
+        return levelManager.getCurrentLevelId(); // Отримуємо ID від LevelManager
+    }
+
+    // Геттери для доступу до даних
+    public List<GameObject> getGameObjects() {
+        return gameObjects; // Повертаємо список ігрових об’єктів
+    }
+
+    public Player getPlayer() {
+        return player; // Повертаємо гравця
+    }
+
+    public List<Police> getPolice() {
+        return police; // Повертаємо список поліцейських
+    }
+
+    public List<SecurityCamera> getCameras() {
+        return cameras; // Повертаємо список камер
+    }
+
+    public List<Interactable> getInteractables() {
+        return interactables; // Повертаємо список інтерактивних об’єктів
+    }
+
+    public List<Puzzle> getPuzzles() {
+        return puzzles; // Повертаємо список головоломок
+    }
+
+    // Повертає кімнату за позицією
+    public Room getRoomForPosition(Vector2D position) {
+        for (Room room : rooms) {
+            Bounds bounds = room.getBounds(); // Отримуємо межі кімнати
+            if (bounds.contains(position.x, position.y)) { // Перевіряємо, чи позиція в межах
+                return room; // Повертаємо кімнату
+            }
+        }
+        return null; // Повертаємо null, якщо кімната не знайдена
+    }
 }
