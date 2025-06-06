@@ -26,4 +26,16 @@ public class Vector2D {
     // Множить вектор на скаляр
     // Отримує scalar, повертає новий Vector2D
     public Vector2D multiply(double scalar) { return new Vector2D(this.x * scalar, this.y * scalar); }
+
+    public void setX(double v) {
+        this.x = v;
+    }
+
+    public double getX() {
+        return x;
+    }
+
+    public double getY() {
+        return y;
+    }
 }
