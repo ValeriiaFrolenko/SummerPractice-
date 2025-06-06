@@ -1,0 +1,14 @@
+{ "columns":1,
+ "image":"..\/..\/..\/assets\/images\/background\/doors\/stairsUp.png",
+ "imageheight":44,
+ "imagewidth":42,
+ "margin":0,
+ "name":"stairsUp",
+ "spacing":0,
+ "tilecount":1,
+ "tiledversion":"1.11.2",
+ "tileheight":44,
+ "tilewidth":42,
+ "type":"tileset",
+ "version":"1.10"
+}

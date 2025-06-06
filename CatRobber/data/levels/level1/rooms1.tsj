@@ -1,0 +1,14 @@
+{ "columns":1,
+ "image":"..\/..\/..\/assets\/images\/background\/level1\/rooms.png",
+ "imageheight":384,
+ "imagewidth":608,
+ "margin":0,
+ "name":"rooms",
+ "spacing":0,
+ "tilecount":1,
+ "tiledversion":"1.11.2",
+ "tileheight":384,
+ "tilewidth":608,
+ "type":"tileset",
+ "version":"1.10"
+}
