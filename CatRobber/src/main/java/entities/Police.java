@@ -2,108 +2,200 @@ package entities;
 
 import interfaces.*;
 import javafx.geometry.Bounds;
-import utils.Vector2D;
-import javafx.scene.image.Image;
+import javafx.geometry.BoundingBox;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.Image;
 import org.json.JSONObject;
+import utils.GameLoader;
+import utils.Vector2D;
+import java.util.HashMap;
 import java.util.Map;
 
-// Поліцейський, реалізує необхідні інтерфейси
+// Представляє поліцейського NPC, який патрулює або переслідує гравця
 public class Police implements Animatable, GameObject {
     // Поля
-    private Vector2D position; // Позиція, з defaultData/saveData (x, y)
-    private PoliceDirection direction; // Напрямок (LEFT, RIGHT), з defaultData/saveData
-    private PoliceState state; // Стан (PATROL, CHASE, ALERT, STUNNED), з defaultData/saveData
-    private Vector2D[] patrolRoute; // Маршрут патрулювання, з defaultData/saveData, парситься з рядка
-    private String currentAnimation; // Поточна анімація, з defaultData/saveData
-    private int animationFrame; // Поточний кадр, з defaultData/saveData
-    private double animationTime; // Таймер анімації, з defaultData/saveData
-    private Map<String, Image[]> animationFrames; // Кадри анімацій, з spritePaths
-    private String[] spritePaths; // Шляхи до спрайтів, з defaultData/saveData
+    private Vector2D position; // Позиція поліцейського, з JSON
+    private PoliceDirection direction; // Напрям руху (LEFT, RIGHT), з JSON
+    private PoliceState state; // Стан (PATROL, CHASE, ALERT, STUNNED, IDLE), з JSON
+    private String currentAnimation; // Поточна анімація ("idle", "patrol", "stunned", "alarm")
+    private int animationFrame; // Поточний кадр анімації
+    private double animationTime; // Час для анімації
+    private Map<String, Image[]> animations; // Анімації, завантажені через GameLoader
+    private String[] spritePaths; // Шляхи до спрайтів
+    private double width; // Ширина зображення, з JSON
+    private double height; // Висота зображення, з JSON
+    private double collWidth; // Ширина колізійної області, з JSON
+    private double collHeight; // Висота колізійної області, з JSON
+    private double normalSpeed = 50.0; // Швидкість патрулювання
+    private double chaseSpeed = 70.0; // Швидкість переслідування
+    private double scaleX = 1.0; // Масштаб по X
+    private double scaleY = 1.0; // Масштаб по Y
 
+    // Напрями та стани поліцейського
+    public enum PoliceDirection { LEFT, RIGHT }
+    public enum PoliceState { PATROL, CHASE, ALERT, STUNNED, IDLE }
+
+    // Конструктор: ініціалізує поліцейського з JSON-даними
+    public Police(Vector2D position, JSONObject defaultData) {
+        this.position = position;
+        this.width = defaultData.optDouble("width", 32.0);
+        this.height = defaultData.optDouble("height", 32.0);
+        this.collWidth = defaultData.optDouble("widthColl", 20.0);
+        this.collHeight = defaultData.optDouble("hightColl", 20.0);
+        this.direction = PoliceDirection.valueOf(defaultData.optString("direction", "LEFT"));
+        this.state = PoliceState.valueOf(defaultData.optString("state", "PATROL"));
+        this.currentAnimation = defaultData.optString("animation", "patrol");
+        this.animations = new HashMap<>();
+        this.spritePaths = new String[]{"police/idle.png", "police/run.png", "police/lay.png", "police/alarm.png"};
+        GameLoader loader = new GameLoader();
+        animations.put("idle", loader.splitSpriteSheet(spritePaths[0], 12));
+        animations.put("patrol", loader.splitSpriteSheet(spritePaths[1], 9));
+        animations.put("stunned", loader.splitSpriteSheet(spritePaths[2], 1));
+        animations.put("alarm", loader.splitSpriteSheet(spritePaths[3], 2));
+        this.animationFrame = 0;
+        this.animationTime = 0;
+        // Зв’язок із GameLoader для завантаження спрайтів
+    }
+
+    // --- Ініціалізація та оновлення ---
+
+    // Оновлює логіку поліцейського (викликається з GameManager.update())
+    public void update(double deltaTime) {
+        // TODO: Реалізувати логіку патрулювання та переслідування
+        // Змінити position залежно від state (PATROL: рух у межах, CHASE: до гравця)
+        // Зупинити рух, якщо досягнуто межу кімнати
+    }
+
+    // Оновлює анімацію поліцейського
+    @Override
+    public void updateAnimation(double deltaTime) {
+        // TODO: Реалізувати оновлення анімації
+        // Оновити animationTime, animationFrame залежно від deltaTime
+        // Переключити кадри на основі currentAnimation
+    }
+
+    // Перевіряє, чи гравець у полі зору
+    public void detectPlayer(Vector2D playerPosition) {
+        // TODO: Реалізувати логіку виявлення гравця
+        // Перевірити відстань до playerPosition, змінити state на CHASE або ALERT
+    }
+
+    // Зупиняє рух поліцейського
+    public void stopMovement() {
+        // TODO: Реалізувати зупинку руху
+        // Встановити state = IDLE, скинути швидкість
+    }
+
+    // Активує стан тривоги
+    public void alert() {
+        // TODO: Реалізувати активацію тривоги
+        // Встановити state = ALERT, змінити currentAnimation
+    }
+
+    // Обробляє отримання удару
+    public void takeHit(boolean isRanged) {
+        // TODO: Реалізувати обробку удару
+        // Встановити state = STUNNED, змінити анімацію
+    }
+
+    // --- Рендеринг ---
+
+    // Рендерить поліцейського на canvas (викликається з GameManager.render())
+    @Override
+    public void render(GraphicsContext gc) {
+        // TODO: Реалізувати рендеринг
+        // Отримати поточний кадр через getCurrentFrame()
+        // Намалювати його на gc з урахуванням position, width, height, direction
+    }
+
+    // Повертає поточний кадр анімації
+    @Override
+    public Image getCurrentFrame() {
+        // TODO: Реалізувати повернення кадру
+        // Повернути animations.get(currentAnimation)[animationFrame] або null
+        return null;
+    }
+
+    // --- Взаємодії ---
+
+    // Встановлює стан анімації
+    @Override
+    public void setAnimationState(String state) {
+        // TODO: Реалізувати зміну стану анімації
+        // Оновити currentAnimation, скинути animationFrame і animationTime
+    }
+
+    // --- Серіалізація ---
+
+    // Повертає JSON для збереження (викликається з SaveManager.savePolice())
+    @Override
+    public JSONObject getSerializableData() {
+        // TODO: Реалізувати серіалізацію
+        // Створити JSONObject з position, direction, state, currentAnimation тощо
+        return null;
+    }
+
+    // Відновлює стан із JSON (викликається з SaveManager.loadGame())
+    @Override
+    public void setFromData(JSONObject data) {
+        // TODO: Реалізувати десеріалізацію
+        // Оновити position, direction, state, currentAnimation із data
+    }
+
+    // --- Геттери/Сеттери ---
+
+    // Повертає тип об’єкта
     @Override
     public String getType() {
         return "Police";
     }
 
-    // Енуми
-    public enum PoliceDirection { LEFT, RIGHT }
-    public enum PoliceState { PATROL, CHASE, ALERT, STUNNED }
-
-    // Конструктор
-    // Отримує defaultData з /data/defaults/police_level_X.json через GameLoader
-    public Police(JSONObject defaultData) {
-        setFromData(defaultData); // Ініціалізація з дефолтних даних
+    // Повертає позицію поліцейського
+    @Override
+    public Vector2D getPosition() {
+        return new Vector2D(position.x, position.y);
     }
 
-    // Ініціалізація або відновлення стану
-    // Отримує defaultData (/data/defaults/) або saveData (/data/saves/), парсить усі поля
-    // Створює animationFrames з spritePaths через GameLoader.loadImage, patrolRoute з рядка
+    // Повертає уявну позицію (та ж, що й позиція)
     @Override
-    public void setFromData(JSONObject data) {}
+    public Vector2D getImaginePosition() {
+        return getPosition();
+    }
 
-    // Методи Animatable
-    // Оновлює анімацію, отримує deltaTime від GameManager
+    // Встановлює позицію поліцейського
     @Override
-    public void updateAnimation(double deltaTime) {}
+    public void setPosition(Vector2D position) {
+        this.position = position;
+    }
 
-    // Встановлює стан анімації, викликається при зміні state
+    // Встановлює уявну позицію
     @Override
-    public void setAnimationState(String state) {}
+    public void setImaginePosition(Vector2D position) {
+        this.position = position;
+    }
 
-    // Повертає поточний кадр, передає в render
+    // Повертає межі для колізій
     @Override
-    public Image getCurrentFrame() { return null; }
+    public Bounds getBounds() {
+        return new BoundingBox(position.x, position.y, collWidth, collHeight);
+    }
 
-    // Методи Renderable
-    // Малює поліцейського, отримує GraphicsContext від GameManager
+    // Повертає межі для рендерингу
     @Override
-    public void render(GraphicsContext gc) {}
+    public Bounds getImagineBounds() {
+        return new BoundingBox(position.x, position.y, width, height);
+    }
 
-    // Повертає шар рендерингу (1, як у гравця, малюється поверх фону, під UI)
-    // Передає в GameManager для сортування
+    // Повертає шар рендерингу
     @Override
-    public int getRenderLayer() { return 1; }
+    public int getRenderLayer() {
+        return 1; // Поліцейські рендеряться на шарі 1
+    }
 
-    // Перевіряє видимість (завжди true для поліцейського), передає в GameManager
+    // Перевіряє видимість
     @Override
-    public boolean isVisible() { return true; }
+    public boolean isVisible() {
+        return true; // Поліцейський завжди видимий
+    }
 
-    // Методи Positioned
-    // Повертає позицію, передає в GameManager для колізій
-    @Override
-    public Vector2D getPosition() { return position; }
-
-    // Встановлює позицію, отримує від GameManager (наприклад, при русі)
-    @Override
-    public void setPosition(Vector2D position) {}
-
-    // Повертає межі для колізій, передає в GameManager
-    @Override
-    public Bounds getBounds() { return null; }
-
-    // Методи Savable
-    // Повертає JSON-стан, передає в SaveManager
-    @Override
-    public JSONObject getSerializableData() { return null; }
-
-    // Патрулює за маршрутом
-    // Оновлює position, direction, викликається в GameManager.update
-    public void patrol() {}
-
-    // Виявляє гравця
-    // Отримує playerPosition від GameManager, змінює state, передає тривогу в GameManager
-    public void detectPlayer(Vector2D playerPosition) {}
-
-    // Переслідує гравця
-    // Оновлює position, direction, викликається в GameManager.update
-    public void chase() {}
-
-    // Реагує на тривогу
-    // Змінює state на ALERT, викликається при виявленні, передає в GameManager
-    public void alert() {}
-
-    // Отримує удар (ближній/дальній)
-    // Отримує isRanged від Player.attack, змінює state на STUNNED, передає в GameManager
-    public void takeHit(boolean isRanged) {}
 }
