@@ -21,7 +21,11 @@ public class Vector2D {
 
     // Обчислює відстань до іншого вектора
     // Отримує other, повертає відстань (число)
-    public double distance(Vector2D other) { return Math.sqrt(x * x + y * y) ; }
+    public double distance(Vector2D other) {
+        double dx = this.x - other.x;
+        double dy = this.y - other.y;
+        return Math.sqrt(dx * dx + dy * dy);
+        }
 
     // Множить вектор на скаляр
     // Отримує scalar, повертає новий Vector2D
