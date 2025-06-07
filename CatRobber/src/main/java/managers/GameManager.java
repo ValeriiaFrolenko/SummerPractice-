@@ -90,8 +90,20 @@ public class GameManager implements Savable {
         if (player == null) return;
         checkInteractions(); // Перевіряємо взаємодії перед обробкою вводу
         managePlayerMoving(inputHandler, deltaTime);
+        managePlayerHit(inputHandler, deltaTime);
         managePlayerOpenDoor(inputHandler);
         checkCollisions();
+    }
+
+    private void managePlayerHit(InputHandler inputHandler, double deltaTime) {
+        if (inputHandler.isKeyPressed(KeyCode.Q)) {
+            player.attack(false);
+                for (Interactable interactable: interactables){
+                    if (interactable instanceof Police && interactable.canInteract(player)){
+                        interactable.interact(player);
+                    }
+                }
+        }
     }
 
     //Відкриття дверей за допомогою кнопки Е
@@ -213,7 +225,8 @@ public class GameManager implements Savable {
             animatable.updateAnimation(deltaTime); // Оновлюємо анімації всіх Animatable об’єктів
         }
         for (Police police : police) {
-            police.update(deltaTime); // Оновлюємо логіку поліцейських
+            police.update(deltaTime, rooms, player);// Оновлюємо логіку поліцейських
+            checkPoliceCollisions();
             police.detectPlayer(player.getPosition()); // Перевіряємо, чи бачить поліцейський гравця
         }
         for (SecurityCamera camera : cameras) {
@@ -258,6 +271,51 @@ public class GameManager implements Savable {
 
     // Перевіряє колізії гравця з кімнатами
     public void checkCollisions() {
+        checkPlayerCollisions();
+        checkPoliceCollisions();
+    }
+
+    private void checkPoliceCollisions() {
+        if (police == null || police.isEmpty()) return;
+
+        for (Police police1: police) {
+            Bounds policeBounds = police1.getBounds(); // Отримуємо межі гравця
+            double policeX = policeBounds.getMinX();
+            double policeY = policeBounds.getMinY();
+            double policeWidth = policeBounds.getWidth();
+            double policeHeight = policeBounds.getHeight();
+
+            boolean fullyInside = false; // Прапорець, чи гравець повністю в межах кімнати
+
+            for (Room room : rooms) {
+                Bounds roomBounds = room.getBounds(); // Отримуємо межі кімнати
+                double roomX = roomBounds.getMinX();
+                double roomY = roomBounds.getMinY();
+                double roomWidth = roomBounds.getWidth();
+                double roomHeight = roomBounds.getHeight();
+
+                // Перевіряємо, чи гравець повністю в межах кімнати
+                fullyInside = policeX >= roomX &&
+                        policeY >= roomY &&
+                        (policeX + policeWidth) <= (roomX + roomWidth) &&
+                        (policeY + policeHeight) <= (roomY + roomHeight);
+
+                if (fullyInside) {
+                    break;
+                }
+            }
+
+            if (!fullyInside) {
+                if (police1.getDirection().equals(Police.PoliceDirection.LEFT)) {
+                   police1.setDirection(Police.PoliceDirection.RIGHT);
+                } else if (police1.getDirection().equals(Police.PoliceDirection.RIGHT)) {
+                    police1.setDirection(Police.PoliceDirection.LEFT);
+                }
+            }
+        }
+    }
+
+    private void checkPlayerCollisions() {
         if (player == null) return; // Виходимо, якщо гравець не ініціалізований
 
         Bounds playerBounds = player.getBounds(); // Отримуємо межі гравця

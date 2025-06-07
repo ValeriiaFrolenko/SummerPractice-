@@ -20,6 +20,16 @@
       "value": 0
     },
     {
+      "name": "collX",
+      "type": "float",
+      "value": 202
+    },
+    {
+      "name": "collY",
+      "type": "float",
+      "value": 537.5
+    },
+    {
       "name": "currentAnimation",
       "type": "string",
       "value": "idle"
@@ -36,8 +46,8 @@
     },
     {
       "name": "hightColl",
-      "type": "int",
-      "value": 21
+      "type": "float",
+      "value": 68
     },
     {
       "name": "state",
@@ -46,8 +56,8 @@
     },
     {
       "name": "widthColl",
-      "type": "int",
-      "value": 13
+      "type": "float",
+      "value": 43
     }
   ],
   "height": 101.948246196698

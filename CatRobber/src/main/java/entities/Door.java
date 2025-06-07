@@ -23,7 +23,7 @@ public class Door implements GameObject, Interactable {
     private boolean isLaser; // Чи лазерні двері, з JSON
     private boolean isRoomLink; // Чи ведуть до іншої кімнати, з JSON
     private boolean isFloorLink; // Чи ведуть до іншого поверху, з JSON
-    private String direction; // Напрям дверей ("left", "right", "up", "down"), з JSON
+    String direction; // Напрям дверей ("left", "right", "up", "down"), з JSON
     private Map<String, Image> sprites; // Спрайти для різних станів, завантажені через GameLoader
     private String[] spritePaths; // Шляхи до спрайтів
     private final String path = "background/doors/"; // Базовий шлях до спрайтів
@@ -69,20 +69,20 @@ public class Door implements GameObject, Interactable {
     // Взаємодія з гравцем (викликається з GameManager.checkInteractions())
     @Override
     public void interact(Player player) {
-        if (isLocked) {
-            return;
-        } else {
-            if (isOpen) {
+        // if (isLocked) {
+            //return;
+       // } else {
+            //if (isOpen) {
                 Player.Direction direction = player.getDirection();
                 if ((direction.equals(Player.Direction.LEFT) || direction.equals(Player.Direction.RIGHT)) && isRoomLink) {
                     player.teleportToRoom(this);
                 } else {
                     player.teleportToFloor(this);
                 }
-            } else {
-                return;
-            }
-        }
+            //} else {
+               // return;
+           // }
+        //}
     }
 
     // Перевіряє, чи можлива взаємодія
@@ -290,9 +290,9 @@ public class Door implements GameObject, Interactable {
 
     // Відкриває двері
     public void open(Player player) {
-        if (!isLocked) {
+        //if (!isLocked) {
             this.isOpen = true;
-        }
+      //  }
     }
 
     // Повертає унікальний ID для зв’язку між дверима

@@ -1540,6 +1540,16 @@
                          "value":0
                         }, 
                         {
+                         "name":"collX",
+                         "type":"float",
+                         "value":202
+                        }, 
+                        {
+                         "name":"collY",
+                         "type":"float",
+                         "value":537.5
+                        }, 
+                        {
                          "name":"currentAnimation",
                          "type":"string",
                          "value":"idle"
@@ -1556,8 +1566,8 @@
                         }, 
                         {
                          "name":"hightColl",
-                         "type":"int",
-                         "value":21
+                         "type":"float",
+                         "value":68
                         }, 
                         {
                          "name":"state",
@@ -1566,8 +1576,8 @@
                         }, 
                         {
                          "name":"widthColl",
-                         "type":"int",
-                         "value":13
+                         "type":"float",
+                         "value":43
                         }],
                  "rotation":0,
                  "type":"Police",
@@ -1635,6 +1645,28 @@
                  "width":40.7406431019961,
                  "x":59.4257263314337,
                  "y":65.204420482757
+                }, 
+                {
+                 "height":68,
+                 "id":128,
+                 "name":"policeCollision",
+                 "rotation":0,
+                 "type":"PoliceCollision",
+                 "visible":true,
+                 "width":43,
+                 "x":202,
+                 "y":537.5
+                }, 
+                {
+                 "height":0,
+                 "id":129,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":17.5,
+                 "y":773
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -1643,7 +1675,7 @@
          "y":0
         }],
  "nextlayerid":4,
- "nextobjectid":127,
+ "nextobjectid":130,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.2",

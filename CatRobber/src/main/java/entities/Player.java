@@ -14,6 +14,10 @@ import java.util.Map;
 
 // Представляє гравця, який може рухатися, атакувати, взаємодіяти з об’єктами
 public class Player implements Animatable, GameObject, Interactable {
+    private boolean isAttacking;
+    private String attackAnimationType;
+    private double attackAnimationDuration; // Час відтворення анімації атаки
+
     // Поля
     private double imageX; // Верхній лівий кут зображення по X
     private double imageY; // Верхній лівий кут зображення по Y
@@ -33,7 +37,7 @@ public class Player implements Animatable, GameObject, Interactable {
     private Map<String, Image[]> animations; // Анімації, завантажені через GameLoader
     private String[] spritePaths; // Шляхи до спрайтів
     private boolean canMove; // Чи може гравець рухатися
-
+;
     public void setDirection(Direction direction) {
         this.direction = direction;
     }
@@ -73,6 +77,9 @@ public class Player implements Animatable, GameObject, Interactable {
         this.currentAnimation = "idle";
         this.animationFrame = 0;
         this.animationTime = 0;
+        this.isAttacking = false;
+        this.attackAnimationDuration = 0.0;
+        this.attackAnimationType = null;
         // Завантаження анімацій через GameLoader
         this.animations = new HashMap<>();
         this.spritePaths = new String[]{"player/idle.png", "player/run.png", "player/beating.png", "player/shoot.png"};
@@ -119,14 +126,37 @@ public class Player implements Animatable, GameObject, Interactable {
         animationTime += deltaTime;
         Image[] frames = animations.getOrDefault(currentAnimation, animations.get("idle"));
         if (frames == null || frames.length == 0) return;
-        double frameDuration = 0.2;
-        int frameCount = frames.length;
-        animationFrame = (int) (animationTime / frameDuration) % frameCount;
+
+        if (isAttacking) {
+            // Для анімації атаки відтворюємо всі кадри
+            attackAnimationDuration -= deltaTime;
+            double frameDuration = 0.2; // Тривалість одного кадру
+            int frameCount = frames.length;
+            animationFrame = (int) (animationTime / frameDuration) % frameCount;
+            if (attackAnimationDuration <= 0) {
+                // Завершення анімації атаки
+                isAttacking = false;
+                setAnimationState("idle"); // Повертаємося до idle після атаки
+            }
+        } else {
+            // Звичайна анімація
+            double frameDuration = 0.2;
+            int frameCount = frames.length;
+            animationFrame = (int) (animationTime / frameDuration) % frameCount;
+        }
     }
 
     // Виконує атаку (ближню або дальню)
     public void attack(boolean isRanged) {
-        setAnimationState(isRanged ? "shoot" : "hit");
+        if (!isAttacking) {
+            isAttacking = true;
+            setAnimationState(isRanged ? "shoot" : "hit");
+            // Встановлюємо тривалість анімації залежно від кількості кадрів
+            Image[] frames = animations.get(currentAnimation);
+            if (frames != null) {
+                attackAnimationDuration = frames.length * 0.2; // 0.2 сек на кадр
+            }
+        }
     }
 
     // Піднімається по драбині
@@ -237,10 +267,12 @@ public class Player implements Animatable, GameObject, Interactable {
     // Встановлює стан анімації
     @Override
     public void setAnimationState(String state) {
-        if (animations.containsKey(state) && !state.equals(currentAnimation)) {
-            currentAnimation = state;
-            animationFrame = 0;
-            animationTime = 0;
+        if (!isAttacking || state.equals("hit") || state.equals("shoot")) {
+            if (animations.containsKey(state) && !state.equals(currentAnimation)) {
+                currentAnimation = state;
+                animationFrame = 0;
+                animationTime = 0;
+            }
         }
     }
 
@@ -363,7 +395,7 @@ public class Player implements Animatable, GameObject, Interactable {
     // Повертає шар рендерингу
     @Override
     public int getRenderLayer() {
-        return 1; // Гравець рендериться на шарі 1
+        return 2; // Гравець рендериться на шарі 1
     }
 
     // Перевіряє видимість
@@ -385,5 +417,10 @@ public class Player implements Animatable, GameObject, Interactable {
     // Встановлює можливість руху
     public void setCanMove(boolean canMove) {
         this.canMove = canMove;
+    }
+
+    // Геттер для перевірки стану атаки
+    public boolean isAttacking() {
+        return isAttacking;
     }
 }

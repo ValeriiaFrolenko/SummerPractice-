@@ -5,16 +5,26 @@ import javafx.geometry.Bounds;
 import javafx.geometry.BoundingBox;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
+import javafx.scene.paint.Color;
+import managers.GameManager;
 import org.json.JSONObject;
 import utils.GameLoader;
 import utils.Vector2D;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 // Представляє поліцейського NPC, який патрулює або переслідує гравця
-public class Police implements Animatable, GameObject {
+public class Police implements Animatable, GameObject, Interactable{
     // Поля
-    private Vector2D position; // Позиція поліцейського, з JSON
+    private double imageX; // Верхній лівий кут зображення по X
+    private double imageY; // Верхній лівий кут зображення по Y
+    private double collX; // Верхній лівий кут колізійної області по X
+    private double collY; // Верхній лівий кут колізійної області по Y
+    private double imageWidth; // Ширина зображення, з JSON
+    private double imageHeight; // Висота зображення, з JSON
+    private double collWidth; // Ширина колізійної області, з JSON
+    private double collHeight; // Висота колізійної області, з JSON
     private PoliceDirection direction; // Напрям руху (LEFT, RIGHT), з JSON
     private PoliceState state; // Стан (PATROL, CHASE, ALERT, STUNNED, IDLE), з JSON
     private String currentAnimation; // Поточна анімація ("idle", "patrol", "stunned", "alarm")
@@ -22,14 +32,44 @@ public class Police implements Animatable, GameObject {
     private double animationTime; // Час для анімації
     private Map<String, Image[]> animations; // Анімації, завантажені через GameLoader
     private String[] spritePaths; // Шляхи до спрайтів
-    private double width; // Ширина зображення, з JSON
-    private double height; // Висота зображення, з JSON
-    private double collWidth; // Ширина колізійної області, з JSON
-    private double collHeight; // Висота колізійної області, з JSON
-    private double normalSpeed = 50.0; // Швидкість патрулювання
+    private double normalSpeed = 40.0; // Швидкість патрулювання
     private double chaseSpeed = 70.0; // Швидкість переслідування
-    private double scaleX = 1.0; // Масштаб по X
-    private double scaleY = 1.0; // Масштаб по Y
+    private double stunDuration = 0.0; // Тривалість стану STUNNED
+    private static final double MAX_STUN_DURATION = 3.0; // Максимальна тривалість оглушення (в секундах)
+    private boolean canSeePlayer;
+    private boolean inSameRoom;
+
+    @Override
+    public void interact(Player player) {
+        takeHit(false);
+    }
+
+    @Override
+    public boolean canInteract(Player player) {
+        Bounds playerBounds = player.getBounds();
+        Bounds policeBounds = this.getBounds();
+        Bounds newBounds = new BoundingBox(playerBounds.getMinX(), playerBounds.getMinY(), playerBounds.getWidth(), playerBounds.getHeight());
+        // Перевіряємо перекриття bounds'ів
+        boolean hasOverlap = newBounds.intersects(policeBounds);
+
+        if (!hasOverlap) {
+            return false;
+        }
+        if ( canSeePlayer&&inSameRoom){
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public double getInteractionRange() {
+        return 0;
+    }
+
+    @Override
+    public String getInteractionPrompt() {
+        return "";
+    }
 
     // Напрями та стани поліцейського
     public enum PoliceDirection { LEFT, RIGHT }
@@ -37,14 +77,17 @@ public class Police implements Animatable, GameObject {
 
     // Конструктор: ініціалізує поліцейського з JSON-даними
     public Police(Vector2D position, JSONObject defaultData) {
-        this.position = position;
-        this.width = defaultData.optDouble("width", 32.0);
-        this.height = defaultData.optDouble("height", 32.0);
-        this.collWidth = defaultData.optDouble("widthColl", 20.0);
-        this.collHeight = defaultData.optDouble("hightColl", 20.0);
+        this.imageHeight = defaultData.getDouble("height");
+        this.imageX = position.x;
+        this.imageY = position.y - imageHeight;
+        this.collX = defaultData.getDouble("collX");
+        this.collY = defaultData.getDouble("collY");
+        this.imageWidth = defaultData.getDouble("width");
+        this.collWidth = defaultData.getDouble("widthColl");
+        this.collHeight = defaultData.getDouble("hightColl");
         this.direction = PoliceDirection.valueOf(defaultData.optString("direction", "LEFT"));
         this.state = PoliceState.valueOf(defaultData.optString("state", "PATROL"));
-        this.currentAnimation = defaultData.optString("animation", "patrol");
+        this.currentAnimation = defaultData.optString("currentAnimation", "patrol");
         this.animations = new HashMap<>();
         this.spritePaths = new String[]{"police/idle.png", "police/run.png", "police/lay.png", "police/alarm.png"};
         GameLoader loader = new GameLoader();
@@ -54,48 +97,153 @@ public class Police implements Animatable, GameObject {
         animations.put("alarm", loader.splitSpriteSheet(spritePaths[3], 2));
         this.animationFrame = 0;
         this.animationTime = 0;
-        // Зв’язок із GameLoader для завантаження спрайтів
     }
 
     // --- Ініціалізація та оновлення ---
 
     // Оновлює логіку поліцейського (викликається з GameManager.update())
-    public void update(double deltaTime) {
-        // TODO: Реалізувати логіку патрулювання та переслідування
-        // Змінити position залежно від state (PATROL: рух у межах, CHASE: до гравця)
-        // Зупинити рух, якщо досягнуто межу кімнати
+    // Оновлює логіку поліцейського (викликається з GameManager.update())
+    public void update(double deltaTime, List<GameManager.Room> rooms, Player player) {
+        // Оновлення стану оглушення
+        if (state == PoliceState.STUNNED) {
+            stunDuration -= deltaTime;
+            if (stunDuration <= 0) {
+                state = PoliceState.PATROL;
+                setAnimationState("patrol");
+            }
+            return;
+        }
+
+        // Перевірка, чи гравець у тій самій кімнаті
+        Bounds playerBounds = player.getBounds();
+        Bounds policeBounds = getBounds();
+        inSameRoom = false;
+
+        for (GameManager.Room room : rooms) {
+            if (room.getBounds().contains(policeBounds.getCenterX(), policeBounds.getCenterY()) &&
+                    room.getBounds().contains(playerBounds.getCenterX(), playerBounds.getCenterY())) {
+                inSameRoom = true;
+                break;
+            }
+        }
+
+        // Якщо гравець у тій самій кімнаті, перевіряємо виявлення
+        if (inSameRoom) {
+            canSeePlayer = false;
+            double playerX = player.getPosition().x;
+            double policeX = getPosition().x;
+            double playerCenterX = playerBounds.getCenterX();
+            double policeMinX = policeBounds.getMinX();
+            double policeMaxX = policeBounds.getMaxX();
+            double policeMidX = policeMinX + policeBounds.getWidth() / 2.0;
+            double policeWidth = policeBounds.getWidth();
+
+            // Перевірка позиції гравця (лівіше для LEFT, правіше для RIGHT)
+            if (direction == PoliceDirection.LEFT && playerX < policeX ||
+                    direction == PoliceDirection.RIGHT && playerX > policeX) {
+                canSeePlayer = true;
+            }
+
+            // Перевірка перетину меж
+            if (playerBounds.intersects(policeBounds)) {
+                // Повний перетин: гравець повністю в межах поліцейського
+                if (playerBounds.getMinX() >= policeMinX && playerBounds.getMaxX() <= policeMaxX) {
+                    canSeePlayer = true;
+                } else {
+                    // Часткове перетин: перевіряємо передню половину
+                    if (direction == PoliceDirection.LEFT && playerCenterX <= policeMidX) {
+                        canSeePlayer = true; // Гравець у передній половині (ліва для LEFT)
+                    } else if (direction == PoliceDirection.RIGHT && playerCenterX >= policeMidX) {
+                        canSeePlayer = true; // Гравець у передній половині (права для RIGHT)
+                    } else {
+                        // Задня половина: перевіряємо, чи перетин більше половини
+                        double overlapWidth = 0.0;
+                        if (direction == PoliceDirection.LEFT) {
+                            // Для LEFT задня половина — права (playerCenterX > policeMidX)
+                            overlapWidth = Math.min(playerBounds.getMaxX(), policeMaxX) - Math.max(playerBounds.getMinX(), policeMinX);
+                        } else if (direction == PoliceDirection.RIGHT) {
+                            // Для RIGHT задня половина — ліва (playerCenterX < policeMidX)
+                            overlapWidth = Math.min(playerBounds.getMaxX(), policeMaxX) - Math.max(playerBounds.getMinX(), policeMinX);
+                        }
+                        if (overlapWidth > policeWidth / 2.0) {
+                            canSeePlayer = true; // Перетин ззаду більше половини
+                        }
+                    }
+                }
+            }
+
+            // Якщо гравець виявлений, переслідуємо
+            if (canSeePlayer) {
+                state = PoliceState.CHASE;
+                setAnimationState("patrol"); // Використовуємо анімацію бігу для переслідування
+                // Визначаємо напрямок до гравця
+                if (playerX < policeX) {
+                    direction = PoliceDirection.LEFT;
+                } else {
+                    direction = PoliceDirection.RIGHT;
+                }
+                // Рухаємося до гравця зі швидкістю переслідування
+                patrol(deltaTime, chaseSpeed);
+            } else {
+                // Якщо гравець не виявлений, патрулюємо
+                state = PoliceState.PATROL;
+                setAnimationState("patrol");
+                patrol(deltaTime, normalSpeed);
+            }
+        } else {
+            // Якщо гравця немає в кімнаті, патрулюємо
+            state = PoliceState.PATROL;
+            setAnimationState("patrol");
+            patrol(deltaTime, normalSpeed);
+        }
+    }
+    // Патрулює зі вказаною швидкістю
+    public void patrol(double deltaTime, double speed) {
+        setAnimationState("patrol");
+        double movement = speed * deltaTime;
+        double deltaX = 0;
+        if (direction == PoliceDirection.LEFT) {
+            deltaX = -movement;
+        } else if (direction == PoliceDirection.RIGHT) {
+            deltaX = movement;
+        }
+        collX += deltaX;
+        imageX += deltaX;
     }
 
     // Оновлює анімацію поліцейського
     @Override
     public void updateAnimation(double deltaTime) {
-        // TODO: Реалізувати оновлення анімації
-        // Оновити animationTime, animationFrame залежно від deltaTime
-        // Переключити кадри на основі currentAnimation
+        animationTime += deltaTime;
+        Image[] frames = animations.getOrDefault(currentAnimation, animations.get("idle"));
+        if (frames == null || frames.length == 0) return;
+        double frameDuration = 0.2;
+        int frameCount = frames.length;
+        animationFrame = (int) (animationTime / frameDuration) % frameCount;
     }
 
     // Перевіряє, чи гравець у полі зору
     public void detectPlayer(Vector2D playerPosition) {
-        // TODO: Реалізувати логіку виявлення гравця
-        // Перевірити відстань до playerPosition, змінити state на CHASE або ALERT
+        // Логіка виявлення перенесена в update, цей метод залишається порожнім
     }
 
     // Зупиняє рух поліцейського
     public void stopMovement() {
-        // TODO: Реалізувати зупинку руху
-        // Встановити state = IDLE, скинути швидкість
+        state = PoliceState.IDLE;
+        setAnimationState("idle");
     }
 
     // Активує стан тривоги
     public void alert() {
-        // TODO: Реалізувати активацію тривоги
-        // Встановити state = ALERT, змінити currentAnimation
+        state = PoliceState.ALERT;
+        setAnimationState("alarm");
     }
 
     // Обробляє отримання удару
     public void takeHit(boolean isRanged) {
-        // TODO: Реалізувати обробку удару
-        // Встановити state = STUNNED, змінити анімацію
+        state = PoliceState.STUNNED;
+        setAnimationState("stunned");
+        stunDuration = MAX_STUN_DURATION; // Встановлюємо тривалість оглушення
     }
 
     // --- Рендеринг ---
@@ -103,17 +251,40 @@ public class Police implements Animatable, GameObject {
     // Рендерить поліцейського на canvas (викликається з GameManager.render())
     @Override
     public void render(GraphicsContext gc) {
-        // TODO: Реалізувати рендеринг
-        // Отримати поточний кадр через getCurrentFrame()
-        // Намалювати його на gc з урахуванням position, width, height, direction
+        Image frame = getCurrentFrame();
+        if (frame != null) {
+            gc.setImageSmoothing(false);
+            Bounds bounds = getImageBounds();
+            double renderX = bounds.getMinX();
+            double renderY = bounds.getMinY();
+            double renderWidth = imageWidth;
+            double renderHeight = imageHeight;
+            if (direction == PoliceDirection.LEFT) {
+                gc.save();
+                gc.translate(renderX + renderWidth, renderY);
+                gc.scale(-1, 1);
+                gc.drawImage(frame, 0, 0, renderWidth, renderHeight);
+                gc.restore();
+            } else {
+                gc.drawImage(frame, renderX, renderY, renderWidth, renderHeight);
+            }
+            // Малюємо червону рамку для колізійної області
+            Bounds collBounds = getBounds();
+            gc.setStroke(Color.RED);
+            gc.setLineWidth(2);
+            gc.strokeRect(collBounds.getMinX(), collBounds.getMinY(), collBounds.getWidth(), collBounds.getHeight());
+        }
     }
 
     // Повертає поточний кадр анімації
     @Override
     public Image getCurrentFrame() {
-        // TODO: Реалізувати повернення кадру
-        // Повернути animations.get(currentAnimation)[animationFrame] або null
-        return null;
+        Image[] frames = animations.getOrDefault(currentAnimation, animations.get("idle"));
+        if (frames == null || frames.length == 0) {
+            System.err.println("Немає кадрів для анімації: " + currentAnimation);
+            return null;
+        }
+        return frames[animationFrame];
     }
 
     // --- Взаємодії ---
@@ -121,8 +292,11 @@ public class Police implements Animatable, GameObject {
     // Встановлює стан анімації
     @Override
     public void setAnimationState(String state) {
-        // TODO: Реалізувати зміну стану анімації
-        // Оновити currentAnimation, скинути animationFrame і animationTime
+        if (animations.containsKey(state) && !state.equals(currentAnimation)) {
+            currentAnimation = state;
+            animationFrame = 0;
+            animationTime = 0;
+        }
     }
 
     // --- Серіалізація ---
@@ -130,16 +304,46 @@ public class Police implements Animatable, GameObject {
     // Повертає JSON для збереження (викликається з SaveManager.savePolice())
     @Override
     public JSONObject getSerializableData() {
-        // TODO: Реалізувати серіалізацію
-        // Створити JSONObject з position, direction, state, currentAnimation тощо
-        return null;
+        JSONObject data = new JSONObject();
+        data.put("type", getType());
+        data.put("x", imageX);
+        data.put("y", imageY + imageHeight); // Зберігаємо як нижній лівий кут
+        data.put("collX", collX);
+        data.put("collY", collY);
+        data.put("width", imageWidth);
+        data.put("height", imageHeight);
+        data.put("widthColl", collWidth);
+        data.put("hightColl", collHeight);
+        data.put("direction", direction.toString());
+        data.put("state", state.toString());
+        data.put("currentAnimation", currentAnimation);
+        data.put("stunDuration", stunDuration);
+        return data;
     }
 
     // Відновлює стан із JSON (викликається з SaveManager.loadGame())
     @Override
     public void setFromData(JSONObject data) {
-        // TODO: Реалізувати десеріалізацію
-        // Оновити position, direction, state, currentAnimation із data
+        this.imageX = data.optDouble("x", imageX);
+        this.imageY = data.optDouble("y", imageY + imageHeight) - imageHeight; // Конвертуємо назад у верхній лівий кут
+        this.collX = data.optDouble("collX", collX);
+        this.collY = data.optDouble("collY", collY);
+        this.imageWidth = data.optDouble("width", imageWidth);
+        this.imageHeight = data.optDouble("height", imageHeight);
+        this.collWidth = data.optDouble("widthColl", collWidth);
+        this.collHeight = data.optDouble("hightColl", collHeight);
+        this.stunDuration = data.optDouble("stunDuration", stunDuration);
+        try {
+            this.direction = PoliceDirection.valueOf(data.optString("direction", direction.toString()));
+        } catch (IllegalArgumentException e) {
+            System.err.println("Невірне значення direction: " + data.optString("direction") + ". Залишаю поточний.");
+        }
+        try {
+            this.state = PoliceState.valueOf(data.optString("state", state.toString()));
+        } catch (IllegalArgumentException e) {
+            System.err.println("Невірне значення state: " + data.optString("state") + ". Залишаю поточний.");
+        }
+        this.currentAnimation = data.optString("currentAnimation", currentAnimation);
     }
 
     // --- Геттери/Сеттери ---
@@ -153,37 +357,39 @@ public class Police implements Animatable, GameObject {
     // Повертає позицію поліцейського
     @Override
     public Vector2D getPosition() {
-        return new Vector2D(position.x, position.y);
+        return new Vector2D(collX, collY);
     }
 
     // Повертає уявну позицію (та ж, що й позиція)
     @Override
     public Vector2D getImagePosition() {
-        return getPosition();
+        return new Vector2D(imageX, imageY);
     }
 
     // Встановлює позицію поліцейського
     @Override
     public void setPosition(Vector2D position) {
-        this.position = position;
+        this.collX = position.x;
+        this.collY = position.y;
     }
 
     // Встановлює уявну позицію
     @Override
     public void setImagePosition(Vector2D position) {
-        this.position = position;
+        this.imageX = position.x;
+        this.imageY = position.y;
     }
 
     // Повертає межі для колізій
     @Override
     public Bounds getBounds() {
-        return new BoundingBox(position.x, position.y, collWidth, collHeight);
+        return new BoundingBox(collX, collY, collWidth, collHeight);
     }
 
     // Повертає межі для рендерингу
     @Override
     public Bounds getImageBounds() {
-        return new BoundingBox(position.x, position.y, width, height);
+        return new BoundingBox(imageX, imageY, imageWidth, imageHeight);
     }
 
     // Повертає шар рендерингу
@@ -198,4 +404,11 @@ public class Police implements Animatable, GameObject {
         return true; // Поліцейський завжди видимий
     }
 
+    public PoliceDirection getDirection() {
+        return direction;
+    }
+
+    public void setDirection(PoliceDirection direction) {
+        this.direction = direction;
+    }
 }
