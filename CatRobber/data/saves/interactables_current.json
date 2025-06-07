@@ -1,0 +1,15 @@
+{"interactable_0": {
+  "canMove": true,
+  "currentAnimation": "idle",
+  "collY": 65.19999999999999,
+  "collX": 177.4911660000018,
+  "type": "Player",
+  "widthColl": 40.74,
+  "x": 151.6137020107437,
+  "width": 100.948246196698,
+  "y": 135.10076904296875,
+  "hightColl": 57.15,
+  "state": "IDLE",
+  "height": 100.948246196698,
+  "direction": "RIGHT"
+}}
