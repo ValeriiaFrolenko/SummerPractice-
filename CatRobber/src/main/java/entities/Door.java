@@ -14,20 +14,30 @@ import java.util.Map;
 // Представляє двері, які можуть бути відкриті, закриті, замкнені або вести до іншої кімнати/поверху
 public class Door implements GameObject, Interactable {
     // Поля
-    private Vector2D position; // Позиція дверей, з JSON
+    private double imageX; // Верхній лівий кут зображення по X
+    private double imageY; // Верхній лівий кут зображення по Y
+
+    private double imageWidth; // Ширина зображення, з JSON
+    private double imageHeight; // Висота зображення, з JSON
+
     private boolean isOpen; // Чи відкриті двері, з JSON
     private boolean isLocked; // Чи замкнені двері, з JSON
     private boolean isLaser; // Чи лазерні двері, з JSON
     private boolean isRoomLink; // Чи ведуть до іншої кімнати, з JSON
     private boolean isFloorLink; // Чи ведуть до іншого поверху, з JSON
-    private String direction; // Напрям дверей ("left", "right", "up", "down"), з JSON
+    String direction; // Напрям дверей ("left", "right", "up", "down"), з JSON
     private Map<String, Image> sprites; // Спрайти для різних станів, завантажені через GameLoader
     private String[] spritePaths; // Шляхи до спрайтів
     private final String path = "background/doors/"; // Базовий шлях до спрайтів
 
     // Конструктор: ініціалізує двері з JSON-даними
     public Door(Vector2D vector2D, JSONObject defaultData) {
-        this.position = vector2D;
+        double jsonImageX = vector2D.getX();
+        double jsonImageY = vector2D.getY();
+        this.imageWidth = defaultData.getDouble("width");
+        this.imageHeight = defaultData.getDouble("height");
+        this.imageX = jsonImageX;
+        this.imageY = jsonImageY - imageHeight;
         this.isOpen = defaultData.optBoolean("isOpen", false);
         this.isLocked = defaultData.optBoolean("isLocked", false);
         this.isLaser = defaultData.optBoolean("isLaser", false);
@@ -59,17 +69,59 @@ public class Door implements GameObject, Interactable {
     // Взаємодія з гравцем (викликається з GameManager.checkInteractions())
     @Override
     public void interact(Player player) {
-        // TODO: Реалізувати взаємодію
-        // Якщо !isLocked, змінити isOpen, можливо, викликати player.teleportToRoom() або teleportToFloor()
+        if (isLocked){
+            return;
+        } else {
+           // if (isOpen){
+               Player.Direction direction =  player.getDirection();
+               if ((direction.equals(Player.Direction.LEFT)||direction.equals(Player.Direction.RIGHT))&&isRoomLink){
+                   player.teleportToRoom(this);
+               } else {
+                   player.teleportToFloor(this);
+               }
+            //} else {
+                //return;
+            //}
+        }
     }
 
-    // Перевіряє, чи можлива взаємодія
-    @Override
+    // У класі Door - метод canInteract
     public boolean canInteract(Player player) {
-        // TODO: Реалізувати перевірку
-        // Перевірити відстань до гравця через getInteractionRange()
+        Bounds playerBounds = player.getBounds();
+        Bounds doorBounds = this.getBounds();
+        double offset = 10;
+        Bounds newBounds = new BoundingBox(playerBounds.getMinX(), playerBounds.getMinY(), playerBounds.getWidth()+10, playerBounds.getHeight());
+        // Перевіряємо перекриття bounds'ів
+        boolean hasOverlap = newBounds.intersects(doorBounds);
+
+        if (!hasOverlap) {
+            return false;
+        }
+
+        Player.Direction playerDirection = player.getDirection();
+        String doorDirection = this.direction;
+
+        // Для дверей між кімнатами - гравець рухається ПРОТИЛЕЖНО до напрямку дверей
+        if (isRoomLink) {
+            if (playerDirection == Player.Direction.RIGHT && doorDirection.equals("left")) {
+                return true; // Гравець іде праворуч до лівих дверей
+            } else if (playerDirection == Player.Direction.LEFT && doorDirection.equals("right")) {
+                return true; // Гравець іде ліворуч до правих дверей
+            }
+        }
+
+        // Для дверей між поверхами - однакові напрямки
+        if (isFloorLink) {
+            if (playerDirection == Player.Direction.UP && doorDirection.equals("up")) {
+                return true; // Гравець іде вгору до верхніх дверей
+            } else if (playerDirection == Player.Direction.DOWN && doorDirection.equals("down")) {
+                return true; // Гравець іде вниз до нижніх дверей
+            }
+        }
+
         return false;
     }
+
 
     // --- Рендеринг ---
 
@@ -115,7 +167,14 @@ public class Door implements GameObject, Interactable {
             }
         }
         if (sprite != null) {
-            // Малюємо спрайт за позицією
+            gc.setImageSmoothing(false);
+            Bounds bounds = getImageBounds();
+            double renderX = bounds.getMinX();
+            double renderY = bounds.getMinY();
+            double renderWidth = imageWidth;
+            double renderHeight = imageHeight;
+            gc.drawImage(sprite, renderX, renderY, renderWidth, renderHeight);
+
         }
     }
 
@@ -147,43 +206,43 @@ public class Door implements GameObject, Interactable {
     // Повертає позицію дверей
     @Override
     public Vector2D getPosition() {
-        return new Vector2D(position.x, position.y);
+        return new Vector2D(imageX, imageY);
     }
 
     // Повертає уявну позицію
     @Override
-    public Vector2D getImaginePosition() {
-        return getPosition();
+    public Vector2D getImagePosition() {
+        return new Vector2D(imageX, imageY);
     }
 
     // Встановлює позицію дверей
     @Override
     public void setPosition(Vector2D position) {
-        this.position = position;
-    }
+        this.imageX = position.getX();
+        this.imageY = position.getY();    }
 
     // Встановлює уявну позицію
     @Override
-    public void setImaginePosition(Vector2D position) {
-        this.position = position;
-    }
+    public void setImagePosition(Vector2D position) {
+        this.imageX = position.getX();
+        this.imageY = position.getY();    }
 
     // Повертає межі для колізій
     @Override
     public Bounds getBounds() {
-        return new BoundingBox(position.x, position.y, 32, 32); // Фіксовані розміри
+        return new BoundingBox(imageX, imageY, imageWidth, imageHeight);
     }
 
     // Повертає межі для рендерингу
     @Override
-    public Bounds getImagineBounds() {
-        return getBounds();
+    public Bounds getImageBounds() {
+        return new BoundingBox(imageX, imageY, imageWidth, imageHeight);
     }
 
     // Повертає діапазон взаємодії
     @Override
     public double getInteractionRange() {
-        return 50.0; // Фіксована відстань взаємодії
+        return 20.0; // Фіксована відстань взаємодії
     }
 
     // Повертає підказку для UI
@@ -195,7 +254,7 @@ public class Door implements GameObject, Interactable {
     // Повертає шар рендерингу
     @Override
     public int getRenderLayer() {
-        return 1; // Двері рендеряться на шарі 1
+        return 0; // Двері рендеряться на шарі 1
     }
 
     // Перевіряє видимість
