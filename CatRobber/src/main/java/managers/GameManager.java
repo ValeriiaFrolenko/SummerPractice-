@@ -86,47 +86,62 @@ public class GameManager implements Savable {
     }
 
     // Обробляє ввід гравця, викликається з GameWindow.update()
-
-
     public void handleInput(InputHandler inputHandler, double deltaTime) {
         if (player == null) return;
-        boolean isMoving = false;
-
         checkInteractions(); // Перевіряємо взаємодії перед обробкою вводу
+        managePlayerMoving(inputHandler, deltaTime);
+        managePlayerOpenDoor(inputHandler);
+        checkCollisions();
+    }
 
-        if (inputHandler.isKeyPressed(KeyCode.LEFT)) {
+    //Відкриття дверей за допомогою кнопки Е
+    private void managePlayerOpenDoor(InputHandler inputHandler) {
+        if (inputHandler.isKeyPressed(KeyCode.E)) {
+            if (closestInteractable != null && closestInteractable instanceof Door) {
+                Door door = (Door) closestInteractable;
+                door.open(player);
+                int id = door.getSharedId();
+                for (Interactable interactable: interactables){
+                    if (interactable instanceof Door && ((Door) interactable).getSharedId() == id ){
+                        ((Door) interactable).open(player); //Відкртваємо також двері з іншої сторони
+                    }
+                }
+            }
+        }
+    }
+    //Рух гравця
+    private void managePlayerMoving(InputHandler inputHandler, double deltaTime) {
+        boolean isMoving = false;
+        if (inputHandler.isKeyPressed(KeyCode.LEFT)||inputHandler.isKeyPressed(KeyCode.A)) {
             player.setDirection(Player.Direction.LEFT);
             if (closestInteractable != null && closestInteractable instanceof Door) {
                 closestInteractable.interact(player); // Телепортація при натисканні стрілки
             }
             player.move(Player.Direction.LEFT, deltaTime);
             isMoving = true;
-        } else if (inputHandler.isKeyPressed(KeyCode.RIGHT)) {
+        } else if (inputHandler.isKeyPressed(KeyCode.RIGHT) ||inputHandler.isKeyPressed(KeyCode.D)) {
             player.setDirection(Player.Direction.RIGHT);
             if (closestInteractable != null && closestInteractable instanceof Door) {
                 closestInteractable.interact(player);
             }
             player.move(Player.Direction.RIGHT, deltaTime);
             isMoving = true;
-        } else if (inputHandler.isKeyPressed(KeyCode.UP)) {
+        } else if (inputHandler.isKeyPressed(KeyCode.UP)||inputHandler.isKeyPressed(KeyCode.W)) {
             player.setDirection(Player.Direction.UP);
             if (closestInteractable != null && closestInteractable instanceof Door) {
                 closestInteractable.interact(player);
             }
             isMoving = true;
-        } else if (inputHandler.isKeyPressed(KeyCode.DOWN)) {
+        } else if (inputHandler.isKeyPressed(KeyCode.DOWN)||inputHandler.isKeyPressed(KeyCode.S)) {
             player.setDirection(Player.Direction.DOWN);
             if (closestInteractable != null && closestInteractable instanceof Door) {
                 closestInteractable.interact(player);
             }
             isMoving = true;
         }
-
         if (!isMoving) {
             player.stopMovement();
         }
-
-        checkCollisions();
     }
 
 

@@ -29,7 +29,7 @@ public class Door implements GameObject, Interactable {
     private Map<String, Image> sprites; // Спрайти для різних станів, завантажені через GameLoader
     private String[] spritePaths; // Шляхи до спрайтів
     private final String path = "background/doors/"; // Базовий шлях до спрайтів
-
+    private int sharedId = 0;
     // Конструктор: ініціалізує двері з JSON-даними
     public Door(Vector2D vector2D, JSONObject defaultData) {
         double jsonImageX = vector2D.getX();
@@ -38,6 +38,7 @@ public class Door implements GameObject, Interactable {
         this.imageHeight = defaultData.getDouble("height");
         this.imageX = jsonImageX;
         this.imageY = jsonImageY - imageHeight;
+        this.sharedId = defaultData.getInt("sharedId");
         this.isOpen = defaultData.optBoolean("isOpen", false);
         this.isLocked = defaultData.optBoolean("isLocked", false);
         this.isLaser = defaultData.optBoolean("isLaser", false);
@@ -72,16 +73,16 @@ public class Door implements GameObject, Interactable {
         if (isLocked){
             return;
         } else {
-           // if (isOpen){
+           if (isOpen){
                Player.Direction direction =  player.getDirection();
                if ((direction.equals(Player.Direction.LEFT)||direction.equals(Player.Direction.RIGHT))&&isRoomLink){
                    player.teleportToRoom(this);
                } else {
                    player.teleportToFloor(this);
                }
-            //} else {
-                //return;
-            //}
+            } else {
+                return;
+            }
         }
     }
 
@@ -266,5 +267,15 @@ public class Door implements GameObject, Interactable {
     // Повертає стан відкритості
     public boolean isOpen() {
         return isOpen;
+    }
+
+    public void open(Player player) {
+        if(!isLocked){
+            this.isOpen = true;
+        }
+    }
+
+    public int getSharedId() {
+        return sharedId;
     }
 }
