@@ -158,7 +158,7 @@ public class Police implements Animatable, GameObject {
 
     // Повертає уявну позицію (та ж, що й позиція)
     @Override
-    public Vector2D getImaginePosition() {
+    public Vector2D getImagePosition() {
         return getPosition();
     }
 
@@ -170,7 +170,7 @@ public class Police implements Animatable, GameObject {
 
     // Встановлює уявну позицію
     @Override
-    public void setImaginePosition(Vector2D position) {
+    public void setImagePosition(Vector2D position) {
         this.position = position;
     }
 
@@ -182,7 +182,7 @@ public class Police implements Animatable, GameObject {
 
     // Повертає межі для рендерингу
     @Override
-    public Bounds getImagineBounds() {
+    public Bounds getImageBounds() {
         return new BoundingBox(position.x, position.y, width, height);
     }
 

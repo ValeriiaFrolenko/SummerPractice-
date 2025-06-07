@@ -92,7 +92,7 @@ public class InteractiveObject implements GameObject, Interactable {
 
     // Повертає уявну позицію
     @Override
-    public Vector2D getImaginePosition() {
+    public Vector2D getImagePosition() {
         return getPosition();
     }
 
@@ -104,7 +104,7 @@ public class InteractiveObject implements GameObject, Interactable {
 
     // Встановлює уявну позицію
     @Override
-    public void setImaginePosition(Vector2D position) {
+    public void setImagePosition(Vector2D position) {
         this.position = position;
     }
 
@@ -116,7 +116,7 @@ public class InteractiveObject implements GameObject, Interactable {
 
     // Повертає межі для рендерингу
     @Override
-    public Bounds getImagineBounds() {
+    public Bounds getImageBounds() {
         return getBounds();
     }
 
