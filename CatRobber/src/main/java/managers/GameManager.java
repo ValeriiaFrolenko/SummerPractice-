@@ -7,7 +7,6 @@ import javafx.geometry.Bounds;
 import javafx.scene.image.Image;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.KeyCode;
-import main.GameWindow;
 import org.json.JSONObject;
 import puzzles.Puzzle;
 import utils.GameLoader;
@@ -38,6 +37,7 @@ public class GameManager implements Savable {
     private Image backgroundImage; // Фонове зображення рівня, завантажується через GameLoader
     private double canvasWidth; // Ширина canvas, отримується від GameWindow
     private double canvasHeight; // Висота canvas, отримується від GameWindow
+    private Interactable closestInteractable;
 
     // Перелік станів гри
     public enum GameState {MENU, PLAYING, PAUSED, GAME_OVER}
@@ -86,25 +86,49 @@ public class GameManager implements Savable {
     }
 
     // Обробляє ввід гравця, викликається з GameWindow.update()
+
+
     public void handleInput(InputHandler inputHandler, double deltaTime) {
-        if (player == null) return; // Виходимо, якщо гравець не ініціалізований
+        if (player == null) return;
+        boolean isMoving = false;
 
-        boolean isMoving = false; // Прапорець руху гравця
+        checkInteractions(); // Перевіряємо взаємодії перед обробкою вводу
 
-        // Перевіряємо натиснення клавіш через InputHandler
         if (inputHandler.isKeyPressed(KeyCode.LEFT)) {
-            player.move(Player.Direction.LEFT, deltaTime); // Рухаємо гравця ліворуч
+            player.setDirection(Player.Direction.LEFT);
+            if (closestInteractable != null && closestInteractable instanceof Door) {
+                closestInteractable.interact(player); // Телепортація при натисканні стрілки
+            }
+            player.move(Player.Direction.LEFT, deltaTime);
+            isMoving = true;
+        } else if (inputHandler.isKeyPressed(KeyCode.RIGHT)) {
+            player.setDirection(Player.Direction.RIGHT);
+            if (closestInteractable != null && closestInteractable instanceof Door) {
+                closestInteractable.interact(player);
+            }
+            player.move(Player.Direction.RIGHT, deltaTime);
+            isMoving = true;
+        } else if (inputHandler.isKeyPressed(KeyCode.UP)) {
+            player.setDirection(Player.Direction.UP);
+            if (closestInteractable != null && closestInteractable instanceof Door) {
+                closestInteractable.interact(player);
+            }
+            isMoving = true;
+        } else if (inputHandler.isKeyPressed(KeyCode.DOWN)) {
+            player.setDirection(Player.Direction.DOWN);
+            if (closestInteractable != null && closestInteractable instanceof Door) {
+                closestInteractable.interact(player);
+            }
             isMoving = true;
         }
-        if (inputHandler.isKeyPressed(KeyCode.RIGHT)) {
-            player.move(Player.Direction.RIGHT, deltaTime); // Рухаємо гравця праворуч
-            isMoving = true;
-        }
-        checkCollisions(); // Перевіряємо колізії після руху
+
         if (!isMoving) {
-            player.stopMovement(); // Зупиняємо рух, якщо клавіші не натиснуті
+            player.stopMovement();
         }
+
+        checkCollisions();
     }
+
 
     // Встановлює список ігрових об’єктів, сортує їх за типами
     public void setGameObjects(List<GameObject> objects) {
@@ -124,7 +148,8 @@ public class GameManager implements Savable {
             if (obj instanceof Player) player = (Player) obj; // Зберігаємо гравця
             if (obj instanceof Police) police.add((Police) obj); // Додаємо поліцейських
             if (obj instanceof SecurityCamera) cameras.add((SecurityCamera) obj); // Додаємо камери
-            if (obj instanceof Interactable) interactables.add((Interactable) obj); // Додаємо інтерактивні об’єкти
+            if (obj instanceof Interactable) {interactables.add((Interactable) obj);
+         System.out.println("Додано інтерактивний об'єкт: " + obj.getClass().getSimpleName());}
         }
     }
 
@@ -248,54 +273,28 @@ public class GameManager implements Savable {
         }
 
         if (!fullyInside) {
-            adjustPlayerPosition(playerBounds); // Коригуємо позицію, якщо гравець поза кімнатою
+            if (player.getDirection().equals(Player.Direction.LEFT)) {
+                player.adjustPlayerPosition(1, Player.Direction.RIGHT);
+            } else if (player.getDirection().equals(Player.Direction.RIGHT)) {
+                player.adjustPlayerPosition(1, Player.Direction.LEFT);
+            }
         }
-    }
-
-    // Коригує позицію гравця при колізії
-    private void adjustPlayerPosition(Bounds playerBounds) {
-        Vector2D currentPosition = player.getPosition(); // Отримуємо поточну позицію гравця
-        Vector2D currentImaginePosition = player.getImaginePosition(); // Отримуємо уявну позицію
-        Player.Direction direction = player.getDirection(); // Отримуємо напрям руху
-        double adjustmentX = 0; // Зміщення по X
-        double backOffDistance = 1; // Відстань відступу
-
-        // Коригуємо позицію залежно від напрямку
-        if (direction == Player.Direction.LEFT) {
-            adjustmentX = backOffDistance; // Відступаємо праворуч
-        } else if (direction == Player.Direction.RIGHT) {
-            adjustmentX = -backOffDistance; // Відступаємо ліворуч
-        }
-
-        // Оновлюємо позицію гравця
-        Vector2D newPosition = new Vector2D(currentPosition.x + adjustmentX, currentPosition.y);
-        player.setPosition(newPosition); // Встановлюємо нову позицію
-        Vector2D newImaginePosition = new Vector2D(currentImaginePosition.x + adjustmentX, currentImaginePosition.y);
-        player.setImaginePosition(newImaginePosition); // Встановлюємо нову позицію зображення
     }
 
     // Перевіряє взаємодії гравця з об’єктами
     public void checkInteractions() {
-        if (player == null) return; // Виходимо, якщо гравець не ініціалізований
-        Interactable closest = null; // Найближчий інтерактивний об’єкт
-        double minDistance = Double.MAX_VALUE; // Мінімальна відстань до об’єкта
-        Vector2D playerPos = player.getPosition(); // Отримуємо позицію гравця
+        if (player == null) return;
+        closestInteractable = null;
+
         for (Interactable interactable : interactables) {
-            if (interactable.canInteract(player)) { // Перевіряємо, чи можлива взаємодія
-                Positioned pos = (Positioned) interactable; // Приводимо до Positioned
-                double distance = Math.hypot(playerPos.x - pos.getPosition().x,
-                        playerPos.y - pos.getPosition().y); // Обчислюємо відстань
-                if (distance < minDistance) {
-                    minDistance = distance; // Оновлюємо мінімальну відстань
-                    closest = interactable; // Зберігаємо найближчий об’єкт
-                }
+            if (interactable.canInteract(player)) {
+                closestInteractable = interactable;
+                System.out.println("Can interact with: " + interactable.getClass().getSimpleName() +
+                        ", Player direction: " + player.getDirection());
+                break; // Берем першу доступну взаємодію
             }
         }
-        if (closest != null) {
-            // UIManager.showPrompt(closest.getInteractionPrompt()); // Закоментований виклик для UI
-        }
     }
-
     // Завершує гру, змінюючи стан
     public void gameOver() {
         gameState = GameState.GAME_OVER; // Встановлюємо стан GAME_OVER

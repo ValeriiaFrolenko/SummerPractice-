@@ -34,8 +34,12 @@ public class Player implements Animatable, GameObject, Interactable {
     private String[] spritePaths; // Шляхи до спрайтів
     private boolean canMove; // Чи може гравець рухатися
 
+    public void setDirection(Direction direction) {
+        this.direction = direction;
+    }
+
     // Напрями та стани гравця
-    public enum Direction { LEFT, RIGHT }
+    public enum Direction { LEFT, RIGHT, UP, DOWN }
     public enum PlayerState { IDLE, RUN, HIT, CLIMB, INVISIBLE, SHOOT }
 
     // Конструктор: ініціалізує гравця з JSON-даними
@@ -47,8 +51,8 @@ public class Player implements Animatable, GameObject, Interactable {
         double jsonCollY = defaultData.optDouble("collY", jsonImageY - defaultData.optDouble("hightColl", 20.0));
         this.imageWidth = defaultData.getDouble("width");
         this.imageHeight = defaultData.getDouble("height");
-        this.collWidth = defaultData.optDouble("widthColl", 20.0);
-        this.collHeight = defaultData.optDouble("hightColl", 20.0);
+        this.collWidth = defaultData.getDouble("widthColl");
+        this.collHeight = defaultData.getDouble("hightColl");
         // Конвертація в верхній лівий кут
         this.imageX = jsonImageX;
         this.imageY = jsonImageY - imageHeight;
@@ -136,16 +140,55 @@ public class Player implements Animatable, GameObject, Interactable {
         // Оновити рівень виявлення гравця (наприклад, для Police або SecurityCamera)
     }
 
-    // Телепортує гравця до іншої кімнати
-    public void teleportToRoom(int roomId) {
-        // TODO: Реалізувати телепортацію
-        // Змінити позицію гравця до координат кімнати roomId
+    public void teleportToRoom(Door door) {
+        Direction currentDirection = this.getDirection();
+
+        // Телепортуємо в тому напрямку, куди гравець рухається
+        adjustPlayerPosition(140.0, currentDirection); // Телепортуємо в напрямку руху гравця
+        System.out.println("Teleported to room: x=" + getPosition().x + ", y=" + getPosition().y);
     }
 
-    // Телепортує гравця до іншого поверху
-    public void teleportToFloor(int floorId) {
-        // TODO: Реалізувати телепортацію
-        // Завантажити новий рівень через GameManager.loadLevel(floorId)
+
+    public void teleportToFloor(Door door) {
+        String doorDirection = door.direction;
+        Direction teleportDirection;
+
+        // Для поверхів - той самий напрямок руху
+        if (doorDirection.equals("up")) {
+            teleportDirection = Direction.UP; // Якщо двері верхні, продовжуємо вгору
+        } else if (doorDirection.equals("down")) {
+            teleportDirection = Direction.DOWN; // Якщо двері нижні, продовжуємо вниз
+        } else {
+            return; // Некоректний напрямок
+        }
+
+        stopMovement(); // Зупиняємо рух і анімацію
+        setAnimationState("idle"); // Скидаємо анімацію на idle
+        adjustPlayerPosition(120, teleportDirection); // Телепортуємо в тому ж напрямку
+        System.out.println("Teleported to floor: x=" + getPosition().x + ", y=" + getPosition().y);
+    }
+
+    public void adjustPlayerPosition(double offset, Direction direction) {
+        Vector2D currentPosition = getPosition(); // Отримуємо поточну позицію гравця
+        Vector2D currentImaginePosition = getImagePosition(); // Отримуємо уявну позицію
+        double adjustmentX = 0; // Зміщення по X
+        double adjustmentY = 0; // Зміщення по Y
+        double backOffDistance = offset; // Відстань відступу
+        if (direction == Player.Direction.LEFT) {
+            adjustmentX = -backOffDistance;
+        } else if (direction == Player.Direction.RIGHT) {
+            adjustmentX = backOffDistance;
+        } else if (direction == Direction.DOWN) {
+            adjustmentY = backOffDistance;
+        } else if (direction == Player.Direction.UP) {
+            adjustmentY = -backOffDistance;
+        }
+
+        // Оновлюємо позицію гравця
+        Vector2D newPosition = new Vector2D(currentPosition.x + adjustmentX, currentPosition.y + adjustmentY);
+        setPosition(newPosition); // Встановлюємо нову позицію
+        Vector2D newImaginePosition = new Vector2D(currentImaginePosition.x + adjustmentX, currentImaginePosition.y + adjustmentY);
+        setImagePosition(newImaginePosition); // Встановлюємо нову позицію зображення
     }
 
     // --- Рендеринг ---
@@ -156,7 +199,7 @@ public class Player implements Animatable, GameObject, Interactable {
         Image frame = getCurrentFrame();
         if (frame != null && isVisible) {
             gc.setImageSmoothing(false);
-            Bounds bounds = getImagineBounds();
+            Bounds bounds = getImageBounds();
             double renderX = bounds.getMinX();
             double renderY = bounds.getMinY();
             double renderWidth = imageWidth;
@@ -275,7 +318,7 @@ public class Player implements Animatable, GameObject, Interactable {
 
     // Повертає уявну позицію (верхній лівий кут зображення)
     @Override
-    public Vector2D getImaginePosition() {
+    public Vector2D getImagePosition() {
         return new Vector2D(imageX, imageY);
     }
 
@@ -288,7 +331,7 @@ public class Player implements Animatable, GameObject, Interactable {
 
     // Встановлює уявну позицію зображення
     @Override
-    public void setImaginePosition(Vector2D position) {
+    public void setImagePosition(Vector2D position) {
         this.imageX = position.getX();
         this.imageY = position.getY();
     }
@@ -301,7 +344,7 @@ public class Player implements Animatable, GameObject, Interactable {
 
     // Повертає межі зображення
     @Override
-    public Bounds getImagineBounds() {
+    public Bounds getImageBounds() {
         return new BoundingBox(imageX, imageY, imageWidth, imageHeight);
     }
 
