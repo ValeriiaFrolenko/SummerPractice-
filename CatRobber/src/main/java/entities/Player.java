@@ -173,7 +173,9 @@ public class Player implements Animatable, GameObject, Interactable {
         Direction currentDirection = this.getDirection();
 
         // Телепортуємо в тому напрямку, куди гравець рухається
-        adjustPlayerPosition(140.0, currentDirection); // Телепортуємо в напрямку руху гравця
+       if (!door.isLaser()){
+            adjustPlayerPosition(140.0, currentDirection);
+        }// Телепортуємо в напрямку руху гравця
         System.out.println("Teleported to room: x=" + getPosition().x + ", y=" + getPosition().y);
     }
 

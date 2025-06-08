@@ -91,7 +91,7 @@
                         }],
                  "rotation":0,
                  "type":"Room",
-                 "visible":true,
+                 "visible":false,
                  "width":894.038528587221,
                  "x":343,
                  "y":31
@@ -1675,15 +1675,52 @@
                  "y":130
                 }, 
                 {
-                 "height":28,
-                 "id":148,
-                 "name":"",
+                 "gid":32,
+                 "height":105,
+                 "id":150,
+                 "name":"laserDoor",
+                 "properties":[
+                        {
+                         "name":"direction",
+                         "type":"string",
+                         "value":"left"
+                        }, 
+                        {
+                         "name":"isFloorLink",
+                         "type":"bool",
+                         "value":false
+                        }, 
+                        {
+                         "name":"isLaser",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"isLocked",
+                         "type":"bool",
+                         "value":false
+                        }, 
+                        {
+                         "name":"isOpen",
+                         "type":"bool",
+                         "value":false
+                        }, 
+                        {
+                         "name":"isRoomLink",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"sharedId",
+                         "type":"int",
+                         "value":22
+                        }],
                  "rotation":0,
-                 "type":"",
+                 "type":"Door",
                  "visible":true,
-                 "width":29.5,
-                 "x":660,
-                 "y":32
+                 "width":21,
+                 "x":932.5,
+                 "y":134
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -1692,7 +1729,7 @@
          "y":0
         }],
  "nextlayerid":4,
- "nextobjectid":149,
+ "nextobjectid":151,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.2",
@@ -1741,6 +1778,10 @@
         {
          "firstgid":31,
          "source":"stairsWithLock.tsj"
+        }, 
+        {
+         "firstgid":32,
+         "source":"laserLocked.tsj"
         }],
  "tilewidth":32,
  "type":"map",

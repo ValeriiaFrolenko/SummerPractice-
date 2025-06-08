@@ -272,6 +272,25 @@ public class GameManager implements Savable {
     public void checkCollisions() {
         checkPlayerCollisions();
         checkPoliceCollisions();
+        checkPlayerCollisionsWithLaserDoor();
+    }
+
+    private void checkPlayerCollisionsWithLaserDoor() {
+        if (player == null) return;
+        Bounds laserBounds = null;
+        Door door= null;
+        for (Interactable interactable: interactables){
+            if (interactable instanceof Door && ((Door) interactable).isLaser()){
+                laserBounds = ((Door) interactable).getBounds();
+                door = (Door) interactable;
+            }
+        }
+
+        if (player.getBounds().intersects(laserBounds)){
+            if (door.isLocked()) {
+                player.adjustPlayerPosition(1, Player.Direction.LEFT);
+            }
+        }
     }
 
     private void checkPoliceCollisions() {

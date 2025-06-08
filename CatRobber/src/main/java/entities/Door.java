@@ -48,7 +48,7 @@ public class Door implements GameObject, Interactable {
                 path + "close.png", path + "closeLeft.png", path + "closeRight.png",
                 path + "leftLock.png", path + "openLeft.png", path + "openRight.png",
                 path + "rightLock.png", path + "stairsUp.png", path + "stairsDown.png",
-                path + "withLock.png"
+                path + "withLock.png", path + "laserLocked.png", path + "laserUnlocked.png"
         };
         GameLoader loader = new GameLoader();
         this.sprites = new HashMap<>();
@@ -62,6 +62,10 @@ public class Door implements GameObject, Interactable {
         sprites.put("stairsUp", loader.loadImage(spritePaths[7]));
         sprites.put("stairsDown", loader.loadImage(spritePaths[8]));
         sprites.put("stairsLocked", loader.loadImage(spritePaths[9]));
+        sprites.put("laserLocked", loader.loadImage(spritePaths[10]));
+        sprites.put("laserUnlocked", loader.loadImage(spritePaths[11]));
+
+
     }
 
     // --- Ініціалізація та оновлення ---
@@ -90,7 +94,10 @@ public class Door implements GameObject, Interactable {
     public boolean canInteract(Player player) {
         Bounds playerBounds = player.getBounds();
         Bounds doorBounds = this.getBounds();
-        double offset = 10;
+        double offset = 0;
+        if(!isLaser){
+            offset = 10;
+        }
         Bounds newBounds = new BoundingBox(playerBounds.getMinX(), playerBounds.getMinY(), playerBounds.getWidth() + offset, playerBounds.getHeight());
         // Перевіряємо перекриття bounds'ів
         boolean hasOverlap = newBounds.intersects(doorBounds);
@@ -134,43 +141,55 @@ public class Door implements GameObject, Interactable {
     @Override
     public void render(GraphicsContext gc) {
         Image sprite = null;
-        if (isFloorLink) {
-            if (isLocked) {
-                sprite = sprites.get("stairsLocked");
-            } else {
-                if (isOpen) {
-                    if (direction.equals("up")) {
-                        sprite = sprites.get("stairsUp");
-                    } else if (direction.equals("down")) {
-                        sprite = sprites.get("stairsDown");
-                    }
+            if (isFloorLink) {
+                if (isLocked) {
+                    sprite = sprites.get("stairsLocked");
                 } else {
-                    sprite = sprites.get("stairsClosed");
-                }
-            }
-        } else {
-            if (isLocked) {
-                if (direction.equals("left")) {
-                    sprite = sprites.get("lockedLeft");
-                } else if (direction.equals("right")) {
-                    sprite = sprites.get("lockedRight");
+                    if (isOpen) {
+                        if (direction.equals("up")) {
+                            sprite = sprites.get("stairsUp");
+                        } else if (direction.equals("down")) {
+                            sprite = sprites.get("stairsDown");
+                        }
+                    } else {
+                        sprite = sprites.get("stairsClosed");
+                    }
                 }
             } else {
-                if (isOpen) {
+                if (isLocked) {
+                    if(isLaser){
+                        sprite = sprites.get("laserLocked");
+                    } else {
                     if (direction.equals("left")) {
-                        sprite = sprites.get("openLeft");
+                        sprite = sprites.get("lockedLeft");
                     } else if (direction.equals("right")) {
-                        sprite = sprites.get("openRight");
+                        sprite = sprites.get("lockedRight");
+                    }
                     }
                 } else {
-                    if (direction.equals("left")) {
-                        sprite = sprites.get("closedLeft");
-                    } else if (direction.equals("right")) {
-                        sprite = sprites.get("closedRight");
+                    if (isOpen) {
+                        if(isLaser){
+                            sprite = sprites.get("laserUnlocked");
+                        } else {
+                            if (direction.equals("left")) {
+                                sprite = sprites.get("openLeft");
+                            } else if (direction.equals("right")) {
+                                sprite = sprites.get("openRight");
+                            }
+                        }
+                    } else {
+                        if(isLaser){
+                            sprite = sprites.get("laserUnlocked");
+                        } else {
+                            if (direction.equals("left")) {
+                                sprite = sprites.get("closedLeft");
+                            } else if (direction.equals("right")) {
+                                sprite = sprites.get("closedRight");
+                            }
+                        }
                     }
                 }
             }
-        }
         if (sprite != null) {
             gc.setImageSmoothing(false);
             Bounds bounds = getImageBounds();
@@ -298,5 +317,13 @@ public class Door implements GameObject, Interactable {
     // Повертає унікальний ID для зв’язку між дверима
     public int getSharedId() {
         return sharedId;
+    }
+
+    public boolean isLaser() {
+        return isLaser;
+    }
+
+    public boolean isLocked() {
+        return isLocked;
     }
 }

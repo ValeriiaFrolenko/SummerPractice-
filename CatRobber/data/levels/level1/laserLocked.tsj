@@ -1,0 +1,14 @@
+{ "columns":1,
+ "image":"..\/..\/..\/assets\/images\/background\/doors\/laserLocked.png",
+ "imageheight":105,
+ "imagewidth":21,
+ "margin":0,
+ "name":"laserLocked",
+ "spacing":0,
+ "tilecount":1,
+ "tiledversion":"1.11.2",
+ "tileheight":105,
+ "tilewidth":21,
+ "type":"tileset",
+ "version":"1.10"
+}
