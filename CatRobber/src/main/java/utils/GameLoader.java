@@ -161,7 +161,7 @@ public class GameLoader {
             case "Door":
                 return new Door(new Vector2D(x, y), properties);
             case "Camera":
-                return new SecurityCamera(properties);
+                return new SecurityCamera(new Vector2D(x,y), properties);
             case "InteractiveObject":
                 return new InteractiveObject(new Vector2D(x, y), properties);
             default:

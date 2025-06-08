@@ -37,7 +37,7 @@ public class Player implements Animatable, GameObject, Interactable {
     private Map<String, Image[]> animations; // Анімації, завантажені через GameLoader
     private String[] spritePaths; // Шляхи до спрайтів
     private boolean canMove; // Чи може гравець рухатися
-;
+    private int detectionCount;
     public void setDirection(Direction direction) {
         this.direction = direction;
     }
@@ -166,8 +166,7 @@ public class Player implements Animatable, GameObject, Interactable {
 
     // Збільшує рівень виявлення
     public void increaseDetection() {
-        // TODO: Реалізувати логіку виявлення
-        // Оновити рівень виявлення гравця (наприклад, для Police або SecurityCamera)
+
     }
 
     public void teleportToRoom(Door door) {

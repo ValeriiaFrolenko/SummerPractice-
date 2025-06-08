@@ -93,8 +93,8 @@
                  "type":"Room",
                  "visible":true,
                  "width":894.038528587221,
-                 "x":343.257891077273,
-                 "y":31.5174772513311
+                 "x":343,
+                 "y":31
                 }, 
                 {
                  "height":100,
@@ -1610,7 +1610,12 @@
                         {
                          "name":"direction",
                          "type":"string",
-                         "value":"RIGHT"
+                         "value":"LEFT"
+                        }, 
+                        {
+                         "name":"floorPointY",
+                         "type":"float",
+                         "value":130
                         }, 
                         {
                          "name":"hightColl",
@@ -1631,8 +1636,8 @@
                  "type":"Camera",
                  "visible":true,
                  "width":67.9654974644651,
-                 "x":647.20165570332,
-                 "y":62.1999105931361
+                 "x":647,
+                 "y":62
                 },
             
                 {
@@ -1659,14 +1664,26 @@
                 }, 
                 {
                  "height":0,
-                 "id":129,
+                 "id":147,
+                 "name":"",
+                 "point":true,
+                 "rotation":0,
+                 "type":"FloorPointY",
+                 "visible":true,
+                 "width":0,
+                 "x":675,
+                 "y":130
+                }, 
+                {
+                 "height":28,
+                 "id":148,
                  "name":"",
                  "rotation":0,
                  "type":"",
                  "visible":true,
-                 "width":0,
-                 "x":17.5,
-                 "y":773
+                 "width":29.5,
+                 "x":660,
+                 "y":32
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -1675,7 +1692,7 @@
          "y":0
         }],
  "nextlayerid":4,
- "nextobjectid":130,
+ "nextobjectid":149,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.2",

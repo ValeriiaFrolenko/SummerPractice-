@@ -39,6 +39,7 @@ public class Police implements Animatable, GameObject, Interactable{
     private boolean canSeePlayer;
     private boolean inSameRoom;
 
+
     @Override
     public void interact(Player player) {
         takeHit(false);
@@ -174,6 +175,7 @@ public class Police implements Animatable, GameObject, Interactable{
 
             // Якщо гравець виявлений, переслідуємо
             if (canSeePlayer) {
+                player.increaseDetection();
                 state = PoliceState.CHASE;
                 setAnimationState("patrol"); // Використовуємо анімацію бігу для переслідування
                 // Визначаємо напрямок до гравця
@@ -220,11 +222,6 @@ public class Police implements Animatable, GameObject, Interactable{
         double frameDuration = 0.2;
         int frameCount = frames.length;
         animationFrame = (int) (animationTime / frameDuration) % frameCount;
-    }
-
-    // Перевіряє, чи гравець у полі зору
-    public void detectPlayer(Vector2D playerPosition) {
-        // Логіка виявлення перенесена в update, цей метод залишається порожнім
     }
 
     // Зупиняє рух поліцейського

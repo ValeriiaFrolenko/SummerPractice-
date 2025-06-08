@@ -227,11 +227,10 @@ public class GameManager implements Savable {
         for (Police police : police) {
             police.update(deltaTime, rooms, player);// Оновлюємо логіку поліцейських
             checkPoliceCollisions();
-            police.detectPlayer(player.getPosition()); // Перевіряємо, чи бачить поліцейський гравця
         }
         for (SecurityCamera camera : cameras) {
-            camera.detectPlayer(player.getPosition()); // Перевіряємо, чи бачить камера гравця
-            camera.updateFrame(); // Оновлюємо кадр анімації камери
+            camera.updateAnimation(deltaTime);
+            camera.detectPlayer(player); // Перевіряємо, чи бачить камера гравця
         }
         checkCollisions(); // Перевіряємо колізії
         checkInteractions(); // Перевіряємо взаємодії
