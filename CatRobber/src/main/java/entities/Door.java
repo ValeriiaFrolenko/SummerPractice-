@@ -6,30 +6,32 @@ import javafx.geometry.BoundingBox;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import org.json.JSONObject;
+import puzzles.*;
 import utils.GameLoader;
 import utils.Vector2D;
+import managers.GameManager;
+import managers.UIManager;
+import main.GameWindow;
 import java.util.HashMap;
 import java.util.Map;
 
-// Представляє двері, які можуть бути відкриті, закриті, замкнені або вести до іншої кімнати/поверху
 public class Door implements GameObject, Interactable {
-    // Поля
-    private double imageX; // Верхній лівий кут зображення по X
-    private double imageY; // Верхній лівий кут зображення по Y
-    private double imageWidth; // Ширина зображення, з JSON
-    private double imageHeight; // Висота зображення, з JSON
-    private boolean isOpen; // Чи відкриті двері, з JSON
-    private boolean isLocked; // Чи замкнені двері, з JSON
-    private boolean isLaser; // Чи лазерні двері, з JSON
-    private boolean isRoomLink; // Чи ведуть до іншої кімнати, з JSON
-    private boolean isFloorLink; // Чи ведуть до іншого поверху, з JSON
-    String direction; // Напрям дверей ("left", "right", "up", "down"), з JSON
-    private Map<String, Image> sprites; // Спрайти для різних станів, завантажені через GameLoader
-    private String[] spritePaths; // Шляхи до спрайтів
-    private final String path = "background/doors/"; // Базовий шлях до спрайтів
-    private int sharedId; // Унікальний ID для зв’язку між дверима
+    private double imageX;
+    private double imageY;
+    private double imageWidth;
+    private double imageHeight;
+    private boolean isOpen;
+    private boolean isLocked;
+    private boolean isLaser;
+    private boolean isRoomLink;
+    private boolean isFloorLink;
+    String direction;
+    private Map<String, Image> sprites;
+    private String[] spritePaths;
+    private final String path = "background/doors/";
+    private int sharedId;
+    private LockTipe lockTipe;
 
-    // Конструктор: ініціалізує двері з JSON-даними
     public Door(Vector2D vector2D, JSONObject defaultData) {
         double jsonImageX = vector2D.getX();
         double jsonImageY = vector2D.getY();
@@ -44,6 +46,7 @@ public class Door implements GameObject, Interactable {
         this.isRoomLink = defaultData.optBoolean("isRoomLink", false);
         this.isFloorLink = defaultData.optBoolean("isFloorLink", false);
         this.direction = defaultData.optString("direction", "right");
+        this.lockTipe = LockTipe.valueOf(defaultData.getString("lockType"));
         this.spritePaths = new String[]{
                 path + "close.png", path + "closeLeft.png", path + "closeRight.png",
                 path + "leftLock.png", path + "openLeft.png", path + "openRight.png",
@@ -64,43 +67,100 @@ public class Door implements GameObject, Interactable {
         sprites.put("stairsLocked", loader.loadImage(spritePaths[9]));
         sprites.put("laserLocked", loader.loadImage(spritePaths[10]));
         sprites.put("laserUnlocked", loader.loadImage(spritePaths[11]));
-
-
     }
 
-    // --- Ініціалізація та оновлення ---
+    public enum LockTipe { CODE_LOCK, PICK_LOCK, LASER_LOCK, NONE }
 
-    // Взаємодія з гравцем (викликається з GameManager.checkInteractions())
     @Override
     public void interact(Player player) {
-        // if (isLocked) {
-            //return;
-       // } else {
-            //if (isOpen) {
-                Player.Direction direction = player.getDirection();
-                if ((direction.equals(Player.Direction.LEFT) || direction.equals(Player.Direction.RIGHT)) && isRoomLink) {
-                    player.teleportToRoom(this);
-                } else {
-                    player.teleportToFloor(this);
-                }
-            //} else {
-               // return;
-           // }
-        //}
+        // Викликається при натисканні стрілок: телепортує гравця, якщо двері відкриті та не заблоковані
+        if (!isLocked && isOpen) {
+            Player.Direction direction = player.getDirection();
+            if ((direction.equals(Player.Direction.LEFT) || direction.equals(Player.Direction.RIGHT)) && isRoomLink) {
+                player.teleportToRoom(this);
+                System.out.println("Teleporting to room: " + sharedId);
+            } else if (isFloorLink) {
+                player.teleportToFloor(this);
+                System.out.println("Teleporting to floor: " + sharedId);
+            }
+        }
     }
 
-    // Перевіряє, чи можлива взаємодія
+    public void open(Player player) {
+        UIManager uiManager = GameWindow.getInstance().getUIManager();
+        if (uiManager == null) {
+            System.err.println("UIManager не доступний");
+            return;
+        }
+
+        if (isLocked) {
+            if (isLaser) {
+                // Лазерні двері лише показують підказку
+                uiManager.showInteractionPrompt(getInteractionPrompt());
+                System.out.println("Laser door interaction: locked");
+                return;
+            }
+            // Для інших заблокованих дверей викликаємо головоломку
+            Puzzle puzzle = null;
+            switch (lockTipe) {
+                case CODE_LOCK:
+                    puzzle = new CodeLockPuzzle(new JSONObject().put("solution", "1234"));
+                    break;
+                case PICK_LOCK:
+                    puzzle = new LockPickPuzzle(new JSONObject().put("solution", "lockpick"));
+                    break;
+                case LASER_LOCK:
+                    return; // Лазерні двері не викликають головоломку
+                case NONE:
+                    return;
+            }
+            if (puzzle != null) {
+                puzzle.setLinkedDoor(this, (solved, door) -> {
+                    if (solved) {
+                        door.unlock(); // Розблоковуємо всі зв’язані двері
+                        uiManager.hidePuzzleUI();
+                        System.out.println("Puzzle solved, door unlocked: " + sharedId);
+                    }
+                });
+                uiManager.showPuzzleUI(puzzle.getUI());
+            }
+        } else {
+            // Якщо двері не заблоковані, відкриваємо всіх зв’язаних
+            openLinkedDoors();
+            System.out.println("Door opened: " + sharedId);
+        }
+    }
+
+    public void openLinkedDoors() {
+        // Відкриваємо всі двері з однаковим sharedId
+        for (Interactable interactable : GameManager.getInstance().getInteractables()) {
+            if (interactable instanceof Door otherDoor && otherDoor.getSharedId() == this.sharedId) {
+                otherDoor.isOpen = true;
+                System.out.println("Linked door opened: " + otherDoor.getSharedId());
+            }
+        }
+    }
+
+    public void unlock() {
+        this.isLocked = false;
+        this.isOpen = true;
+        // Розблоковуємо всі зв’язані двері
+        for (Interactable interactable : GameManager.getInstance().getInteractables()) {
+            if (interactable instanceof Door otherDoor && otherDoor.getSharedId() == this.sharedId) {
+                otherDoor.isLocked = false;
+                otherDoor.isOpen = true;
+                System.out.println("Linked door unlocked: " + otherDoor.getSharedId());
+            }
+        }
+    }
+
     @Override
     public boolean canInteract(Player player) {
         Bounds playerBounds = player.getBounds();
         Bounds doorBounds = this.getBounds();
-        double offset = 0;
-        if(!isLaser){
-            offset = 10;
-        }
-        Bounds newBounds = new BoundingBox(playerBounds.getMinX(), playerBounds.getMinY(), playerBounds.getWidth() + offset, playerBounds.getHeight());
-        // Перевіряємо перекриття bounds'ів
-        boolean hasOverlap = newBounds.intersects(doorBounds);
+        double offset = 5;
+        Bounds bounds = new BoundingBox(playerBounds.getMinX()-offset, playerBounds.getMinY(), playerBounds.getWidth() + offset*2, playerBounds.getHeight());
+        boolean hasOverlap = bounds.intersects(doorBounds);
 
         if (!hasOverlap) {
             return false;
@@ -109,21 +169,25 @@ public class Door implements GameObject, Interactable {
         Player.Direction playerDirection = player.getDirection();
         String doorDirection = this.direction;
 
-        // Для дверей між кімнатами - гравець рухається ПРОТИЛЕЖНО до напрямку дверей
-        if (isRoomLink) {
-            if (playerDirection == Player.Direction.RIGHT && doorDirection.equals("left")) {
-                return true; // Гравець іде праворуч до лівих дверей
-            } else if (playerDirection == Player.Direction.LEFT && doorDirection.equals("right")) {
-                return true; // Гравець іде ліворуч до правих дверей
+        if (isLaser) {
+            if (playerDirection == Player.Direction.RIGHT || playerDirection == Player.Direction.LEFT) {
+                return true; // Лазерні двері дозволяють взаємодію для показу підказки
             }
         }
 
-        // Для дверей між поверхами - однакові напрямки
+        if (isRoomLink) {
+            if (playerDirection == Player.Direction.RIGHT && doorDirection.equals("left")) {
+                return true;
+            } else if (playerDirection == Player.Direction.LEFT && doorDirection.equals("right")) {
+                return true;
+            }
+        }
+
         if (isFloorLink) {
             if (playerDirection == Player.Direction.UP && doorDirection.equals("up")) {
-                return true; // Гравець іде вгору до верхніх дверей
+                return true;
             } else if (playerDirection == Player.Direction.DOWN && doorDirection.equals("down")) {
-                return true; // Гравець іде вниз до нижніх дверей
+                return true;
             }
         }
 
@@ -135,61 +199,58 @@ public class Door implements GameObject, Interactable {
         return 0;
     }
 
-    // --- Рендеринг ---
-
-    // Рендерить двері на canvas (викликається з GameManager.render())
     @Override
     public void render(GraphicsContext gc) {
         Image sprite = null;
-            if (isFloorLink) {
-                if (isLocked) {
-                    sprite = sprites.get("stairsLocked");
-                } else {
-                    if (isOpen) {
-                        if (direction.equals("up")) {
-                            sprite = sprites.get("stairsUp");
-                        } else if (direction.equals("down")) {
-                            sprite = sprites.get("stairsDown");
-                        }
-                    } else {
-                        sprite = sprites.get("stairsClosed");
-                    }
-                }
+        if (isFloorLink) {
+            if (isLocked) {
+                sprite = sprites.get("stairsLocked");
             } else {
-                if (isLocked) {
-                    if(isLaser){
-                        sprite = sprites.get("laserLocked");
-                    } else {
+                if (isOpen) {
+                    if (direction.equals("up")) {
+                        sprite = sprites.get("stairsUp");
+                    } else if (direction.equals("down")) {
+                        sprite = sprites.get("stairsDown");
+                    }
+                } else {
+                    sprite = sprites.get("stairsClosed");
+                }
+            }
+        } else {
+            if (isLocked) {
+                if (isLaser) {
+                    sprite = sprites.get("laserLocked");
+                } else {
                     if (direction.equals("left")) {
                         sprite = sprites.get("lockedLeft");
                     } else if (direction.equals("right")) {
                         sprite = sprites.get("lockedRight");
                     }
+                }
+            } else {
+                if (isOpen) {
+                    if (isLaser) {
+                        sprite = sprites.get("laserUnlocked");
+                    } else {
+                        if (direction.equals("left")) {
+                            sprite = sprites.get("openLeft");
+                        } else if (direction.equals("right")) {
+                            sprite = sprites.get("openRight");
+                        }
                     }
                 } else {
-                    if (isOpen) {
-                        if(isLaser){
-                            sprite = sprites.get("laserUnlocked");
-                        } else {
-                            if (direction.equals("left")) {
-                                sprite = sprites.get("openLeft");
-                            } else if (direction.equals("right")) {
-                                sprite = sprites.get("openRight");
-                            }
-                        }
+                    if (isLaser) {
+                        sprite = sprites.get("laserUnlocked");
                     } else {
-                        if(isLaser){
-                            sprite = sprites.get("laserUnlocked");
-                        } else {
-                            if (direction.equals("left")) {
-                                sprite = sprites.get("closedLeft");
-                            } else if (direction.equals("right")) {
-                                sprite = sprites.get("closedRight");
-                            }
+                        if (direction.equals("left")) {
+                            sprite = sprites.get("closedLeft");
+                        } else if (direction.equals("right")) {
+                            sprite = sprites.get("closedRight");
                         }
                     }
                 }
             }
+        }
         if (sprite != null) {
             gc.setImageSmoothing(false);
             Bounds bounds = getImageBounds();
@@ -201,15 +262,12 @@ public class Door implements GameObject, Interactable {
         }
     }
 
-    // --- Серіалізація ---
-
-    // Повертає JSON для збереження (викликається з SaveManager.saveInteractables())
     @Override
     public JSONObject getSerializableData() {
         JSONObject data = new JSONObject();
         data.put("type", getType());
         data.put("x", imageX);
-        data.put("y", imageY + imageHeight); // Зберігаємо як нижній лівий кут
+        data.put("y", imageY + imageHeight);
         data.put("width", imageWidth);
         data.put("height", imageHeight);
         data.put("sharedId", sharedId);
@@ -219,14 +277,14 @@ public class Door implements GameObject, Interactable {
         data.put("isRoomLink", isRoomLink);
         data.put("isFloorLink", isFloorLink);
         data.put("direction", direction);
+        data.put("lockType", lockTipe.toString());
         return data;
     }
 
-    // Відновлює стан із JSON (викликається з SaveManager.loadGame())
     @Override
     public void setFromData(JSONObject data) {
         this.imageX = data.optDouble("x", imageX);
-        this.imageY = data.optDouble("y", imageY + imageHeight) - imageHeight; // Конвертуємо назад у верхній лівий кут
+        this.imageY = data.optDouble("y", imageY + imageHeight) - imageHeight;
         this.imageWidth = data.optDouble("width", imageWidth);
         this.imageHeight = data.optDouble("height", imageHeight);
         this.sharedId = data.optInt("sharedId", sharedId);
@@ -236,85 +294,78 @@ public class Door implements GameObject, Interactable {
         this.isRoomLink = data.optBoolean("isRoomLink", isRoomLink);
         this.isFloorLink = data.optBoolean("isFloorLink", isFloorLink);
         this.direction = data.optString("direction", direction);
+        try {
+            this.lockTipe = LockTipe.valueOf(data.optString("lockType", lockTipe.toString()));
+        } catch (IllegalArgumentException e) {
+            System.err.println("Invalid lock type: " + data.optString("lockType"));
+        }
     }
 
-    // --- Геттери/Сеттери ---
-
-    // Повертає тип об’єкта
     @Override
     public String getType() {
         return "Door";
     }
 
-    // Повертає позицію дверей
     @Override
     public Vector2D getPosition() {
         return new Vector2D(imageX, imageY);
     }
 
-    // Повертає уявну позицію
     @Override
     public Vector2D getImagePosition() {
         return new Vector2D(imageX, imageY);
     }
 
-    // Встановлює позицію дверей
     @Override
     public void setPosition(Vector2D position) {
         this.imageX = position.getX();
         this.imageY = position.getY();
     }
 
-    // Встановлює позицію зображення
     @Override
     public void setImagePosition(Vector2D position) {
         this.imageX = position.getX();
         this.imageY = position.getY();
     }
 
-    // Повертає межі для колізій
     @Override
     public Bounds getBounds() {
         return new BoundingBox(imageX, imageY, imageWidth, imageHeight);
     }
 
-    // Повертає межі для рендерингу
     @Override
     public Bounds getImageBounds() {
         return new BoundingBox(imageX, imageY, imageWidth, imageHeight);
     }
 
-    // Повертає підказку для UI
     @Override
     public String getInteractionPrompt() {
-        return isLocked ? "Locked Door" : "Open Door";
+        if (isLaser && isLocked) {
+            return "Laser door is locked";
+        }
+        if (isLocked) {
+            return "Door is locked. Press E to unlock the door";
+        }
+        if (!isOpen) {
+            return "Press E to open the door";
+        }
+        return null;
     }
 
-    // Повертає шар рендерингу
     @Override
     public int getRenderLayer() {
-        return 0; // Двері рендеряться на шарі 0
+        return 0;
     }
 
-    // Перевіряє видимість
     @Override
     public boolean isVisible() {
-        return true; // Двері завжди видимі
+        return true;
     }
 
-    // Повертає стан відкритості
     public boolean isOpen() {
         return isOpen;
     }
 
-    // Відкриває двері
-    public void open(Player player) {
-        //if (!isLocked) {
-            this.isOpen = true;
-      //  }
-    }
-
-    // Повертає унікальний ID для зв’язку між дверима
     public int getSharedId() {
         return sharedId;
     }
@@ -325,5 +376,9 @@ public class Door implements GameObject, Interactable {
 
     public boolean isLocked() {
         return isLocked;
+    }
+
+    public LockTipe getLockType() {
+        return lockTipe;
     }
 }

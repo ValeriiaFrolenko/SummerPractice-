@@ -320,6 +320,11 @@
                          "value":false
                         }, 
                         {
+                         "name":"lockType",
+                         "type":"string",
+                         "value":"NONE"
+                        }, 
+                        {
                          "name":"sharedId",
                          "type":"int",
                          "value":2
@@ -366,6 +371,11 @@
                          "name":"isRoomLink",
                          "type":"bool",
                          "value":false
+                        }, 
+                        {
+                         "name":"lockType",
+                         "type":"string",
+                         "value":"NONE"
                         }, 
                         {
                          "name":"sharedId",
@@ -416,6 +426,11 @@
                          "value":false
                         }, 
                         {
+                         "name":"lockType",
+                         "type":"string",
+                         "value":"NONE"
+                        }, 
+                        {
                          "name":"sharedId",
                          "type":"int",
                          "value":1
@@ -462,6 +477,11 @@
                          "name":"isRoomLink",
                          "type":"bool",
                          "value":false
+                        }, 
+                        {
+                         "name":"lockType",
+                         "type":"string",
+                         "value":"NONE"
                         }, 
                         {
                          "name":"sharedId",
@@ -512,6 +532,11 @@
                          "value":false
                         }, 
                         {
+                         "name":"lockType",
+                         "type":"string",
+                         "value":"NONE"
+                        }, 
+                        {
                          "name":"sharedId",
                          "type":"int",
                          "value":3
@@ -558,6 +583,11 @@
                          "name":"isRoomLink",
                          "type":"bool",
                          "value":false
+                        }, 
+                        {
+                         "name":"lockType",
+                         "type":"string",
+                         "value":"NONE"
                         }, 
                         {
                          "name":"sharedId",
@@ -608,6 +638,11 @@
                          "value":false
                         }, 
                         {
+                         "name":"lockType",
+                         "type":"string",
+                         "value":"NONE"
+                        }, 
+                        {
                          "name":"sharedId",
                          "type":"int",
                          "value":4
@@ -654,6 +689,11 @@
                          "name":"isRoomLink",
                          "type":"bool",
                          "value":false
+                        }, 
+                        {
+                         "name":"lockType",
+                         "type":"string",
+                         "value":"NONE"
                         }, 
                         {
                          "name":"sharedId",
@@ -704,6 +744,11 @@
                          "value":false
                         }, 
                         {
+                         "name":"lockType",
+                         "type":"string",
+                         "value":"NONE"
+                        }, 
+                        {
                          "name":"sharedId",
                          "type":"int",
                          "value":6
@@ -750,6 +795,11 @@
                          "name":"isRoomLink",
                          "type":"bool",
                          "value":false
+                        }, 
+                        {
+                         "name":"lockType",
+                         "type":"string",
+                         "value":"NONE"
                         }, 
                         {
                          "name":"sharedId",
@@ -800,6 +850,11 @@
                          "value":false
                         }, 
                         {
+                         "name":"lockType",
+                         "type":"string",
+                         "value":"PICK_LOCK"
+                        }, 
+                        {
                          "name":"sharedId",
                          "type":"int",
                          "value":5
@@ -846,6 +901,11 @@
                          "name":"isRoomLink",
                          "type":"bool",
                          "value":false
+                        }, 
+                        {
+                         "name":"lockType",
+                         "type":"string",
+                         "value":"PICK_LOCK"
                         }, 
                         {
                          "name":"sharedId",
@@ -896,6 +956,11 @@
                          "value":true
                         }, 
                         {
+                         "name":"lockType",
+                         "type":"string",
+                         "value":"NONE"
+                        }, 
+                        {
                          "name":"sharedId",
                          "type":"int",
                          "value":7
@@ -942,6 +1007,11 @@
                          "name":"isRoomLink",
                          "type":"bool",
                          "value":true
+                        }, 
+                        {
+                         "name":"lockType",
+                         "type":"string",
+                         "value":"NONE"
                         }, 
                         {
                          "name":"sharedId",
@@ -992,6 +1062,11 @@
                          "value":true
                         }, 
                         {
+                         "name":"lockType",
+                         "type":"string",
+                         "value":"NONE"
+                        }, 
+                        {
                          "name":"sharedId",
                          "type":"int",
                          "value":9
@@ -1038,6 +1113,11 @@
                          "name":"isRoomLink",
                          "type":"bool",
                          "value":true
+                        }, 
+                        {
+                         "name":"lockType",
+                         "type":"string",
+                         "value":"NONE"
                         }, 
                         {
                          "name":"sharedId",
@@ -1088,6 +1168,11 @@
                          "value":true
                         }, 
                         {
+                         "name":"lockType",
+                         "type":"string",
+                         "value":"NONE"
+                        }, 
+                        {
                          "name":"sharedId",
                          "type":"int",
                          "value":7
@@ -1134,6 +1219,11 @@
                          "name":"isRoomLink",
                          "type":"bool",
                          "value":true
+                        }, 
+                        {
+                         "name":"lockType",
+                         "type":"string",
+                         "value":"NONE"
                         }, 
                         {
                          "name":"sharedId",
@@ -1184,6 +1274,11 @@
                          "value":true
                         }, 
                         {
+                         "name":"lockType",
+                         "type":"string",
+                         "value":"CODE_LOCK"
+                        }, 
+                        {
                          "name":"sharedId",
                          "type":"int",
                          "value":10
@@ -1230,6 +1325,11 @@
                          "name":"isRoomLink",
                          "type":"bool",
                          "value":true
+                        }, 
+                        {
+                         "name":"lockType",
+                         "type":"string",
+                         "value":"PICK_LOCK"
                         }, 
                         {
                          "name":"sharedId",
@@ -1280,6 +1380,11 @@
                          "value":true
                         }, 
                         {
+                         "name":"lockType",
+                         "type":"string",
+                         "value":"NONE"
+                        }, 
+                        {
                          "name":"sharedId",
                          "type":"int",
                          "value":9
@@ -1326,6 +1431,11 @@
                          "name":"isRoomLink",
                          "type":"bool",
                          "value":true
+                        }, 
+                        {
+                         "name":"lockType",
+                         "type":"string",
+                         "value":"NONE"
                         }, 
                         {
                          "name":"sharedId",
@@ -1376,6 +1486,11 @@
                          "value":true
                         }, 
                         {
+                         "name":"lockType",
+                         "type":"string",
+                         "value":"CODE_LOCK"
+                        }, 
+                        {
                          "name":"sharedId",
                          "type":"int",
                          "value":10
@@ -1422,6 +1537,11 @@
                          "name":"isRoomLink",
                          "type":"bool",
                          "value":true
+                        }, 
+                        {
+                         "name":"lockType",
+                         "type":"string",
+                         "value":"PICK_LOCK"
                         }, 
                         {
                          "name":"sharedId",
@@ -1498,6 +1618,11 @@
                         }, 
                         {
                          "name":"key",
+                         "type":"int",
+                         "value":0
+                        }, 
+                        {
+                         "name":"money",
                          "type":"int",
                          "value":0
                         }, 
@@ -1698,7 +1823,7 @@
                         {
                          "name":"isLocked",
                          "type":"bool",
-                         "value":false
+                         "value":true
                         }, 
                         {
                          "name":"isOpen",
@@ -1711,6 +1836,11 @@
                          "value":true
                         }, 
                         {
+                         "name":"lockType",
+                         "type":"string",
+                         "value":"LASER_LOCK"
+                        }, 
+                        {
                          "name":"sharedId",
                          "type":"int",
                          "value":22
@@ -1721,6 +1851,91 @@
                  "width":21,
                  "x":932.5,
                  "y":134
+                }, 
+                {
+                 "height":24,
+                 "id":152,
+                 "name":"note",
+                 "properties":[
+                        {
+                         "name":"type",
+                         "type":"string",
+                         "value":"NOTE"
+                        }],
+                 "rotation":0,
+                 "type":"InteractiveObject",
+                 "visible":true,
+                 "width":24,
+                 "x":195,
+                 "y":288
+                }, 
+                {
+                 "height":40,
+                 "id":154,
+                 "name":"elecrtricalPanel",
+                 "properties":[
+                        {
+                         "name":"type",
+                         "type":"string",
+                         "value":"ELECTRICAL_PANEL"
+                        }],
+                 "rotation":0,
+                 "type":"InteractiveObject",
+                 "visible":true,
+                 "width":44,
+                 "x":405,
+                 "y":180
+                }, 
+                {
+                 "height":45,
+                 "id":158,
+                 "name":"withMoney",
+                 "properties":[
+                        {
+                         "name":"type",
+                         "type":"string",
+                         "value":"WITH_MONEY"
+                        }],
+                 "rotation":0,
+                 "type":"InteractiveObject",
+                 "visible":true,
+                 "width":30,
+                 "x":668,
+                 "y":186.666666666667
+                }, 
+                {
+                 "height":45,
+                 "id":159,
+                 "name":"withMoney",
+                 "properties":[
+                        {
+                         "name":"type",
+                         "type":"string",
+                         "value":"WITH_MONEY"
+                        }],
+                 "rotation":0,
+                 "type":"InteractiveObject",
+                 "visible":true,
+                 "width":30,
+                 "x":1204.66666666667,
+                 "y":306.666666666667
+                }, 
+                {
+                 "height":45,
+                 "id":160,
+                 "name":"finalPrice",
+                 "properties":[
+                        {
+                         "name":"type",
+                         "type":"string",
+                         "value":"FINAL_PRICE"
+                        }],
+                 "rotation":0,
+                 "type":"InteractiveObject",
+                 "visible":true,
+                 "width":60,
+                 "x":552,
+                 "y":430.666666666667
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -1729,7 +1944,7 @@
          "y":0
         }],
  "nextlayerid":4,
- "nextobjectid":151,
+ "nextobjectid":161,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.2",

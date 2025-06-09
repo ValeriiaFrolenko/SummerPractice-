@@ -41,6 +41,11 @@
         "value": false
       },
       {
+        "name": "lockType",
+        "type": "string",
+        "value": "NONE"
+      },
+      {
         "name": "sharedId",
         "type": "int",
         "value": 4
@@ -88,6 +93,11 @@
         "name": "isRoomLink",
         "type": "bool",
         "value": false
+      },
+      {
+        "name": "lockType",
+        "type": "string",
+        "value": "NONE"
       },
       {
         "name": "sharedId",
@@ -139,6 +149,11 @@
         "value": false
       },
       {
+        "name": "lockType",
+        "type": "string",
+        "value": "NONE"
+      },
+      {
         "name": "sharedId",
         "type": "int",
         "value": 6
@@ -186,6 +201,11 @@
         "name": "isRoomLink",
         "type": "bool",
         "value": false
+      },
+      {
+        "name": "lockType",
+        "type": "string",
+        "value": "NONE"
       },
       {
         "name": "sharedId",
@@ -237,6 +257,11 @@
         "value": false
       },
       {
+        "name": "lockType",
+        "type": "string",
+        "value": "NONE"
+      },
+      {
         "name": "sharedId",
         "type": "int",
         "value": 1
@@ -284,6 +309,11 @@
         "name": "isRoomLink",
         "type": "bool",
         "value": false
+      },
+      {
+        "name": "lockType",
+        "type": "string",
+        "value": "NONE"
       },
       {
         "name": "sharedId",
@@ -335,6 +365,11 @@
         "value": true
       },
       {
+        "name": "lockType",
+        "type": "string",
+        "value": "PICK_LOCK"
+      },
+      {
         "name": "sharedId",
         "type": "int",
         "value": 11
@@ -382,6 +417,11 @@
         "name": "isRoomLink",
         "type": "bool",
         "value": false
+      },
+      {
+        "name": "lockType",
+        "type": "string",
+        "value": "NONE"
       },
       {
         "name": "sharedId",
@@ -433,6 +473,11 @@
         "value": false
       },
       {
+        "name": "lockType",
+        "type": "string",
+        "value": "NONE"
+      },
+      {
         "name": "sharedId",
         "type": "int",
         "value": 6
@@ -480,6 +525,11 @@
         "name": "isRoomLink",
         "type": "bool",
         "value": false
+      },
+      {
+        "name": "lockType",
+        "type": "string",
+        "value": "PICK_LOCK"
       },
       {
         "name": "sharedId",
@@ -531,6 +581,11 @@
         "value": false
       },
       {
+        "name": "lockType",
+        "type": "string",
+        "value": "NONE"
+      },
+      {
         "name": "sharedId",
         "type": "int",
         "value": 3
@@ -580,6 +635,11 @@
         "value": false
       },
       {
+        "name": "lockType",
+        "type": "string",
+        "value": "PICK_LOCK"
+      },
+      {
         "name": "sharedId",
         "type": "int",
         "value": 5
@@ -616,7 +676,7 @@
       {
         "name": "isLocked",
         "type": "bool",
-        "value": false
+        "value": true
       },
       {
         "name": "isOpen",
@@ -627,6 +687,11 @@
         "name": "isRoomLink",
         "type": "bool",
         "value": true
+      },
+      {
+        "name": "lockType",
+        "type": "string",
+        "value": "LASER_LOCK"
       },
       {
         "name": "sharedId",
@@ -678,6 +743,11 @@
         "value": true
       },
       {
+        "name": "lockType",
+        "type": "string",
+        "value": "NONE"
+      },
+      {
         "name": "sharedId",
         "type": "int",
         "value": 8
@@ -725,6 +795,11 @@
         "name": "isRoomLink",
         "type": "bool",
         "value": true
+      },
+      {
+        "name": "lockType",
+        "type": "string",
+        "value": "NONE"
       },
       {
         "name": "sharedId",
@@ -776,6 +851,11 @@
         "value": true
       },
       {
+        "name": "lockType",
+        "type": "string",
+        "value": "PICK_LOCK"
+      },
+      {
         "name": "sharedId",
         "type": "int",
         "value": 11
@@ -823,6 +903,11 @@
         "name": "isRoomLink",
         "type": "bool",
         "value": true
+      },
+      {
+        "name": "lockType",
+        "type": "string",
+        "value": "CODE_LOCK"
       },
       {
         "name": "sharedId",
@@ -874,6 +959,11 @@
         "value": true
       },
       {
+        "name": "lockType",
+        "type": "string",
+        "value": "NONE"
+      },
+      {
         "name": "sharedId",
         "type": "int",
         "value": 8
@@ -921,6 +1011,11 @@
         "name": "isRoomLink",
         "type": "bool",
         "value": true
+      },
+      {
+        "name": "lockType",
+        "type": "string",
+        "value": "NONE"
       },
       {
         "name": "sharedId",
@@ -972,6 +1067,11 @@
         "value": true
       },
       {
+        "name": "lockType",
+        "type": "string",
+        "value": "NONE"
+      },
+      {
         "name": "sharedId",
         "type": "int",
         "value": 12
@@ -1019,6 +1119,11 @@
         "name": "isRoomLink",
         "type": "bool",
         "value": true
+      },
+      {
+        "name": "lockType",
+        "type": "string",
+        "value": "NONE"
       },
       {
         "name": "sharedId",
@@ -1070,6 +1175,11 @@
         "value": true
       },
       {
+        "name": "lockType",
+        "type": "string",
+        "value": "NONE"
+      },
+      {
         "name": "sharedId",
         "type": "int",
         "value": 9
@@ -1117,6 +1227,11 @@
         "name": "isRoomLink",
         "type": "bool",
         "value": true
+      },
+      {
+        "name": "lockType",
+        "type": "string",
+        "value": "CODE_LOCK"
       },
       {
         "name": "sharedId",
@@ -1168,6 +1283,11 @@
         "value": false
       },
       {
+        "name": "lockType",
+        "type": "string",
+        "value": "NONE"
+      },
+      {
         "name": "sharedId",
         "type": "int",
         "value": 2
@@ -1215,6 +1335,11 @@
         "name": "isRoomLink",
         "type": "bool",
         "value": true
+      },
+      {
+        "name": "lockType",
+        "type": "string",
+        "value": "NONE"
       },
       {
         "name": "sharedId",

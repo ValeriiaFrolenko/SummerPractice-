@@ -1,5 +1,6 @@
 package ui;
 
+import javafx.scene.Node;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.control.Button;
@@ -8,7 +9,7 @@ import entities.Player;
 import java.util.List;
 
 // Магазин для купівлі предметів, розширює UIWindow
-public class Shop extends UIWindow {
+public class Shop implements UIWindow {
     // Поля
     private List<ShopItem> items; // Список предметів у магазині
     private int playerMoney; // Гроші гравця
@@ -23,7 +24,6 @@ public class Shop extends UIWindow {
 
     // Обробляє ввід
     // Отримує KeyEvent від UIManager
-    @Override
     public void handleInput(KeyEvent event) {}
 
     // Купує предмет
@@ -37,4 +37,19 @@ public class Shop extends UIWindow {
     // Створює UI магазину
     // Налаштовує shopPane, додає компоненти
     public void createShopUI() {}
+
+    @Override
+    public void show() {
+
+    }
+
+    @Override
+    public void hide() {
+
+    }
+
+    @Override
+    public Node getRoot() {
+        return null;
+    }
 }

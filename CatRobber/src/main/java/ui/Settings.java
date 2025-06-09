@@ -1,6 +1,7 @@
 package ui;
 
 import interfaces.Savable;
+import javafx.scene.Node;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.control.Slider;
@@ -14,7 +15,7 @@ import javafx.scene.input.KeyCode;
 import javafx.geometry.Dimension2D;
 
 // Налаштування гри, розширює UIWindow, реалізує Savable
-public class Settings extends UIWindow implements Savable {
+public class Settings implements Savable, UIWindow {
     // Поля
     private double volume; // Загальна гучність
     private Map<Action, KeyCode> controls; // Налаштування керування
@@ -25,6 +26,21 @@ public class Settings extends UIWindow implements Savable {
     private Button applyButton; // Кнопка "Застосувати"
     private Button cancelButton; // Кнопка "Скасувати"
 
+    @Override
+    public void show() {
+
+    }
+
+    @Override
+    public void hide() {
+
+    }
+
+    @Override
+    public Node getRoot() {
+        return null;
+    }
+
     // Енум для дій керування
     public enum Action { MOVE_UP, MOVE_DOWN, MOVE_LEFT, MOVE_RIGHT, INTERACT }
 
@@ -34,7 +50,6 @@ public class Settings extends UIWindow implements Savable {
 
     // Обробляє ввід
     // Отримує KeyEvent від UIManager
-    @Override
     public void handleInput(KeyEvent event) {}
 
     // Зберігає налаштування

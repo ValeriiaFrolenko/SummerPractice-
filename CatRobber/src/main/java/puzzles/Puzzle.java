@@ -1,47 +1,56 @@
 package puzzles;
 
+import entities.Door;
 import interfaces.Savable;
 import org.json.JSONObject;
 import javafx.scene.Node;
 import javafx.stage.Stage;
 
-// Абстрактний базовий клас для головоломок, реалізує Savable
 public abstract class Puzzle implements Savable {
-    // Поля
-    protected PuzzleState state; // Стан головоломки (UNSOLVED, SOLVED)
-    protected Object solution; // Правильне рішення
-    protected Node uiNode; // UI-компонент для UIManager
-    protected Stage stage; // Окреме вікно для головоломки
+    protected PuzzleState state;
+    protected Object solution;
+    protected Node uiNode;
+    protected Stage stage;
+    protected Door linkedDoor; // Двері, пов’язані з головоломкою
+    protected PuzzleCallback callback; // Callback для повідомлення результату
 
-    // Енум для стану головоломки
     public enum PuzzleState { UNSOLVED, SOLVED }
 
-    // Конструктор
-    // Отримує defaultData з /data/defaults/puzzles_level_X.json
-    public Puzzle(JSONObject defaultData) {}
+    // Інтерфейс для callback
+    public interface PuzzleCallback {
+        void onPuzzleSolved(boolean solved, Door door);
+    }
 
-    // Перевіряє рішення
-    // Отримує input від UIManager, передає результат у Door
+    public Puzzle(JSONObject defaultData) {
+        this.state = PuzzleState.UNSOLVED;
+        this.solution = defaultData.opt("solution");
+    }
+
+    // Встановлює двері та callback
+    public void setLinkedDoor(Door door, PuzzleCallback callback) {
+        this.linkedDoor = door;
+        this.callback = callback;
+    }
+
     public abstract void solve(Object input);
 
-    // Повертає UI головоломки
-    // Передає Node у UIManager.showPuzzleUI
     public abstract Node getUI();
 
-    // Ініціалізує з дефолтних даних
-    // Отримує дані з /data/defaults/puzzles_level_X.json
     public void initializeFromDefault() {}
 
-    // Ініціалізує зі збереження
-    // Отримує дані з /data/saves/puzzles_current.json
-    public void initializeFromSave(JSONObject saveData) {}
+    public void initializeFromSave(JSONObject saveData) {
+        this.state = PuzzleState.valueOf(saveData.optString("state", "UNSOLVED"));
+    }
 
-    // Методи Savable
-    // Повертає JSON-стан (state, solution)
     @Override
-    public JSONObject getSerializableData() { return null; }
+    public JSONObject getSerializableData() {
+        JSONObject data = new JSONObject();
+        data.put("state", state.toString());
+        return data;
+    }
 
-    // Ініціалізує з JSON
     @Override
-    public void setFromData(JSONObject data) {}
+    public void setFromData(JSONObject data) {
+        this.state = PuzzleState.valueOf(data.optString("state", "UNSOLVED"));
+    }
 }

@@ -4,9 +4,9 @@
   "x": 647,
   "width": 67.9654974644651,
   "y": 62,
-  "alertTimer": -0.007055200000004411,
+  "alertTimer": -0.007308999999998834,
   "type": "Camera",
   "height": 33.9827487322325,
-  "direction": "LEFT",
+  "direction": "RIGHT",
   "animation": "normal"
 }}

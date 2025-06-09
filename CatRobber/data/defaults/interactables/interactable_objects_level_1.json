@@ -1,1 +1,82 @@
-{}
+{
+  "interactable_158": {
+    "visible": true,
+    "rotation": 0,
+    "name": "withMoney",
+    "width": 30,
+    "x": 668,
+    "y": 186.666666666667,
+    "id": 158,
+    "type": "InteractiveObject",
+    "properties": [{
+      "name": "type",
+      "type": "string",
+      "value": "WITH_MONEY"
+    }],
+    "height": 45
+  },
+  "interactable_159": {
+    "visible": true,
+    "rotation": 0,
+    "name": "withMoney",
+    "width": 30,
+    "x": 1204.66666666667,
+    "y": 306.666666666667,
+    "id": 159,
+    "type": "InteractiveObject",
+    "properties": [{
+      "name": "type",
+      "type": "string",
+      "value": "WITH_MONEY"
+    }],
+    "height": 45
+  },
+  "interactable_154": {
+    "visible": true,
+    "rotation": 0,
+    "name": "elecrtricalPanel",
+    "width": 44,
+    "x": 405,
+    "y": 180,
+    "id": 154,
+    "type": "InteractiveObject",
+    "properties": [{
+      "name": "type",
+      "type": "string",
+      "value": "ELECTRICAL_PANEL"
+    }],
+    "height": 40
+  },
+  "interactable_160": {
+    "visible": true,
+    "rotation": 0,
+    "name": "finalPrice",
+    "width": 60,
+    "x": 552,
+    "y": 430.666666666667,
+    "id": 160,
+    "type": "InteractiveObject",
+    "properties": [{
+      "name": "type",
+      "type": "string",
+      "value": "FINAL_PRICE"
+    }],
+    "height": 45
+  },
+  "interactable_152": {
+    "visible": true,
+    "rotation": 0,
+    "name": "note",
+    "width": 24,
+    "x": 195,
+    "y": 288,
+    "id": 152,
+    "type": "InteractiveObject",
+    "properties": [{
+      "name": "type",
+      "type": "string",
+      "value": "NOTE"
+    }],
+    "height": 24
+  }
+}

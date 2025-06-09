@@ -38,8 +38,13 @@ public class Player implements Animatable, GameObject, Interactable {
     private String[] spritePaths; // Шляхи до спрайтів
     private boolean canMove; // Чи може гравець рухатися
     private int detectionCount;
+    private int money;
     public void setDirection(Direction direction) {
         this.direction = direction;
+    }
+
+    public void addMoney(int i) {
+        money+=i;
     }
 
     // Напрями та стани гравця
@@ -62,6 +67,8 @@ public class Player implements Animatable, GameObject, Interactable {
         this.imageY = jsonImageY - imageHeight;
         this.collX = jsonCollX;
         this.collY = jsonCollY;
+        this.detectionCount = defaultData.getInt("detectionCount");
+        this.money = defaultData.getInt("money");
         // Ініціалізація інших параметрів
         this.canMove = defaultData.optBoolean("canMove", true);
         String directionStr = defaultData.optString("direction", "RIGHT").toUpperCase();

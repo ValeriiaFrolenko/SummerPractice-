@@ -69,7 +69,7 @@ public class Police implements Animatable, GameObject, Interactable{
 
     @Override
     public String getInteractionPrompt() {
-        return "";
+        return "Press Q to hit";
     }
 
     // Напрями та стани поліцейського
@@ -102,42 +102,58 @@ public class Police implements Animatable, GameObject, Interactable{
 
     // --- Ініціалізація та оновлення ---
 
-    // Оновлює логіку поліцейського (викликається з GameManager.update())
+    // Перевіряє, чи гравець у тій самій кімнаті
+    private boolean isPlayerInSameRoom(List<GameManager.Room> rooms, Player player) {
+        Bounds playerBounds = player.getBounds();
+        Bounds policeBounds = getBounds();
+        for (GameManager.Room room : rooms) {
+            if (room.getBounds().contains(policeBounds.getCenterX(), policeBounds.getCenterY()) &&
+                    room.getBounds().contains(playerBounds.getCenterX(), playerBounds.getCenterY())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     // Оновлює логіку поліцейського (викликається з GameManager.update())
     public void update(double deltaTime, List<GameManager.Room> rooms, Player player) {
         // Оновлення стану оглушення
         if (state == PoliceState.STUNNED) {
             stunDuration -= deltaTime;
             if (stunDuration <= 0) {
-                state = PoliceState.PATROL;
-                setAnimationState("patrol");
+                inSameRoom = isPlayerInSameRoom(rooms, player);
+                if (inSameRoom) {
+                    state = PoliceState.CHASE;
+                    setAnimationState("patrol");
+                    // Визначаємо напрямок до гравця
+                    double playerX = player.getPosition().x;
+                    double policeX = getPosition().x;
+                    if (playerX < policeX) {
+                        direction = PoliceDirection.LEFT;
+                    } else {
+                        direction = PoliceDirection.RIGHT;
+                    }
+                } else {
+                    state = PoliceState.PATROL;
+                    setAnimationState("patrol");
+                }
             }
             return;
         }
 
         // Перевірка, чи гравець у тій самій кімнаті
-        Bounds playerBounds = player.getBounds();
-        Bounds policeBounds = getBounds();
-        inSameRoom = false;
-
-        for (GameManager.Room room : rooms) {
-            if (room.getBounds().contains(policeBounds.getCenterX(), policeBounds.getCenterY()) &&
-                    room.getBounds().contains(playerBounds.getCenterX(), playerBounds.getCenterY())) {
-                inSameRoom = true;
-                break;
-            }
-        }
+        inSameRoom = isPlayerInSameRoom(rooms, player);
 
         // Якщо гравець у тій самій кімнаті, перевіряємо виявлення
         if (inSameRoom) {
             canSeePlayer = false;
             double playerX = player.getPosition().x;
             double policeX = getPosition().x;
-            double playerCenterX = playerBounds.getCenterX();
-            double policeMinX = policeBounds.getMinX();
-            double policeMaxX = policeBounds.getMaxX();
-            double policeMidX = policeMinX + policeBounds.getWidth() / 2.0;
-            double policeWidth = policeBounds.getWidth();
+            double playerCenterX = player.getBounds().getCenterX();
+            double policeMinX = getBounds().getMinX();
+            double policeMaxX = getBounds().getMaxX();
+            double policeMidX = policeMinX + getBounds().getWidth() / 2.0;
+            double policeWidth = getBounds().getWidth();
 
             // Перевірка позиції гравця (лівіше для LEFT, правіше для RIGHT)
             if (direction == PoliceDirection.LEFT && playerX < policeX ||
@@ -146,9 +162,9 @@ public class Police implements Animatable, GameObject, Interactable{
             }
 
             // Перевірка перетину меж
-            if (playerBounds.intersects(policeBounds)) {
+            if (player.getBounds().intersects(getBounds())) {
                 // Повний перетин: гравець повністю в межах поліцейського
-                if (playerBounds.getMinX() >= policeMinX && playerBounds.getMaxX() <= policeMaxX) {
+                if (player.getBounds().getMinX() >= policeMinX && player.getBounds().getMaxX() <= policeMaxX) {
                     canSeePlayer = true;
                 } else {
                     // Часткове перетин: перевіряємо передню половину
@@ -158,14 +174,7 @@ public class Police implements Animatable, GameObject, Interactable{
                         canSeePlayer = true; // Гравець у передній половині (права для RIGHT)
                     } else {
                         // Задня половина: перевіряємо, чи перетин більше половини
-                        double overlapWidth = 0.0;
-                        if (direction == PoliceDirection.LEFT) {
-                            // Для LEFT задня половина — права (playerCenterX > policeMidX)
-                            overlapWidth = Math.min(playerBounds.getMaxX(), policeMaxX) - Math.max(playerBounds.getMinX(), policeMinX);
-                        } else if (direction == PoliceDirection.RIGHT) {
-                            // Для RIGHT задня половина — ліва (playerCenterX < policeMidX)
-                            overlapWidth = Math.min(playerBounds.getMaxX(), policeMaxX) - Math.max(playerBounds.getMinX(), policeMinX);
-                        }
+                        double overlapWidth = Math.min(player.getBounds().getMaxX(), policeMaxX) - Math.max(player.getBounds().getMinX(), policeMinX);
                         if (overlapWidth > policeWidth / 2.0) {
                             canSeePlayer = true; // Перетин ззаду більше половини
                         }
@@ -199,6 +208,7 @@ public class Police implements Animatable, GameObject, Interactable{
             patrol(deltaTime, normalSpeed);
         }
     }
+
     // Патрулює зі вказаною швидкістю
     public void patrol(double deltaTime, double speed) {
         setAnimationState("patrol");

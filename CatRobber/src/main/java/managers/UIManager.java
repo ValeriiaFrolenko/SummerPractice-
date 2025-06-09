@@ -1,65 +1,182 @@
 package managers;
 
 import interfaces.Renderable;
+import javafx.geometry.Insets;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
 import javafx.scene.control.Label;
 import javafx.scene.Node;
 import ui.UIWindow;
-
+import ui.InteractiveObjectWindow;
+import ui.Menu;
+import ui.Settings;
+import ui.Shop;
+import org.json.JSONObject;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.CornerRadii;
+import javafx.scene.paint.Color;
+import main.GameWindow;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
-// Керує інтерфейсом користувача, реалізує Renderable
 public class UIManager implements Renderable {
-    // Поля
-    private Canvas canvas; // Canvas для рендерингу
-    private UIWindow currentWindow; // Поточне вікно (Menu, Settings, Shop)
-    private Map<WindowType, UIWindow> windows; // Усі вікна за типами
-    private List<String> interactionPrompts; // Підказки взаємодії
-    private Pane overlayPane; // Панель для діалогів і головоломок
-    private VBox dialogBox; // Контейнер для діалогів
-    private Label interactionLabel; // Текст підказки
+    private Canvas canvas;
+    private UIWindow currentWindow;
+    private List<String> interactionPrompts;
+    private Pane overlayPane;
+    private Label interactionLabel;
 
-    // Енум для типів вікон
-    public enum WindowType { MENU, SETTINGS, SHOP }
+    public enum WindowType { MENU, SETTINGS, SHOP, NOTE, PICTURE, COMPUTER, VICTORY, GAME_OVER }
 
-    // Конструктор
-    // Отримує canvas від GameWindow
-    public UIManager(Canvas canvas) {}
+    public UIManager(Canvas canvas) {
+        this.canvas = canvas;
+        this.overlayPane = new Pane();
+        this.interactionLabel = new Label();
+        this.interactionLabel.setBackground(new Background(new BackgroundFill(
+                Color.WHITE,
+                new CornerRadii(5),
+                new Insets(5)
+        )));
+        this.interactionLabel.setTextFill(Color.BLACK);
+        this.interactionLabel.setPadding(new Insets(5));
+        this.interactionLabel.setStyle("-fx-font-size: 14;");
+        this.interactionPrompts = new ArrayList<>();
+        // Додаємо обробку клавіш для overlayPane
+        overlayPane.setFocusTraversable(true);
+        overlayPane.setOnKeyPressed(this::handleInput);
+    }
 
-    // Показує вікно за типом
-    // Отримує тип (MENU, SETTINGS, SHOP), встановлює currentWindow
-    public void showWindow(WindowType type) {}
+    public UIWindow createWindow(WindowType type, JSONObject config) {
+        if (currentWindow != null) {
+            System.out.println("Window creation skipped: existing window = " + currentWindow);
+            return currentWindow;
+        }
+        System.out.println("Creating window: " + type);
+        GameManager.getInstance().setGameState(GameManager.GameState.PAUSED);
+        switch (type) {
+            case MENU:
+                currentWindow = new Menu(config);
+                break;
+            case SETTINGS:
+                currentWindow = new Settings(config);
+                break;
+            case SHOP:
+                currentWindow = new Shop(config.optInt("playerMoney", 0));
+                break;
+            case NOTE:
+            case PICTURE:
+            case COMPUTER:
+            case VICTORY:
+            case GAME_OVER:
+                currentWindow = new InteractiveObjectWindow(this, type, config);
+                break;
+            default:
+                currentWindow = null;
+                break;
+        }
+        if (currentWindow != null) {
+            currentWindow.show();
+            System.out.println("Window shown: " + type);
+        }
+        return currentWindow;
+    }
 
-    // Обробляє ввід
-    // Отримує KeyEvent від InputHandler, передає в GameManager або Puzzle
-    public void handleInput(KeyEvent event) {}
+    public UIWindow getCurrentWindow() {
+        return currentWindow;
+    }
 
-    // Показує діалог
-    // Отримує текст від Note, Computer
-    public void showDialog(String text) {}
+    public void hideCurrentWindow() {
+        if (currentWindow != null) {
+            currentWindow.hide();
+            currentWindow = null;
+            overlayPane.getChildren().clear();
+            GameManager.getInstance().setGameState(GameManager.GameState.PLAYING);
+            if (GameWindow.getInstance().getPrimaryStage() != null) {
+                GameWindow.getInstance().getPrimaryStage().requestFocus();
+                System.out.println("Window closed, game state restored to PLAYING, focus requested");
+            } else {
+                System.err.println("Primary stage is null");
+            }
+        } else {
+            System.out.println("No window to close");
+        }
+    }
 
-    // Показує підказку взаємодії
-    // Отримує текст від Interactable.getInteractionPrompt
-    public void showInteractionPrompt(String prompt) {}
+    public void showPuzzleUI(Node uiNode) {
+        if (overlayPane != null && uiNode != null) {
+            overlayPane.getChildren().clear();
+            overlayPane.getChildren().add(uiNode);
+            // Центрування панелі
+            uiNode.setLayoutX((canvas.getWidth() - ((Pane) uiNode).getPrefWidth()) / 2);
+            uiNode.setLayoutY((canvas.getHeight() - ((Pane) uiNode).getPrefHeight()) / 2);
+            GameManager.getInstance().setGameState(GameManager.GameState.PAUSED);
+            System.out.println("Puzzle UI shown");
+        }
+    }
 
-    // Приховує підказку взаємодії
-    public void hideInteractionPrompt() {}
+    public void hidePuzzleUI() {
+        if (overlayPane != null) {
+            overlayPane.getChildren().clear();
+            GameManager.getInstance().setGameState(GameManager.GameState.PLAYING);
+            if (GameWindow.getInstance().getPrimaryStage() != null) {
+                GameWindow.getInstance().getPrimaryStage().requestFocus();
+            }
+            System.out.println("Puzzle UI hidden");
+        }
+    }
 
-    // Методи Renderable
-    // Малює UI, отримує GraphicsContext від GameWindow
+    public void handleInput(KeyEvent event) {
+        if (event.getCode() == KeyCode.ESCAPE) {
+            System.out.println("Esc pressed, closing window or puzzle UI");
+            if (currentWindow != null) {
+                hideCurrentWindow();
+            } else if (!overlayPane.getChildren().isEmpty()) {
+                hidePuzzleUI();
+            }
+        }
+    }
+
+    public void showInteractionPrompt(String prompt) {
+        if (overlayPane != null && interactionLabel != null && prompt != null && !prompt.isEmpty()) {
+            if (currentWindow == null) {
+                interactionLabel.setText(prompt);
+                if (!overlayPane.getChildren().contains(interactionLabel)) {
+                    overlayPane.getChildren().add(interactionLabel);
+                }
+                interactionLabel.setLayoutX((canvas.getWidth() - interactionLabel.prefWidth(-1)) / 2);
+                interactionLabel.setLayoutY(canvas.getHeight() - 50);
+                System.out.println("Showing interaction prompt: " + prompt);
+            }
+        } else {
+            hideInteractionPrompt();
+        }
+    }
+
+    public void hideInteractionPrompt() {
+        if (overlayPane != null && interactionLabel != null) {
+            overlayPane.getChildren().remove(interactionLabel);
+            System.out.println("Interaction prompt hidden");
+        }
+    }
+
+    public Pane getOverlayPane() {
+        return overlayPane;
+    }
+
     @Override
     public void render(GraphicsContext gc) {}
 
-    // Повертає шар рендерингу (2 для UI)
     @Override
-    public int getRenderLayer() { return 2; }
+    public int getRenderLayer() {
+        return 2;
+    }
 
-    // Перевіряє видимість (true якщо currentWindow не null)
     @Override
-    public boolean isVisible() { return false; }
+    public boolean isVisible() {
+        return true;
+    }
 }

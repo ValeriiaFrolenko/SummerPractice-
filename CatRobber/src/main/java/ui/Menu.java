@@ -1,5 +1,6 @@
 package ui;
 
+import javafx.scene.Node;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.VBox;
 import javafx.scene.control.Button;
@@ -9,7 +10,7 @@ import managers.GameManager;
 import managers.SaveManager;
 
 // Головне меню гри, розширює UIWindow
-public class Menu extends UIWindow {
+public class Menu implements UIWindow {
     // Поля
     private VBox menuPane; // Контейнер для UI
     private Button newGameButton; // Кнопка "Нова гра"
@@ -23,7 +24,6 @@ public class Menu extends UIWindow {
 
     // Обробляє ввід
     // Отримує KeyEvent від UIManager, передає в GameManager
-    @Override
     public void handleInput(KeyEvent event) {}
 
     // Починає нову гру
@@ -41,4 +41,19 @@ public class Menu extends UIWindow {
     // Створює UI меню
     // Налаштовує menuPane, додає кнопки
     public void createMenuUI() {}
+
+    @Override
+    public void show() {
+
+    }
+
+    @Override
+    public void hide() {
+
+    }
+
+    @Override
+    public Node getRoot() {
+        return null;
+    }
 }

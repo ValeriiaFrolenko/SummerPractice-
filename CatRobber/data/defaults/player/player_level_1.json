@@ -70,6 +70,11 @@
       "value": 0
     },
     {
+      "name": "money",
+      "type": "int",
+      "value": 0
+    },
+    {
       "name": "speedBoost",
       "type": "int",
       "value": 0

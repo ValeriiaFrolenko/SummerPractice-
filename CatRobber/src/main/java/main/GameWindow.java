@@ -2,6 +2,7 @@ package main;
 
 import entities.Player;
 import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.input.KeyCode;
@@ -18,134 +19,155 @@ import javafx.animation.AnimationTimer;
 
 public class GameWindow {
     // Поля
-    private Stage primaryStage; // Головне вікно JavaFX, отримане від GameApplication
-    private Scene scene; // Сцена JavaFX, містить canvas для рендерингу
-    private Canvas canvas; // Полотно для малювання гри
-    private GraphicsContext graphicsContext; // Контекст для рендерингу на canvas
-    private GameManager gameManager; // Менеджер гри (логіка, рівні, сутності)
-    private UIManager uiManager; // Менеджер UI (інтерфейс, меню)
-    private SoundManager soundManager; // Менеджер звуку
-    private SaveManager saveManager; // Менеджер збереження гри
-    private InputHandler inputHandler; // Обробник вводу (клавіатура, миша)
-    private AnimationTimer animationTimer; // Таймер для ігрового циклу
-    private boolean isRunning; // Прапорець роботи ігрового циклу
-    private long lastFrameTime; // Час останнього кадру для обчислення deltaTime
+    private static GameWindow instance; // Singleton-екземпляр
+    private Stage primaryStage;
+    private Scene scene;
+    private Canvas canvas;
+    private GraphicsContext graphicsContext;
+    private GameManager gameManager;
+    private UIManager uiManager;
+    private SoundManager soundManager;
+    private SaveManager saveManager;
+    private InputHandler inputHandler;
+    private AnimationTimer animationTimer;
+    private boolean isRunning;
+    private long lastFrameTime;
 
-    // Конструктор, ініціалізує primaryStage
+    // Конструктор
     public GameWindow(Stage primaryStage) {
-        this.primaryStage = primaryStage; // Зберігаємо головне вікно
-        primaryStage.setResizable(false); // Вимикаємо зміну розміру вікна
+        this.primaryStage = primaryStage;
+        primaryStage.setResizable(false);
+        instance = this; // Зберігаємо екземпляр
+    }
+
+    // Повертає єдиний екземпляр GameWindow
+    public static GameWindow getInstance() {
+        if (instance == null) {
+            throw new IllegalStateException("GameWindow не ініціалізовано");
+        }
+        return instance;
     }
 
     // Налаштовує вікно, сцену, canvas і менеджери
     public void initialize() {
-        // Створюємо canvas із фіксованими розмірами 1280x640
         canvas = new Canvas(1280, 640);
-        graphicsContext = canvas.getGraphicsContext2D(); // Отримуємо контекст для малювання
-        graphicsContext.setImageSmoothing(false); // Вимикаємо згладжування для піксельної графіки
+        graphicsContext = canvas.getGraphicsContext2D();
+        graphicsContext.setImageSmoothing(false);
 
-        // Створюємо корінь (Group) для сцени
+        gameManager = GameManager.getInstance();
+        uiManager = new UIManager(canvas);
+        soundManager = new SoundManager();
+        saveManager = new SaveManager();
+
         Group root = new Group();
-        root.getChildren().add(canvas); // Додаємо canvas до кореня
+        root.getChildren().add(canvas);
+        root.getChildren().add(uiManager.getOverlayPane());
 
-        // Створюємо сцену з розмірами 1280x640
         scene = new Scene(root, 1280, 640);
-        primaryStage.setTitle("CatRobber"); // Встановлюємо заголовок вікна
-        primaryStage.setScene(scene); // Встановлюємо сцену
-        primaryStage.show(); // Показуємо вікно
+        primaryStage.setTitle("CatRobber");
+        primaryStage.setScene(scene);
+        primaryStage.show();
 
-        // Прив'язуємо розміри canvas до розмірів сцени
+        inputHandler = new InputHandler(scene);
+        inputHandler.setupKeyHandlers();
+        inputHandler.setupMouseHandlers();
+        // Реєструємо колбек для взаємодії
+        gameManager.registerInteractionCallback(inputHandler);
+
         canvas.widthProperty().bind(scene.widthProperty());
         canvas.heightProperty().bind(scene.heightProperty());
 
-        // Оновлюємо масштаб фону при зміні розміру сцени
         scene.widthProperty().addListener((obs, oldVal, newVal) -> {
-            gameManager.updateBackgroundScale(newVal.doubleValue(), scene.getHeight()); // Оновлюємо масштаб фону
+            gameManager.updateBackgroundScale(newVal.doubleValue(), scene.getHeight());
         });
         scene.heightProperty().addListener((obs, oldVal, newVal) -> {
-            gameManager.updateBackgroundScale(scene.getWidth(), newVal.doubleValue()); // Оновлюємо масштаб фону
+            gameManager.updateBackgroundScale(scene.getWidth(), newVal.doubleValue());
         });
 
-        // Ініціалізуємо менеджери
-        initializeManagers();
         handleWindowEvents();
 
-        // Починаємо нову гру з рівнем 1
         startNewGame(1);
 
-        // Оновлюємо масштаб фону для початкових розмірів сцени
         gameManager.updateBackgroundScale(scene.getWidth(), scene.getHeight());
     }
 
     // Ініціалізує менеджери гри
     public void initializeManagers() {
-        gameManager = GameManager.getInstance(); // Отримуємо singleton-екземпляр GameManager
-        uiManager = new UIManager(canvas); // Створюємо UIManager, передаючи canvas
-        soundManager = new SoundManager(); // Створюємо SoundManager
-        saveManager = new SaveManager(); // Створюємо SaveManager
-        inputHandler = new InputHandler(scene); // Створюємо InputHandler, передаючи сцену
-        inputHandler.setupKeyHandlers(); // Налаштовуємо обробники клавіатури
-        inputHandler.setupMouseHandlers(); // Налаштовуємо обробники миші
+        gameManager = GameManager.getInstance();
+        uiManager = new UIManager(canvas);
+        soundManager = new SoundManager();
+        saveManager = new SaveManager();
+        inputHandler = new InputHandler(scene);
+        inputHandler.setupKeyHandlers();
+        inputHandler.setupMouseHandlers();
     }
 
-    // Запускає ігровий цикл
+    // Повертає UIManager
+    public UIManager getUIManager() {
+        return uiManager;
+    }
+
+    // Решта методів без змін
     public void startGameLoop() {
-        isRunning = true; // Встановлюємо прапорець роботи
-        animationTimer = new AnimationTimer() { // Створюємо таймер для циклу
+        isRunning = true;
+        animationTimer = new AnimationTimer() {
             @Override
             public void handle(long currentNanoTime) {
-                if (!isRunning) return; // Виходимо, якщо гра зупинена
-                double deltaTime = (currentNanoTime - lastFrameTime) / 1_000_000_000.0; // Обчислюємо час між кадрами
-                lastFrameTime = currentNanoTime; // Оновлюємо час останнього кадру
-                update(deltaTime); // Оновлюємо логіку гри
-                render(); // Рендеримо кадр
+                if (!isRunning) return;
+                double deltaTime = (currentNanoTime - lastFrameTime) / 1_000_000_000.0;
+                lastFrameTime = currentNanoTime;
+                update(deltaTime);
+                render();
             }
         };
-        lastFrameTime = System.nanoTime(); // Ініціалізуємо початковий час
-        animationTimer.start(); // Запускаємо таймер
+        lastFrameTime = System.nanoTime();
+        animationTimer.start();
     }
 
-    // Оновлює логіку гри
     public void update(double deltaTime) {
-        gameManager.update(deltaTime); // Оновлюємо стан гри (сутності, логіку)
-        gameManager.handleInput(inputHandler, deltaTime); // Обробляємо ввід користувача
+        gameManager.update(deltaTime);
+        gameManager.handleInput(inputHandler, deltaTime);
     }
 
-    // Рендерить кадр
     public void render() {
-        graphicsContext.clearRect(0, 0, canvas.getWidth(), canvas.getHeight()); // Очищаємо canvas
-        gameManager.render(graphicsContext); // Рендеримо гру (фон, сутності)
-        gameManager.drawRoomOutlines(graphicsContext); // Малюємо контури кімнат
-        uiManager.render(graphicsContext); // Рендеримо UI
+        graphicsContext.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
+        gameManager.render(graphicsContext);
+        gameManager.drawRoomOutlines(graphicsContext);
+        uiManager.render(graphicsContext);
     }
 
-    // Налаштовує обробку подій вікна
     public void handleWindowEvents() {
         primaryStage.setOnCloseRequest(event -> {
-            Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Вийти з гри?"); // Показуємо діалог підтвердження
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Вийти з гри?");
             if (alert.showAndWait().get() != ButtonType.OK) {
-                event.consume(); // Скасовуємо закриття, якщо користувач не підтвердив
+                event.consume();
             } else {
-                cleanup(); // Очищаємо ресурси при підтвердженні
+                cleanup();
             }
         });
     }
 
-    // Очищає ресурси гри
     public void cleanup() {
-        isRunning = false; // Зупиняємо ігровий цикл
-        animationTimer.stop(); // Зупиняємо таймер
-        gameManager.saveGame(); // Зберігаємо гру
-        soundManager.stopAllSounds(); // Зупиняємо всі звуки
+        isRunning = false;
+        animationTimer.stop();
+        gameManager.saveGame();
+        soundManager.stopAllSounds();
     }
 
-    // Починає нову гру
     private void startNewGame(int levelId) {
-        gameManager.loadLevel(levelId, true); // Завантажуємо рівень як нову гру
+        gameManager.loadLevel(levelId, true);
+        gameManager.setGameState(GameManager.GameState.PLAYING); // Явно встановлюємо PLAYING
     }
 
-    // Завантажує збережену гру
     private void loadSavedGame(int levelId) {
-        gameManager.loadLevel(levelId, false); // Завантажуємо рівень зі збереження
+        gameManager.loadLevel(levelId, false);
+    }
+
+    public void setPrimaryStage(Stage primaryStage) {
+        this.primaryStage = primaryStage;
+    }
+
+    public Stage getPrimaryStage() {
+        return primaryStage;
     }
 }

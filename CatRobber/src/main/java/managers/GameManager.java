@@ -7,6 +7,7 @@ import javafx.geometry.Bounds;
 import javafx.scene.image.Image;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.KeyCode;
+import main.GameWindow;
 import org.json.JSONObject;
 import puzzles.Puzzle;
 import utils.GameLoader;
@@ -38,6 +39,11 @@ public class GameManager implements Savable {
     private double canvasWidth; // Ширина canvas, отримується від GameWindow
     private double canvasHeight; // Висота canvas, отримується від GameWindow
     private Interactable closestInteractable;
+
+    public void setGameState(GameState gameState) {
+        this.gameState = gameState;
+    }
+
 
     // Перелік станів гри
     public enum GameState {MENU, PLAYING, PAUSED, GAME_OVER}
@@ -85,6 +91,18 @@ public class GameManager implements Savable {
         return instance; // Повертаємо екземпляр для використання в GameWindow
     }
 
+    public void registerInteractionCallback(InputHandler inputHandler) {
+        inputHandler.registerCallback(KeyCode.E, () -> {
+            UIManager uiManager = GameWindow.getInstance().getUIManager();
+            if (uiManager.getCurrentWindow() == null && closestInteractable != null && closestInteractable instanceof InteractiveObject interactiveObject) {
+                System.out.println("E pressed, interacting with: " + interactiveObject.getType());
+                interactiveObject.interact(player);
+            } else {
+                System.out.println("E pressed, blocked: window=" + uiManager.getCurrentWindow() + ", interactable=" + closestInteractable);
+            }
+        });
+    }
+
     // Обробляє ввід гравця, викликається з GameWindow.update()
     public void handleInput(InputHandler inputHandler, double deltaTime) {
         if (player == null) return;
@@ -94,6 +112,8 @@ public class GameManager implements Savable {
         managePlayerOpenDoor(inputHandler);
         checkCollisions();
     }
+
+
 
     private void managePlayerHit(InputHandler inputHandler, double deltaTime) {
         if (inputHandler.isKeyPressed(KeyCode.Q)) {
@@ -112,12 +132,6 @@ public class GameManager implements Savable {
             if (closestInteractable != null && closestInteractable instanceof Door) {
                 Door door = (Door) closestInteractable;
                 door.open(player);
-                int id = door.getSharedId();
-                for (Interactable interactable: interactables){
-                    if (interactable instanceof Door && ((Door) interactable).getSharedId() == id ){
-                        ((Door) interactable).open(player); //Відкртваємо також двері з іншої сторони
-                    }
-                }
             }
         }
     }
@@ -176,7 +190,7 @@ public class GameManager implements Savable {
             if (obj instanceof Police) police.add((Police) obj); // Додаємо поліцейських
             if (obj instanceof SecurityCamera) cameras.add((SecurityCamera) obj); // Додаємо камери
             if (obj instanceof Interactable) {interactables.add((Interactable) obj);
-         System.out.println("Додано інтерактивний об'єкт: " + obj.getClass().getSimpleName());}
+            }
         }
     }
 
@@ -217,25 +231,26 @@ public class GameManager implements Savable {
 
     // Оновлює логіку гри, викликається з GameWindow.update()
     public void update(double deltaTime) {
-        if (gameState != GameState.PLAYING) return; // Виходимо, якщо гра не в стані PLAYING
+        if (gameState != GameState.PLAYING) {
+            return;
+        }
         if (player != null) {
-            player.updateAnimation(deltaTime); // Оновлюємо анімацію гравця
+            player.updateAnimation(deltaTime);
         }
         for (Animatable animatable : animatableObjects) {
-            animatable.updateAnimation(deltaTime); // Оновлюємо анімації всіх Animatable об’єктів
+            animatable.updateAnimation(deltaTime);
         }
         for (Police police : police) {
-            police.update(deltaTime, rooms, player);// Оновлюємо логіку поліцейських
+            police.update(deltaTime, rooms, player);
             checkPoliceCollisions();
         }
         for (SecurityCamera camera : cameras) {
             camera.updateAnimation(deltaTime);
-            camera.detectPlayer(player); // Перевіряємо, чи бачить камера гравця
+            camera.detectPlayer(player);
         }
-        checkCollisions(); // Перевіряємо колізії
-        checkInteractions(); // Перевіряємо взаємодії
+        checkCollisions();
+        checkInteractions();
     }
-
     // Рендерить гру, викликається з GameWindow.render()
     public void render(GraphicsContext gc) {
         gc.setImageSmoothing(false); // Вимикаємо згладжування для піксельної графіки
@@ -376,16 +391,31 @@ public class GameManager implements Savable {
     public void checkInteractions() {
         if (player == null) return;
         closestInteractable = null;
-
+        UIManager uiManager = GameWindow.getInstance().getUIManager();
+        if (uiManager == null) {
+            System.err.println("UIManager не доступний");
+            return;
+        }
         for (Interactable interactable : interactables) {
             if (interactable.canInteract(player)) {
                 closestInteractable = interactable;
-                System.out.println("Can interact with: " + interactable.getClass().getSimpleName() +
-                        ", Player direction: " + player.getDirection());
-                break; // Берем першу доступну взаємодію
+                // Показуємо підказку лише якщо немає відкритого вікна
+                if (uiManager.getCurrentWindow() == null) {
+                    uiManager.showInteractionPrompt(interactable.getInteractionPrompt());
+                }
+                break;
             }
         }
+        if (closestInteractable == null) {
+            uiManager.hideInteractionPrompt();
+        }
     }
+
+
+    public Interactable getClosestInteractable() {
+        return closestInteractable;
+    }
+
     // Завершує гру, змінюючи стан
     public void gameOver() {
         gameState = GameState.GAME_OVER; // Встановлюємо стан GAME_OVER

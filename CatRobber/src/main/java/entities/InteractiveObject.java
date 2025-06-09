@@ -5,142 +5,215 @@ import javafx.geometry.Bounds;
 import javafx.geometry.BoundingBox;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
+import javafx.scene.paint.Color;
+import main.GameWindow;
+import managers.GameManager;
+import managers.UIManager;
 import org.json.JSONObject;
+import puzzles.LaserLockPuzzle;
 import utils.GameLoader;
 import utils.Vector2D;
 
-// Представляє інтерактивний об’єкт (нотатка, комп’ютер, драбина тощо)
 public class InteractiveObject implements GameObject, Interactable {
-    // Поля
-    private Vector2D position; // Позиція об’єкта, з JSON
-    private Image sprite; // Спрайт об’єкта, завантажений через GameLoader
-    private String spritePath; // Шлях до спрайту, з JSON
-    private Type type; // Тип об’єкта (NOTE, PICTURE, COMPUTER, LADDER), з JSON
-    private double width; // Ширина, з JSON
-    private double height; // Висота, з JSON
+    private double imageX;
+    private double imageY;
+    private double imageWidth;
+    private double imageHeight;
+    private Image sprite;
+    private String spritePath;
+    private Type type;
+    private JSONObject properties;
 
-    // Типи інтерактивних об’єктів
-    public enum Type { NOTE, PICTURE, COMPUTER, LADDER }
+    public enum Type { NOTE, PICTURE, COMPUTER, LADDER, ELECTRICAL_PANEL, WITH_MONEY, FINAL_PRICE }
 
-    // Конструктор: ініціалізує об’єкт із JSON-даними
     public InteractiveObject(Vector2D position, JSONObject properties) {
-        this.position = position;
+        this.properties = properties;
+        this.imageX = position.x;
+        this.imageY = position.y;
         this.type = Type.valueOf(properties.optString("type", "NOTE"));
         this.spritePath = properties.optString("spritePath", "interactables/default.png");
-        this.width = properties.optDouble("width", 32.0);
-        this.height = properties.optDouble("height", 32.0);
+        this.imageWidth = properties.optDouble("width", 32.0);
+        this.imageHeight = properties.optDouble("height", 32.0);
         GameLoader loader = new GameLoader();
         this.sprite = loader.loadImage(spritePath);
     }
 
-    // --- Ініціалізація та оновлення ---
-
-    // Взаємодія з гравцем (викликається з GameManager.checkInteractions())
     @Override
     public void interact(Player player) {
-        // TODO: Реалізувати взаємодію
-        // Залежно від type викликати відповідну дію (напр., player.climb() для LADDER)
+        UIManager uiManager = GameWindow.getInstance().getUIManager();
+        if (uiManager == null) {
+            System.err.println("UIManager не доступний");
+            return;
+        }
+        switch (type) {
+            case NOTE:
+                uiManager.createWindow(UIManager.WindowType.NOTE, properties);
+                break;
+            case PICTURE:
+                uiManager.createWindow(UIManager.WindowType.PICTURE, properties);
+                break;
+            case COMPUTER:
+                uiManager.createWindow(UIManager.WindowType.COMPUTER, properties);
+                break;
+            case LADDER:
+                // TODO: Реалізувати взаємодію для драбини
+                break;
+            case ELECTRICAL_PANEL:
+                // Знаходимо лазерні двері серед інтерактивних об’єктів
+                Door laserDoor = null;
+                for (Interactable obj : GameManager.getInstance().getInteractables()) {
+                    if (obj instanceof Door && ((Door) obj).isLaser()) {
+                        laserDoor = (Door) obj;
+                        break;
+                    }
+                }
+                if (laserDoor != null) {
+                    LaserLockPuzzle puzzle = new LaserLockPuzzle(new JSONObject().put("solution", "laser"));
+                    puzzle.setLinkedDoor(laserDoor, (solved, door) -> {
+                        if (solved) {
+                            door.unlock();
+                            uiManager.hidePuzzleUI(); // Закриваємо UI головоломки
+                        }
+                    });
+                    uiManager.showPuzzleUI(puzzle.getUI());
+                    System.out.println("LaserLockPuzzle opened for door: " + laserDoor.getSharedId());
+                } else {
+                    System.err.println("No laser door found among interactables");
+                }
+                break;
+            case WITH_MONEY:
+                player.addMoney(100);
+                break;
+            case FINAL_PRICE:
+                player.addMoney(500);
+                uiManager.createWindow(UIManager.WindowType.VICTORY, properties);
+                break;
+        }
     }
 
-    // Перевіряє, чи можлива взаємодія
     @Override
     public boolean canInteract(Player player) {
-        // TODO: Реалізувати перевірку
-        // Перевірити відстань до гравця через getInteractionRange()
-        return false;
+        Bounds playerBounds = player.getBounds();
+        Bounds objectBounds = this.getBounds();
+        double interactionRange = getInteractionRange();
+        Bounds extendedBounds = new BoundingBox(
+                playerBounds.getMinX(),
+                playerBounds.getMinY(),
+                playerBounds.getWidth(),
+                playerBounds.getHeight()
+        );
+        return extendedBounds.intersects(objectBounds);
     }
 
-    // --- Рендеринг ---
-
-    // Рендерить об’єкт на canvas (викликається з GameManager.render())
     @Override
     public void render(GraphicsContext gc) {
-        // TODO: Реалізувати рендеринг
-        // Намалювати sprite на gc за position, width, height
+        gc.setFill(Color.BLUE);
+        gc.fillRect(imageX, imageY, imageWidth, imageHeight);
+        if (sprite != null) {
+            gc.drawImage(sprite, imageX, imageY, imageWidth, imageHeight);
+        }
+
+        gc.setStroke(Color.RED);
+        gc.setLineWidth(1);
+        gc.strokeRect(imageX, imageY, imageWidth, imageHeight);
+
+        if (GameManager.getInstance().getClosestInteractable() == this) {
+            gc.setStroke(Color.WHITE);
+            gc.setLineWidth(4);
+            double cornerLength = 10;
+            gc.strokeLine(imageX - 2, imageY - 2, imageX - 2 + cornerLength, imageY - 2);
+            gc.strokeLine(imageX - 2, imageY - 2, imageX - 2, imageY - 2 + cornerLength);
+            gc.strokeLine(imageX + imageWidth + 2 - cornerLength, imageY - 2, imageX + imageWidth + 2, imageY - 2);
+            gc.strokeLine(imageX + imageWidth + 2, imageY - 2, imageX + imageWidth + 2, imageY - 2 + cornerLength);
+            gc.strokeLine(imageX - 2, imageY + imageHeight + 2 - cornerLength, imageX - 2, imageY + imageHeight + 2);
+            gc.strokeLine(imageX - 2, imageY + imageHeight + 2, imageX - 2 + cornerLength, imageY + imageHeight + 2);
+            gc.strokeLine(imageX + imageWidth + 2 - cornerLength, imageY + imageHeight + 2, imageX + imageWidth + 2, imageY + imageHeight + 2);
+            gc.strokeLine(imageX + imageWidth + 2, imageY + imageHeight + 2 - cornerLength, imageX + imageWidth + 2, imageY + imageHeight + 2);
+        }
     }
 
-    // --- Серіалізація ---
-
-    // Повертає JSON для збереження (викликається з SaveManager.saveInteractables())
     @Override
     public JSONObject getSerializableData() {
-        // TODO: Реалізувати серіалізацію
-        // Створити JSONObject з position, type, spritePath тощо
-        return null;
+        JSONObject data = new JSONObject();
+        data.put("type", type.toString());
+        data.put("x", imageX);
+        data.put("y", imageY);
+        data.put("width", imageWidth);
+        data.put("height", imageHeight);
+        data.put("spritePath", spritePath);
+        return data;
     }
 
-    // Відновлює стан із JSON (викликається з SaveManager.loadGame())
     @Override
     public void setFromData(JSONObject data) {
-        // TODO: Реалізувати десеріалізацію
-        // Оновити position, type, spritePath із data
+        this.imageX = data.optDouble("x", imageX);
+        this.imageY = data.optDouble("y", imageY);
+        this.imageWidth = data.optDouble("width", imageWidth);
+        this.imageHeight = data.optDouble("height", imageHeight);
+        this.spritePath = data.optString("spritePath", spritePath);
+        try {
+            this.type = Type.valueOf(data.optString("type", type.toString()));
+        } catch (IllegalArgumentException e) {
+            System.err.println("Невірне значення типу: " + data.optString("type") + ". Залишаю поточний.");
+        }
+        GameLoader loader = new GameLoader();
+        this.sprite = loader.loadImage(spritePath);
     }
 
-    // --- Геттери/Сеттери ---
-
-    // Повертає тип об’єкта
     @Override
     public String getType() {
         return type.toString();
     }
 
-    // Повертає позицію об’єкта
     @Override
     public Vector2D getPosition() {
-        return new Vector2D(position.x, position.y);
+        return new Vector2D(imageX, imageY);
     }
 
-    // Повертає уявну позицію
     @Override
     public Vector2D getImagePosition() {
-        return getPosition();
+        return new Vector2D(imageX, imageY);
     }
 
-    // Встановлює позицію об’єкта
     @Override
     public void setPosition(Vector2D position) {
-        this.position = position;
+        this.imageX = position.x;
+        this.imageY = position.y;
     }
 
-    // Встановлює уявну позицію
     @Override
     public void setImagePosition(Vector2D position) {
-        this.position = position;
+        this.imageX = position.x;
+        this.imageY = position.y;
     }
 
-    // Повертає межі для колізій
     @Override
     public Bounds getBounds() {
-        return new BoundingBox(position.x, position.y, width, height);
+        return new BoundingBox(imageX, imageY, imageWidth, imageHeight);
     }
 
-    // Повертає межі для рендерингу
     @Override
     public Bounds getImageBounds() {
-        return getBounds();
+        return new BoundingBox(imageX, imageY, imageWidth, imageHeight);
     }
 
-    // Повертає діапазон взаємодії
     @Override
     public double getInteractionRange() {
-        return 50.0; // Фіксована відстань
+        return 50.0;
     }
 
-    // Повертає підказку для UI
     @Override
     public String getInteractionPrompt() {
-        return "Interact with " + type.toString();
+        return "Press E to interact with object";
     }
 
-    // Повертає шар рендерингу
     @Override
     public int getRenderLayer() {
-        return 1; // Об’єкти рендеряться на шарі 1
+        return 1;
     }
 
-    // Перевіряє видимість
     @Override
     public boolean isVisible() {
-        return true; // Об’єкти завжди видимі
+        return true;
     }
 }
