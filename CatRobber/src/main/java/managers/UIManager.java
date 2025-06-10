@@ -159,7 +159,6 @@ public class UIManager implements Renderable {
     public void hideInteractionPrompt() {
         if (overlayPane != null && interactionLabel != null) {
             overlayPane.getChildren().remove(interactionLabel);
-            System.out.println("Interaction prompt hidden");
         }
     }
 

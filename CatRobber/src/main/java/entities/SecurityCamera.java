@@ -8,9 +8,12 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
+import managers.GameManager;
 import org.json.JSONObject;
 import utils.GameLoader;
 import utils.Vector2D;
+
+import java.util.List;
 
 public class SecurityCamera implements GameObject, Animatable {
     // Поля
@@ -28,11 +31,11 @@ public class SecurityCamera implements GameObject, Animatable {
     private double imageWidth;
     private double imageHeight;
     private double floorPointY;
-    private static final double ALERT_DURATION = 5.0; // Тривалість червоного трикутника
+    private static final double ALERT_DURATION = 15.0; // Тривалість червоного трикутника
     private static final double FOV_HEIGHT = 100.0; // Висота трикутника (до підлоги)
     private static final double FOV_HALF_ANGLE = Math.toRadians(15.0); // Половина кута 30 градусів
     private static final double X_OFFSET = 13.0; // Зміщення по X для вершини трикутника
-    private static final double DIRECTION_SWITCH_INTERVAL = 7.0; // Інтервал зміни напрямку (секунди)
+    private static final double DIRECTION_SWITCH_INTERVAL = 5.0; // Інтервал зміни напрямку (секунди)
 
     public enum CameraDirection { LEFT, RIGHT }
 
@@ -82,12 +85,12 @@ public class SecurityCamera implements GameObject, Animatable {
             fieldOfView.getPoints().addAll(
                     vertexX, vertexY, // Вершина (біля нижнього лівого кута +13)
                     vertexX - baseWidth - 90, baseY, // Ліва точка основи (зміщена ліворуч на baseWidth + 50 пікселів)
-                    vertexX - baseWidth -50, baseY // Права точка основи (зміщена вправо на baseWidth + 30 пікселів)
+                    vertexX - baseWidth - 50, baseY // Права точка основи (зміщена вправо на baseWidth + 30 пікселів)
             );
         } else { // RIGHT
             fieldOfView.getPoints().addAll(
                     vertexX, vertexY, // Вершина (біля нижнього правого кута -13)
-                    vertexX + baseWidth +50, baseY, // Ліва точка основи (зміщена вліво на baseWidth + 30 пікселів)
+                    vertexX + baseWidth + 50, baseY, // Ліва точка основи (зміщена вліво на baseWidth + 30 пікселів)
                     vertexX + baseWidth + 90, baseY // Права точка основи (зміщена праворуч на baseWidth + 50 пікселів)
             );
         }
@@ -121,7 +124,7 @@ public class SecurityCamera implements GameObject, Animatable {
     }
 
     // Перевіряє, чи гравець у полі зору камери
-    public void detectPlayer(Player player) {
+    public void detectPlayer(Player player, List<Police> police) {
         updateFieldOfView();
         if (player == null) return;
 
@@ -139,11 +142,11 @@ public class SecurityCamera implements GameObject, Animatable {
             if (playerInFOV) break;
         }
 
-        if (playerInFOV) {
+        if (playerInFOV && !isAlert) { // Активуємо тривогу лише якщо ще не активна
             isAlert = true;
-            alertTimer = ALERT_DURATION;
+            alertTimer = ALERT_DURATION; // 10.0
             setAnimationState("alert");
-            player.increaseDetection();
+            GameManager.getInstance().alert(); // Викликаємо глобальну тривогу
         }
     }
 
@@ -218,7 +221,6 @@ public class SecurityCamera implements GameObject, Animatable {
         data.put("direction", direction.toString());
         data.put("animation", currentAnimation);
         data.put("isAlert", isAlert);
-        data.put("alertTimer", alertTimer);
         return data;
     }
 
@@ -231,7 +233,6 @@ public class SecurityCamera implements GameObject, Animatable {
         this.imageHeight = data.optDouble("height", imageHeight);
         this.floorPointY = data.optDouble("floorPointY", floorPointY);
         this.isAlert = data.optBoolean("isAlert", isAlert);
-        this.alertTimer = data.optDouble("alertTimer", alertTimer);
         try {
             this.direction = CameraDirection.valueOf(data.optString("direction", direction.toString()));
             updateFieldOfView();

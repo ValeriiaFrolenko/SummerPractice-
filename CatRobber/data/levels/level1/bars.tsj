@@ -1,0 +1,14 @@
+{ "columns":4,
+ "image":"..\/..\/..\/..\/..\/Downloads\/New Piskel (4).png",
+ "imageheight":105,
+ "imagewidth":84,
+ "margin":0,
+ "name":"bars",
+ "spacing":0,
+ "tilecount":4,
+ "tiledversion":"1.11.2",
+ "tileheight":105,
+ "tilewidth":21,
+ "type":"tileset",
+ "version":"1.10"
+}

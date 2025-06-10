@@ -39,11 +39,13 @@ public class GameManager implements Savable {
     private double canvasWidth; // Ширина canvas, отримується від GameWindow
     private double canvasHeight; // Висота canvas, отримується від GameWindow
     private Interactable closestInteractable;
+    private boolean isGlobalAlert; // Прапорець глобальної тривоги
+    private double globalAlertTimer; // Таймер глобальної тривоги
+    private static final double GLOBAL_ALERT_DURATION = 3.0; // Тривалість глобальної тривоги (секунди)
 
     public void setGameState(GameState gameState) {
         this.gameState = gameState;
     }
-
 
     // Перелік станів гри
     public enum GameState {MENU, PLAYING, PAUSED, GAME_OVER}
@@ -81,6 +83,8 @@ public class GameManager implements Savable {
         levelManager = new LevelManager(); // Створюємо LevelManager для управління рівнями
         saveManager = new SaveManager(); // Створюємо SaveManager для збереження гри
         gameState = GameState.MENU; // Встановлюємо початковий стан MENU
+        isGlobalAlert = false; // Ініціалізуємо глобальну тривогу
+        globalAlertTimer = 0.0; // Ініціалізуємо таймер тривоги
     }
 
     // Повертає єдиний екземпляр GameManager (патерн Singleton)
@@ -113,20 +117,18 @@ public class GameManager implements Savable {
         checkCollisions();
     }
 
-
-
     private void managePlayerHit(InputHandler inputHandler, double deltaTime) {
         if (inputHandler.isKeyPressed(KeyCode.Q)) {
             player.attack(false);
-                for (Interactable interactable: interactables){
-                    if (interactable instanceof Police && interactable.canInteract(player)){
-                        interactable.interact(player);
-                    }
+            for (Interactable interactable : interactables) {
+                if (interactable instanceof Police && interactable.canInteract(player)) {
+                    interactable.interact(player);
                 }
+            }
         }
     }
 
-    //Відкриття дверей за допомогою кнопки Е
+    // Відкриття дверей за допомогою кнопки Е
     private void managePlayerOpenDoor(InputHandler inputHandler) {
         if (inputHandler.isKeyPressed(KeyCode.E)) {
             if (closestInteractable != null && closestInteractable instanceof Door) {
@@ -135,30 +137,31 @@ public class GameManager implements Savable {
             }
         }
     }
-    //Рух гравця
+
+    // Рух гравця
     private void managePlayerMoving(InputHandler inputHandler, double deltaTime) {
         boolean isMoving = false;
-        if (inputHandler.isKeyPressed(KeyCode.LEFT)||inputHandler.isKeyPressed(KeyCode.A)) {
+        if (inputHandler.isKeyPressed(KeyCode.LEFT) || inputHandler.isKeyPressed(KeyCode.A)) {
             player.setDirection(Player.Direction.LEFT);
             if (closestInteractable != null && closestInteractable instanceof Door) {
                 closestInteractable.interact(player); // Телепортація при натисканні стрілки
             }
             player.move(Player.Direction.LEFT, deltaTime);
             isMoving = true;
-        } else if (inputHandler.isKeyPressed(KeyCode.RIGHT) ||inputHandler.isKeyPressed(KeyCode.D)) {
+        } else if (inputHandler.isKeyPressed(KeyCode.RIGHT) || inputHandler.isKeyPressed(KeyCode.D)) {
             player.setDirection(Player.Direction.RIGHT);
             if (closestInteractable != null && closestInteractable instanceof Door) {
                 closestInteractable.interact(player);
             }
             player.move(Player.Direction.RIGHT, deltaTime);
             isMoving = true;
-        } else if (inputHandler.isKeyPressed(KeyCode.UP)||inputHandler.isKeyPressed(KeyCode.W)) {
+        } else if (inputHandler.isKeyPressed(KeyCode.UP) || inputHandler.isKeyPressed(KeyCode.W)) {
             player.setDirection(Player.Direction.UP);
             if (closestInteractable != null && closestInteractable instanceof Door) {
                 closestInteractable.interact(player);
             }
             isMoving = true;
-        } else if (inputHandler.isKeyPressed(KeyCode.DOWN)||inputHandler.isKeyPressed(KeyCode.S)) {
+        } else if (inputHandler.isKeyPressed(KeyCode.DOWN) || inputHandler.isKeyPressed(KeyCode.S)) {
             player.setDirection(Player.Direction.DOWN);
             if (closestInteractable != null && closestInteractable instanceof Door) {
                 closestInteractable.interact(player);
@@ -169,7 +172,6 @@ public class GameManager implements Savable {
             player.stopMovement();
         }
     }
-
 
     // Встановлює список ігрових об’єктів, сортує їх за типами
     public void setGameObjects(List<GameObject> objects) {
@@ -189,7 +191,8 @@ public class GameManager implements Savable {
             if (obj instanceof Player) player = (Player) obj; // Зберігаємо гравця
             if (obj instanceof Police) police.add((Police) obj); // Додаємо поліцейських
             if (obj instanceof SecurityCamera) cameras.add((SecurityCamera) obj); // Додаємо камери
-            if (obj instanceof Interactable) {interactables.add((Interactable) obj);
+            if (obj instanceof Interactable) {
+                interactables.add((Interactable) obj);
             }
         }
     }
@@ -229,11 +232,40 @@ public class GameManager implements Savable {
         this.canvasHeight = canvasHeight; // Зберігаємо висоту canvas
     }
 
+    // Активує глобальну тривогу
+    public void alert() {
+        if (!isGlobalAlert) { // Активуємо лише якщо тривога ще не увімкнена
+            isGlobalAlert = true;
+            globalAlertTimer = GLOBAL_ALERT_DURATION;
+            for (Police police1 : police) {
+                police1.alert();
+            }
+            if (player != null) {
+                player.increaseDetection(); // Збільшуємо лічильник виявлення один раз
+            }
+        }
+    }
+
     // Оновлює логіку гри, викликається з GameWindow.update()
     public void update(double deltaTime) {
         if (gameState != GameState.PLAYING) {
             return;
         }
+
+        // Оновлення глобальної тривоги
+        if (isGlobalAlert) {
+            globalAlertTimer -= deltaTime;
+            if (globalAlertTimer <= 0) {
+                isGlobalAlert = false;
+                for (Police police1 : police) {
+                    if (police1.getState() == Police.PoliceState.ALERT) {
+                        police1.setState(Police.PoliceState.PATROL);
+                        police1.setAnimationState("patrol");
+                    }
+                }
+            }
+        }
+
         if (player != null) {
             player.updateAnimation(deltaTime);
         }
@@ -245,12 +277,12 @@ public class GameManager implements Savable {
             checkPoliceCollisions();
         }
         for (SecurityCamera camera : cameras) {
-            camera.updateAnimation(deltaTime);
-            camera.detectPlayer(player);
+            camera.detectPlayer(player, police);
         }
         checkCollisions();
         checkInteractions();
     }
+
     // Рендерить гру, викликається з GameWindow.render()
     public void render(GraphicsContext gc) {
         gc.setImageSmoothing(false); // Вимикаємо згладжування для піксельної графіки
@@ -293,15 +325,15 @@ public class GameManager implements Savable {
     private void checkPlayerCollisionsWithLaserDoor() {
         if (player == null) return;
         Bounds laserBounds = null;
-        Door door= null;
-        for (Interactable interactable: interactables){
-            if (interactable instanceof Door && ((Door) interactable).isLaser()){
+        Door door = null;
+        for (Interactable interactable : interactables) {
+            if (interactable instanceof Door && ((Door) interactable).isLaser()) {
                 laserBounds = ((Door) interactable).getBounds();
                 door = (Door) interactable;
             }
         }
 
-        if (player.getBounds().intersects(laserBounds)){
+        if (laserBounds != null && player.getBounds().intersects(laserBounds)) {
             if (door.isLocked()) {
                 player.adjustPlayerPosition(1, Player.Direction.LEFT);
             }
@@ -311,7 +343,7 @@ public class GameManager implements Savable {
     private void checkPoliceCollisions() {
         if (police == null || police.isEmpty()) return;
 
-        for (Police police1: police) {
+        for (Police police1 : police) {
             Bounds policeBounds = police1.getBounds(); // Отримуємо межі гравця
             double policeX = policeBounds.getMinX();
             double policeY = policeBounds.getMinY();
@@ -340,7 +372,7 @@ public class GameManager implements Savable {
 
             if (!fullyInside) {
                 if (police1.getDirection().equals(Police.PoliceDirection.LEFT)) {
-                   police1.setDirection(Police.PoliceDirection.RIGHT);
+                    police1.setDirection(Police.PoliceDirection.RIGHT);
                 } else if (police1.getDirection().equals(Police.PoliceDirection.RIGHT)) {
                     police1.setDirection(Police.PoliceDirection.LEFT);
                 }
@@ -410,7 +442,6 @@ public class GameManager implements Savable {
             uiManager.hideInteractionPrompt();
         }
     }
-
 
     public Interactable getClosestInteractable() {
         return closestInteractable;

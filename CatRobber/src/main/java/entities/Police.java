@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 // Представляє поліцейського NPC, який патрулює або переслідує гравця
-public class Police implements Animatable, GameObject, Interactable{
+public class Police implements Animatable, GameObject, Interactable {
     // Поля
     private double imageX; // Верхній лівий кут зображення по X
     private double imageY; // Верхній лівий кут зображення по Y
@@ -38,7 +38,8 @@ public class Police implements Animatable, GameObject, Interactable{
     private static final double MAX_STUN_DURATION = 3.0; // Максимальна тривалість оглушення (в секундах)
     private boolean canSeePlayer;
     private boolean inSameRoom;
-
+    private double alarmDuration = 3;
+    private double frameDuration = 0.2;
 
     @Override
     public void interact(Player player) {
@@ -56,7 +57,7 @@ public class Police implements Animatable, GameObject, Interactable{
         if (!hasOverlap) {
             return false;
         }
-        if ( canSeePlayer&&inSameRoom){
+        if (canSeePlayer && inSameRoom) {
             return false;
         }
         return true;
@@ -90,12 +91,14 @@ public class Police implements Animatable, GameObject, Interactable{
         this.state = PoliceState.valueOf(defaultData.optString("state", "PATROL"));
         this.currentAnimation = defaultData.optString("currentAnimation", "patrol");
         this.animations = new HashMap<>();
-        this.spritePaths = new String[]{"police/idle.png", "police/run.png", "police/lay.png", "police/alarm.png"};
+        this.spritePaths = new String[]{"police/idle.png", "police/run.png", "police/lay.png", "police/alarm.png", "police/question.png"};
         GameLoader loader = new GameLoader();
         animations.put("idle", loader.splitSpriteSheet(spritePaths[0], 12));
         animations.put("patrol", loader.splitSpriteSheet(spritePaths[1], 9));
         animations.put("stunned", loader.splitSpriteSheet(spritePaths[2], 1));
         animations.put("alarm", loader.splitSpriteSheet(spritePaths[3], 2));
+        animations.put("question", loader.splitSpriteSheet(spritePaths[4], 1));
+
         this.animationFrame = 0;
         this.animationTime = 0;
     }
@@ -117,6 +120,7 @@ public class Police implements Animatable, GameObject, Interactable{
 
     // Оновлює логіку поліцейського (викликається з GameManager.update())
     public void update(double deltaTime, List<GameManager.Room> rooms, Player player) {
+        System.out.println(state);
         // Оновлення стану оглушення
         if (state == PoliceState.STUNNED) {
             stunDuration -= deltaTime;
@@ -137,6 +141,14 @@ public class Police implements Animatable, GameObject, Interactable{
                     state = PoliceState.PATROL;
                     setAnimationState("patrol");
                 }
+            }
+            return;
+        }
+        if (state == PoliceState.ALERT) {
+            alarmDuration -= deltaTime;
+            if (alarmDuration <= 0) {
+                state = PoliceState.PATROL;
+                setAnimationState("patrol");
             }
             return;
         }
@@ -214,6 +226,7 @@ public class Police implements Animatable, GameObject, Interactable{
         setAnimationState("patrol");
         double movement = speed * deltaTime;
         double deltaX = 0;
+        frameDuration = 0.2;
         if (direction == PoliceDirection.LEFT) {
             deltaX = -movement;
         } else if (direction == PoliceDirection.RIGHT) {
@@ -226,10 +239,11 @@ public class Police implements Animatable, GameObject, Interactable{
     // Оновлює анімацію поліцейського
     @Override
     public void updateAnimation(double deltaTime) {
+        System.out.println(frameDuration);
+
         animationTime += deltaTime;
         Image[] frames = animations.getOrDefault(currentAnimation, animations.get("idle"));
         if (frames == null || frames.length == 0) return;
-        double frameDuration = 0.2;
         int frameCount = frames.length;
         animationFrame = (int) (animationTime / frameDuration) % frameCount;
     }
@@ -242,8 +256,14 @@ public class Police implements Animatable, GameObject, Interactable{
 
     // Активує стан тривоги
     public void alert() {
-        state = PoliceState.ALERT;
-        setAnimationState("alarm");
+        if (state != PoliceState.ALERT) { // Активуємо лише якщо не в ALERT
+            state = PoliceState.ALERT;
+            setAnimationState("alarm");
+            alarmDuration = 3.0;
+            frameDuration = 1.5;
+            animationTime = 0;
+            animationFrame = 0;
+        }
     }
 
     // Обробляє отримання удару
@@ -266,6 +286,8 @@ public class Police implements Animatable, GameObject, Interactable{
             double renderY = bounds.getMinY();
             double renderWidth = imageWidth;
             double renderHeight = imageHeight;
+
+            // Рендеримо основне зображення поліцейського
             if (direction == PoliceDirection.LEFT) {
                 gc.save();
                 gc.translate(renderX + renderWidth, renderY);
@@ -275,6 +297,22 @@ public class Police implements Animatable, GameObject, Interactable{
             } else {
                 gc.drawImage(frame, renderX, renderY, renderWidth, renderHeight);
             }
+
+            // Рендеримо знак питання, якщо поліцейський у стані ALERT
+            if (state == PoliceState.ALERT) {
+                Image questionFrame = animations.get("question")[0]; // Беремо перший кадр question
+                double questionWidth = imageWidth * 0.2; // Зменшуємо розмір знака питання
+                double questionHeight = imageHeight * 0.2;
+                double questionX = collX + (collWidth - questionWidth) / 2; // Центруємо над головою
+                double questionY = collY - 25; // Розміщуємо над головою з відступом
+                    gc.save();
+                    gc.translate(questionX + questionWidth, questionY);
+                    gc.scale(-1, 1);
+                    gc.drawImage(questionFrame, 0, 0, questionWidth, questionHeight);
+                    gc.restore();
+                    gc.drawImage(questionFrame, questionX, questionY, questionWidth, questionHeight);
+            }
+
             // Малюємо червону рамку для колізійної області
             Bounds collBounds = getBounds();
             gc.setStroke(Color.RED);
@@ -417,5 +455,13 @@ public class Police implements Animatable, GameObject, Interactable{
 
     public void setDirection(PoliceDirection direction) {
         this.direction = direction;
+    }
+
+    public PoliceState getState() {
+        return state;
+    }
+
+    public void setState(PoliceState state) {
+        this.state = state;
     }
 }
