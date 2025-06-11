@@ -1,0 +1,122 @@
+{
+  "interactiveObject164": {
+    "gid": 39,
+    "visible": true,
+    "rotation": 0,
+    "name": "withMoney",
+    "width": 120,
+    "x": 246.801107045689,
+    "y": 250.364855990243,
+    "id": 164,
+    "type": "InteractiveObject",
+    "properties": [
+      {
+        "name": "fileName",
+        "type": "string",
+        "value": "boxes.png"
+      },
+      {
+        "name": "type",
+        "type": "string",
+        "value": "WITH_MONEY"
+      }
+    ],
+    "height": 80
+  },
+  "interactiveObject165": {
+    "gid": 40,
+    "visible": true,
+    "rotation": 0,
+    "name": "withMoney",
+    "width": 50,
+    "x": 1180.83488132095,
+    "y": 362.116521249648,
+    "id": 165,
+    "type": "InteractiveObject",
+    "properties": [
+      {
+        "name": "fileName",
+        "type": "string",
+        "value": "safe.png"
+      },
+      {
+        "name": "type",
+        "type": "string",
+        "value": "WITH_MONEY"
+      }
+    ],
+    "height": 40
+  },
+  "interactiveObject169": {
+    "gid": 2147483691,
+    "visible": true,
+    "rotation": 0,
+    "name": "finalPrize",
+    "width": 80,
+    "x": 531.666666666667,
+    "y": 484.666666666667,
+    "id": 169,
+    "type": "InteractiveObject",
+    "properties": [
+      {
+        "name": "fileName",
+        "type": "string",
+        "value": "finalPrize.png"
+      },
+      {
+        "name": "type",
+        "type": "string",
+        "value": "FINAL_PRIZE"
+      }
+    ],
+    "height": 80
+  },
+  "interactiveObject166": {
+    "gid": 41,
+    "visible": true,
+    "rotation": 0,
+    "name": "note",
+    "width": 50,
+    "x": 173.904681489821,
+    "y": 320.850924101698,
+    "id": 166,
+    "type": "InteractiveObject",
+    "properties": [
+      {
+        "name": "fileName",
+        "type": "string",
+        "value": "note.png"
+      },
+      {
+        "name": "type",
+        "type": "string",
+        "value": "NOTE"
+      }
+    ],
+    "height": 50
+  },
+  "interactiveObject167": {
+    "gid": 42,
+    "visible": true,
+    "rotation": 0,
+    "name": "elecrtricalPanel",
+    "width": 44,
+    "x": 98.498639647246,
+    "y": 252.950182943991,
+    "id": 167,
+    "type": "InteractiveObject",
+    "properties": [
+      {
+        "name": "fileName",
+        "type": "string",
+        "value": "electricalPanel.png"
+      },
+      {
+        "name": "type",
+        "type": "string",
+        "value": "ELECTRICAL_PANEL"
+      }
+    ],
+    "height": 40
+  }
+}
