@@ -35,7 +35,7 @@
     "sharedId": 7,
     "lockType": "NONE",
     "type": "Door",
-    "isOpen": true,
+    "isOpen": false,
     "isFloorLink": false,
     "isLocked": false,
     "x": 261.6705627441406,
@@ -105,28 +105,28 @@
     "direction": "right"
   },
   "interactable_29": {
-    "spritePath": "interactables/default.png",
-    "x": 405,
-    "width": 44,
-    "y": 180,
-    "type": "ELECTRICAL_PANEL",
+    "spritePath": "interactiveObjects/safe.png",
+    "x": 1180.8348388671875,
+    "width": 50,
+    "y": 322.11651611328125,
+    "type": "WITH_MONEY",
     "height": 40
   },
   "interactable_28": {
-    "spritePath": "interactables/default.png",
-    "x": 1204.6666259765625,
-    "width": 30,
-    "y": 306.6666564941406,
+    "spritePath": "interactiveObjects/boxes.png",
+    "x": 246.8011016845703,
+    "width": 120,
+    "y": 170.36485290527344,
     "type": "WITH_MONEY",
-    "height": 45
+    "height": 80
   },
   "interactable_27": {
-    "spritePath": "interactables/default.png",
-    "x": 668,
-    "width": 30,
-    "y": 186.6666717529297,
-    "type": "WITH_MONEY",
-    "height": 45
+    "spritePath": "interactiveObjects/finalPrize.png",
+    "x": 531.6666870117188,
+    "width": 80,
+    "y": 404.6666564941406,
+    "type": "FINAL_PRIZE",
+    "height": 80
   },
   "interactable_4": {
     "isRoomLink": false,
@@ -192,16 +192,16 @@
     "canMove": true,
     "currentAnimation": "idle",
     "collY": 65.2,
-    "collX": 459.6293269999996,
+    "collX": 212.844296,
     "type": "Player",
     "widthColl": 40.74,
-    "x": 433.7518630107418,
+    "x": 186.9668320107422,
     "width": 100.948246196698,
     "y": 135.10076904296875,
     "hightColl": 57.15,
     "state": "IDLE",
     "height": 100.948246196698,
-    "direction": "LEFT"
+    "direction": "RIGHT"
   },
   "interactable_2": {
     "isRoomLink": false,
@@ -221,11 +221,11 @@
   "interactable_1": {
     "currentAnimation": "patrol",
     "collY": 537.5,
-    "collX": 5.934584000001195,
+    "collX": 517.0694119999999,
     "stunDuration": 0,
     "type": "Police",
     "widthColl": 43,
-    "x": -22.6828323818348,
+    "x": 488.45199561816406,
     "width": 101.948246196698,
     "y": 618.5289306640625,
     "hightColl": 68,
@@ -294,12 +294,12 @@
     "direction": "down"
   },
   "interactable_31": {
-    "spritePath": "interactables/default.png",
-    "x": 195,
-    "width": 24,
-    "y": 288,
-    "type": "NOTE",
-    "height": 24
+    "spritePath": "interactiveObjects/electricalPanel.png",
+    "x": 405.4986267089844,
+    "width": 44,
+    "y": 180.95018005371094,
+    "type": "ELECTRICAL_PANEL",
+    "height": 40
   },
   "interactable_9": {
     "isRoomLink": false,
@@ -317,12 +317,12 @@
     "direction": "down"
   },
   "interactable_30": {
-    "spritePath": "interactables/default.png",
-    "x": 552,
-    "width": 60,
-    "y": 430.6666564941406,
-    "type": "FINAL_PRICE",
-    "height": 45
+    "spritePath": "interactiveObjects/note.png",
+    "x": 173.90467834472656,
+    "width": 50,
+    "y": 270.8509216308594,
+    "type": "NOTE",
+    "height": 50
   },
   "interactable_15": {
     "isRoomLink": true,
@@ -435,7 +435,7 @@
     "sharedId": 7,
     "lockType": "NONE",
     "type": "Door",
-    "isOpen": true,
+    "isOpen": false,
     "isFloorLink": false,
     "isLocked": false,
     "x": 322.6853332519531,

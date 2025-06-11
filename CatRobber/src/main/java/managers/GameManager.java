@@ -15,6 +15,7 @@ import utils.InputHandler;
 import utils.Vector2D;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 
 // Клас GameManager керує логікою гри, включаючи об'єкти, стан, колізії, взаємодії
@@ -22,6 +23,7 @@ public class GameManager implements Savable {
     // Поля
     private static GameManager instance; // Singleton-екземпляр GameManager
     private final LevelManager levelManager; // Менеджер рівнів (завантаження даних рівня)
+    private String noteCode;
     private SaveManager saveManager; // Менеджер збереження гри, пов’язаний із SaveManager
     private JSONObject currentLevel; // Дані поточного рівня у форматі JSON, отримані від LevelManager
     private List<GameObject> gameObjects; // Список усіх ігрових об’єктів (Player, Police тощо)
@@ -69,8 +71,17 @@ public class GameManager implements Savable {
         }
     }
 
+    public void setNoteCode(String code) {
+        noteCode  = code;
+    }
+
+    public String getNoteCode() {
+        return noteCode;
+    }
+
     // Конструктор, ініціалізує менеджери та списки
     public GameManager() {
+        noteCode = String.valueOf(0000);
         gameObjects = new ArrayList<>(); // Створюємо список для всіх ігрових об’єктів
         renderableObjects = new ArrayList<>(); // Створюємо список для об’єктів із рендерингом
         animatableObjects = new ArrayList<>(); // Створюємо список для об’єктів з анімаціями
@@ -175,28 +186,27 @@ public class GameManager implements Savable {
 
     // Встановлює список ігрових об’єктів, сортує їх за типами
     public void setGameObjects(List<GameObject> objects) {
-        // Очищаємо всі списки перед новим завантаженням
+        // Clear all lists before loading new objects
         gameObjects.clear();
         renderableObjects.clear();
         animatableObjects.clear();
         police.clear();
         cameras.clear();
         interactables.clear();
-        // Додаємо нові об’єкти
+        puzzles.clear();
+        // Add new objects
         gameObjects.addAll(objects);
         for (GameObject obj : objects) {
-            // Розподіляємо об’єкти за типами
-            if (obj instanceof Renderable) renderableObjects.add((Renderable) obj); // Додаємо до рендерингу
-            if (obj instanceof Animatable) animatableObjects.add((Animatable) obj); // Додаємо до анімацій
-            if (obj instanceof Player) player = (Player) obj; // Зберігаємо гравця
-            if (obj instanceof Police) police.add((Police) obj); // Додаємо поліцейських
-            if (obj instanceof SecurityCamera) cameras.add((SecurityCamera) obj); // Додаємо камери
-            if (obj instanceof Interactable) {
-                interactables.add((Interactable) obj);
-            }
+            if (obj instanceof Renderable) renderableObjects.add((Renderable) obj);
+            if (obj instanceof Animatable) animatableObjects.add((Animatable) obj);
+            if (obj instanceof Player) player = (Player) obj;
+            if (obj instanceof Police) police.add((Police) obj);
+            if (obj instanceof SecurityCamera) cameras.add((SecurityCamera) obj);
+            if (obj instanceof Interactable) interactables.add((Interactable) obj);
+            if (obj instanceof Puzzle) puzzles.add((Puzzle) obj);
         }
     }
-
+    
     // Встановлює карту колізій на основі списку кімнат
     public void setCollisionMap(List<Room> rooms) {
         this.rooms.clear(); // Очищаємо список кімнат
@@ -319,7 +329,7 @@ public class GameManager implements Savable {
     public void checkCollisions() {
         checkPlayerCollisions();
         checkPoliceCollisions();
-        checkPlayerCollisionsWithLaserDoor();
+        // checkPlayerCollisionsWithLaserDoor();
     }
 
     private void checkPlayerCollisionsWithLaserDoor() {
@@ -463,6 +473,7 @@ public class GameManager implements Savable {
         JSONObject data = new JSONObject(); // Створюємо JSON-об’єкт
         data.put("gameState", gameState.toString()); // Додаємо стан гри
         data.put("currentLevelId", levelManager.getCurrentLevelId()); // Додаємо ID рівня
+        data.put("noteCode", getSerializableData());
         return data; // Повертаємо дані для SaveManager
     }
 
@@ -470,7 +481,8 @@ public class GameManager implements Savable {
     @Override
     public void setFromData(JSONObject data) {
         gameState = GameState.valueOf(data.getString("gameState")); // Відновлюємо стан гри
-        int levelId = data.getInt("currentLevelId"); // Отримуємо ID рівня
+        int levelId = data.getInt("currentLevelId");// Отримуємо ID рівня
+        noteCode = data.getString("noteCode");
         loadLevel(levelId, false); // Завантажуємо рівень як збережену гру
     }
 

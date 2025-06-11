@@ -75,7 +75,8 @@ public class LevelManager {
                 "police/police_level_" + currentLevelId + ".json",
                 "doors/door_level_" + currentLevelId + ".json",
                 "cameras/cameras_level_" + currentLevelId + ".json",
-                "interactables/interactable_objects_level_" + currentLevelId + ".json"
+                "interactables/interactiveObjects_level_" + currentLevelId + ".json",
+                "puzzles/puzzle_level_" + currentLevelId + ".json"
         };
         for (String fileType : fileTypes) {
             String filePath = basePath + fileType;

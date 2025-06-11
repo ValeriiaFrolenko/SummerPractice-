@@ -40,12 +40,12 @@
          "name":"background",
          "objects":[
                 {
-                 "gid":1,
+                 "gid":38,
                  "height":640,
-                 "id":1,
+                 "id":163,
                  "name":"",
                  "rotation":0,
-                 "type":"Background",
+                 "type":"",
                  "visible":true,
                  "width":1280,
                  "x":0,
@@ -284,7 +284,7 @@
                  "y":510.05950379183
                 }, 
                 {
-                 "gid":30,
+                 "gid":31,
                  "height":68,
                  "id":99,
                  "name":"door",
@@ -337,7 +337,7 @@
                  "y":114.358274256341
                 }, 
                 {
-                 "gid":30,
+                 "gid":31,
                  "height":68,
                  "id":100,
                  "name":"door",
@@ -390,7 +390,7 @@
                  "y":354.769286561258
                 }, 
                 {
-                 "gid":30,
+                 "gid":31,
                  "height":68,
                  "id":101,
                  "name":"door",
@@ -443,7 +443,7 @@
                  "y":117.734352460577
                 }, 
                 {
-                 "gid":30,
+                 "gid":31,
                  "height":68,
                  "id":102,
                  "name":"door",
@@ -496,7 +496,7 @@
                  "y":472.382074486313
                 }, 
                 {
-                 "gid":30,
+                 "gid":31,
                  "height":68,
                  "id":103,
                  "name":"door",
@@ -549,7 +549,7 @@
                  "y":230.485483395127
                 }, 
                 {
-                 "gid":24,
+                 "gid":25,
                  "height":68,
                  "id":104,
                  "name":"door",
@@ -602,7 +602,7 @@
                  "y":234.091024226339
                 }, 
                 {
-                 "gid":24,
+                 "gid":25,
                  "height":68,
                  "id":105,
                  "name":"door",
@@ -655,7 +655,7 @@
                  "y":474.497723714315
                 }, 
                 {
-                 "gid":24,
+                 "gid":25,
                  "height":68,
                  "id":106,
                  "name":"door",
@@ -708,7 +708,7 @@
                  "y":233.467102430575
                 }, 
                 {
-                 "gid":24,
+                 "gid":25,
                  "height":68,
                  "id":107,
                  "name":"door",
@@ -761,7 +761,7 @@
                  "y":595.308338558831
                 }, 
                 {
-                 "gid":24,
+                 "gid":25,
                  "height":68,
                  "id":108,
                  "name":"door",
@@ -814,7 +814,7 @@
                  "y":355.261237112915
                 }, 
                 {
-                 "gid":31,
+                 "gid":32,
                  "height":68,
                  "id":109,
                  "name":"door",
@@ -863,11 +863,11 @@
                  "type":"Door",
                  "visible":true,
                  "width":81,
-                 "x":815.434973284246,
-                 "y":476.678336139989
+                 "x":816.434973284246,
+                 "y":475.678336139989
                 }, 
                 {
-                 "gid":10,
+                 "gid":11,
                  "height":68,
                  "id":110,
                  "name":"door",
@@ -920,7 +920,7 @@
                  "y":596.372344305474
                 }, 
                 {
-                 "gid":25,
+                 "gid":26,
                  "height":105,
                  "id":111,
                  "name":"door",
@@ -973,7 +973,7 @@
                  "y":133.576742753738
                 }, 
                 {
-                 "gid":25,
+                 "gid":26,
                  "height":105,
                  "id":112,
                  "name":"door",
@@ -1026,7 +1026,7 @@
                  "y":252.436726366543
                 }, 
                 {
-                 "gid":25,
+                 "gid":26,
                  "height":105,
                  "id":113,
                  "name":"door",
@@ -1079,7 +1079,7 @@
                  "y":372.421056559472
                 }, 
                 {
-                 "gid":25,
+                 "gid":26,
                  "height":105,
                  "id":114,
                  "name":"door",
@@ -1132,7 +1132,7 @@
                  "y":611.827756047447
                 }, 
                 {
-                 "gid":26,
+                 "gid":27,
                  "height":105,
                  "id":115,
                  "name":"door",
@@ -1185,7 +1185,7 @@
                  "y":132.867295255399
                 }, 
                 {
-                 "gid":26,
+                 "gid":27,
                  "height":105,
                  "id":116,
                  "name":"door",
@@ -1238,7 +1238,7 @@
                  "y":252.789664550445
                 }, 
                 {
-                 "gid":26,
+                 "gid":27,
                  "height":105,
                  "id":117,
                  "name":"door",
@@ -1291,7 +1291,7 @@
                  "y":373.043221599246
                 }, 
                 {
-                 "gid":26,
+                 "gid":27,
                  "height":105,
                  "id":118,
                  "name":"door",
@@ -1344,7 +1344,7 @@
                  "y":493.634403140538
                 }, 
                 {
-                 "gid":26,
+                 "gid":27,
                  "height":105,
                  "id":119,
                  "name":"door",
@@ -1397,7 +1397,7 @@
                  "y":371.650072947609
                 }, 
                 {
-                 "gid":26,
+                 "gid":27,
                  "height":105,
                  "id":120,
                  "name":"door",
@@ -1450,7 +1450,7 @@
                  "y":614.118733333467
                 }, 
                 {
-                 "gid":11,
+                 "gid":12,
                  "height":105,
                  "id":121,
                  "name":"door",
@@ -1503,7 +1503,7 @@
                  "y":373.919299803481
                 }, 
                 {
-                 "gid":11,
+                 "gid":12,
                  "height":105,
                  "id":122,
                  "name":"door",
@@ -1556,7 +1556,7 @@
                  "y":492.593825506999
                 }, 
                 {
-                 "gid":2,
+                 "gid":3,
                  "height":100.948246196698,
                  "id":123,
                  "name":"player",
@@ -1649,7 +1649,7 @@
                  "y":135.100775251752
                 }, 
                 {
-                 "gid":12,
+                 "gid":13,
                  "height":101.948246196698,
                  "id":124,
                  "name":"police",
@@ -1712,7 +1712,7 @@
                  "y":618.528952432504
                 }, 
                 {
-                 "gid":29,
+                 "gid":30,
                  "height":33.9827487322325,
                  "id":125,
                  "name":"camera",
@@ -1800,7 +1800,7 @@
                  "y":130
                 }, 
                 {
-                 "gid":32,
+                 "gid":33,
                  "height":105,
                  "id":150,
                  "name":"laserDoor",
@@ -1853,10 +1853,62 @@
                  "y":134
                 }, 
                 {
-                 "height":24,
-                 "id":152,
+                 "gid":39,
+                 "height":80,
+                 "id":164,
+                 "name":"withMoney",
+                 "properties":[
+                        {
+                         "name":"fileName",
+                         "type":"string",
+                         "value":"boxes.png"
+                        }, 
+                        {
+                         "name":"type",
+                         "type":"string",
+                         "value":"WITH_MONEY"
+                        }],
+                 "rotation":0,
+                 "type":"InteractiveObject",
+                 "visible":true,
+                 "width":120,
+                 "x":246.801107045689,
+                 "y":250.364855990243
+                }, 
+                {
+                 "gid":40,
+                 "height":40,
+                 "id":165,
+                 "name":"withMoney",
+                 "properties":[
+                        {
+                         "name":"fileName",
+                         "type":"string",
+                         "value":"safe.png"
+                        }, 
+                        {
+                         "name":"type",
+                         "type":"string",
+                         "value":"WITH_MONEY"
+                        }],
+                 "rotation":0,
+                 "type":"InteractiveObject",
+                 "visible":true,
+                 "width":50,
+                 "x":1180.83488132095,
+                 "y":362.116521249648
+                }, 
+                {
+                 "gid":41,
+                 "height":50,
+                 "id":166,
                  "name":"note",
                  "properties":[
+                        {
+                         "name":"fileName",
+                         "type":"string",
+                         "value":"note.png"
+                        }, 
                         {
                          "name":"type",
                          "type":"string",
@@ -1865,15 +1917,21 @@
                  "rotation":0,
                  "type":"InteractiveObject",
                  "visible":true,
-                 "width":24,
-                 "x":195,
-                 "y":288
+                 "width":50,
+                 "x":173.904681489821,
+                 "y":320.850924101698
                 }, 
                 {
+                 "gid":42,
                  "height":40,
-                 "id":154,
+                 "id":167,
                  "name":"elecrtricalPanel",
                  "properties":[
+                        {
+                         "name":"fileName",
+                         "type":"string",
+                         "value":"electricalPanel.png"
+                        }, 
                         {
                          "name":"type",
                          "type":"string",
@@ -1883,59 +1941,119 @@
                  "type":"InteractiveObject",
                  "visible":true,
                  "width":44,
-                 "x":405,
-                 "y":180
+                 "x":402.498639647246,
+                 "y":219.950182943991
                 }, 
                 {
-                 "height":45,
-                 "id":158,
-                 "name":"withMoney",
+                 "gid":2147483691,
+                 "height":80,
+                 "id":169,
+                 "name":"finalPrize",
                  "properties":[
+                        {
+                         "name":"fileName",
+                         "type":"string",
+                         "value":"finalPrize.png"
+                        }, 
                         {
                          "name":"type",
                          "type":"string",
-                         "value":"WITH_MONEY"
+                         "value":"FINAL_PRIZE"
                         }],
                  "rotation":0,
                  "type":"InteractiveObject",
                  "visible":true,
-                 "width":30,
-                 "x":668,
-                 "y":186.666666666667
+                 "width":80,
+                 "x":531.666666666667,
+                 "y":484.666666666667
                 }, 
                 {
-                 "height":45,
-                 "id":159,
-                 "name":"withMoney",
+                 "height":0,
+                 "id":171,
+                 "name":"puzzle",
                  "properties":[
+                        {
+                         "name":"state",
+                         "type":"string",
+                         "value":"UNSOLVED"
+                        }, 
                         {
                          "name":"type",
                          "type":"string",
-                         "value":"WITH_MONEY"
+                         "value":"LaserLockPuzzle"
                         }],
                  "rotation":0,
-                 "type":"InteractiveObject",
+                 "type":"Puzzle",
                  "visible":true,
-                 "width":30,
-                 "x":1204.66666666667,
-                 "y":306.666666666667
+                 "width":0,
+                 "x":465,
+                 "y":207
                 }, 
                 {
-                 "height":45,
-                 "id":160,
-                 "name":"finalPrice",
+                 "height":0,
+                 "id":172,
+                 "name":"puzzle",
                  "properties":[
+                        {
+                         "name":"state",
+                         "type":"string",
+                         "value":"UNSOLVED"
+                        }, 
                         {
                          "name":"type",
                          "type":"string",
-                         "value":"FINAL_PRICE"
+                         "value":"LockPickPuzzle"
                         }],
                  "rotation":0,
-                 "type":"InteractiveObject",
+                 "type":"Puzzle",
                  "visible":true,
-                 "width":60,
-                 "x":552,
-                 "y":430.666666666667
+                 "width":0,
+                 "x":855,
+                 "y":437
+                }, 
+                {
+                 "height":0,
+                 "id":175,
+                 "name":"puzzle",
+                 "properties":[
+                        {
+                         "name":"state",
+                         "type":"string",
+                         "value":"UNSOLVED"
+                        }, 
+                        {
+                         "name":"type",
+                         "type":"string",
+                         "value":"LockPickPuzzle"
+                        }],
+                 "rotation":0,
+                 "type":"Puzzle",
+                 "visible":true,
+                 "width":0,
+                 "x":420,
+                 "y":442
+                }, 
+                {
+                 "height":13,
+                 "id":174,
+                 "name":"puzzle",
+                 "properties":[
+                        {
+                         "name":"state",
+                         "type":"string",
+                         "value":"UNSOLVED"
+                        }, 
+                        {
+                         "name":"type",
+                         "type":"string",
+                         "value":"CodeLockPuzzle"
+                        }],
+                 "rotation":0,
+                 "type":"Puzzle",
+                 "visible":true,
+                 "width":0,
+                 "x":976,
+                 "y":320
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -1944,7 +2062,7 @@
          "y":0
         }],
  "nextlayerid":4,
- "nextobjectid":161,
+ "nextobjectid":176,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.2",
@@ -1955,48 +2073,76 @@
          "source":"rooms1.tsj"
         }, 
         {
-         "firstgid":2,
+         "firstgid":3,
          "source":"player.tsj"
         }, 
         {
-         "firstgid":10,
+         "firstgid":11,
          "source":"stairsClosed.tsj"
         }, 
         {
-         "firstgid":11,
+         "firstgid":12,
          "source":"doorLeftLocked.tsj"
         }, 
         {
-         "firstgid":12,
+         "firstgid":13,
          "source":"police.tsj"
         }, 
         {
-         "firstgid":24,
+         "firstgid":25,
          "source":"stairsUp.tsj"
         }, 
         {
-         "firstgid":25,
+         "firstgid":26,
          "source":"doorClosedLeft.tsj"
         }, 
         {
-         "firstgid":26,
+         "firstgid":27,
          "source":"doorClosedRight.tsj"
         }, 
         {
-         "firstgid":27,
+         "firstgid":28,
          "source":"camera.tsj"
         }, 
         {
-         "firstgid":30,
+         "firstgid":31,
          "source":"stairsDown.tsj"
         }, 
         {
-         "firstgid":31,
+         "firstgid":32,
          "source":"stairsWithLock.tsj"
         }, 
         {
-         "firstgid":32,
+         "firstgid":33,
          "source":"laserLocked.tsj"
+        }, 
+        {
+         "firstgid":34,
+         "source":"bars.tsj"
+        }, 
+        {
+         "firstgid":38,
+         "source":"rooms.tsx"
+        }, 
+        {
+         "firstgid":39,
+         "source":"boxes.tsx"
+        }, 
+        {
+         "firstgid":40,
+         "source":"safe.tsx"
+        }, 
+        {
+         "firstgid":41,
+         "source":"note.tsx"
+        }, 
+        {
+         "firstgid":42,
+         "source":"panel.tsx"
+        }, 
+        {
+         "firstgid":43,
+         "source":"finalPrice.tsx"
         }],
  "tilewidth":32,
  "type":"map",

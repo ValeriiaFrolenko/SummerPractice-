@@ -6,10 +6,7 @@ import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.input.KeyCode;
-import managers.GameManager;
-import managers.UIManager;
-import managers.SoundManager;
-import managers.SaveManager;
+import managers.*;
 import utils.InputHandler;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
@@ -54,6 +51,8 @@ public class GameWindow {
         graphicsContext = canvas.getGraphicsContext2D();
         graphicsContext.setImageSmoothing(false);
 
+        FontManager.getInstance().initializeFonts();
+
         gameManager = GameManager.getInstance();
         uiManager = new UIManager(canvas);
         soundManager = new SoundManager();
@@ -93,6 +92,7 @@ public class GameWindow {
 
     // Ініціалізує менеджери гри
     public void initializeManagers() {
+
         gameManager = GameManager.getInstance();
         uiManager = new UIManager(canvas);
         soundManager = new SoundManager();
@@ -157,7 +157,8 @@ public class GameWindow {
     private void startNewGame(int levelId) {
         gameManager.loadLevel(levelId, true);
         gameManager.setGameState(GameManager.GameState.PLAYING); // Явно встановлюємо PLAYING
-    }
+        // Додаємо збереження після створення нового рівня
+        gameManager.saveGame();    }
 
     private void loadSavedGame(int levelId) {
         gameManager.loadLevel(levelId, false);
