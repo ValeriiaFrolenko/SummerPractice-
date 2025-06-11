@@ -37,13 +37,13 @@ public class UIManager implements Renderable {
         this.overlayPane = new Pane();
         this.interactionLabel = new Label();
         this.interactionLabel.setBackground(new Background(new BackgroundFill(
-                Color.WHITE,
+                Color.GRAY,
                 new CornerRadii(5),
                 new Insets(5)
         )));
         this.interactionLabel.setTextFill(Color.BLACK);
         this.interactionLabel.setPadding(new Insets(5));
-        this.interactionLabel.setStyle("-fx-font-size: 14;");
+        this.interactionLabel.setFont(FontManager.getInstance().getFont("Hardpixel", 16));
         this.interactionPrompts = new ArrayList<>();
         // Додаємо обробку клавіш для overlayPane
         overlayPane.setFocusTraversable(true);

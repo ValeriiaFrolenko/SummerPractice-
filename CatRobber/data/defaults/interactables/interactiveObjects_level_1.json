@@ -1,29 +1,5 @@
 {
-  "interactable_169": {
-    "gid": 2147483691,
-    "visible": true,
-    "rotation": 0,
-    "name": "finalPrize",
-    "width": 80,
-    "x": 531.666666666667,
-    "y": 484.666666666667,
-    "id": 169,
-    "type": "InteractiveObject",
-    "properties": [
-      {
-        "name": "fileName",
-        "type": "string",
-        "value": "finalPrize.png"
-      },
-      {
-        "name": "type",
-        "type": "string",
-        "value": "FINAL_PRIZE"
-      }
-    ],
-    "height": 80
-  },
-  "interactable_164": {
+  "interactiveObjects164": {
     "gid": 39,
     "visible": true,
     "rotation": 0,
@@ -47,7 +23,7 @@
     ],
     "height": 80
   },
-  "interactable_165": {
+  "interactiveObjects165": {
     "gid": 40,
     "visible": true,
     "rotation": 0,
@@ -71,7 +47,7 @@
     ],
     "height": 40
   },
-  "interactable_166": {
+  "interactiveObjects166": {
     "gid": 41,
     "visible": true,
     "rotation": 0,
@@ -95,14 +71,14 @@
     ],
     "height": 50
   },
-  "interactable_167": {
+  "interactiveObjects167": {
     "gid": 42,
     "visible": true,
     "rotation": 0,
     "name": "elecrtricalPanel",
     "width": 44,
-    "x": 98.498639647246,
-    "y": 252.950182943991,
+    "x": 402.498639647246,
+    "y": 219.950182943991,
     "id": 167,
     "type": "InteractiveObject",
     "properties": [
@@ -118,5 +94,29 @@
       }
     ],
     "height": 40
+  },
+  "interactiveObjects169": {
+    "gid": 2147483691,
+    "visible": true,
+    "rotation": 0,
+    "name": "finalPrize",
+    "width": 80,
+    "x": 531.666666666667,
+    "y": 484.666666666667,
+    "id": 169,
+    "type": "InteractiveObject",
+    "properties": [
+      {
+        "name": "fileName",
+        "type": "string",
+        "value": "finalPrize.png"
+      },
+      {
+        "name": "type",
+        "type": "string",
+        "value": "FINAL_PRIZE"
+      }
+    ],
+    "height": 80
   }
 }

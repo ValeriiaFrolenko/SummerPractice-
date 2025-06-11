@@ -1,6 +1,6 @@
 {
   "door_105": {
-    "gid": 24,
+    "gid": 25,
     "visible": true,
     "rotation": 0,
     "name": "door",
@@ -54,7 +54,7 @@
     "height": 68
   },
   "door_104": {
-    "gid": 24,
+    "gid": 25,
     "visible": true,
     "rotation": 0,
     "name": "door",
@@ -108,7 +108,7 @@
     "height": 68
   },
   "door_107": {
-    "gid": 24,
+    "gid": 25,
     "visible": true,
     "rotation": 0,
     "name": "door",
@@ -162,7 +162,7 @@
     "height": 68
   },
   "door_106": {
-    "gid": 24,
+    "gid": 25,
     "visible": true,
     "rotation": 0,
     "name": "door",
@@ -216,7 +216,7 @@
     "height": 68
   },
   "door_101": {
-    "gid": 30,
+    "gid": 31,
     "visible": true,
     "rotation": 0,
     "name": "door",
@@ -270,7 +270,7 @@
     "height": 68
   },
   "door_100": {
-    "gid": 30,
+    "gid": 31,
     "visible": true,
     "rotation": 0,
     "name": "door",
@@ -324,7 +324,7 @@
     "height": 68
   },
   "door_122": {
-    "gid": 11,
+    "gid": 12,
     "visible": true,
     "rotation": 0,
     "name": "door",
@@ -378,7 +378,7 @@
     "height": 105
   },
   "door_103": {
-    "gid": 30,
+    "gid": 31,
     "visible": true,
     "rotation": 0,
     "name": "door",
@@ -432,7 +432,7 @@
     "height": 68
   },
   "door_102": {
-    "gid": 30,
+    "gid": 31,
     "visible": true,
     "rotation": 0,
     "name": "door",
@@ -486,13 +486,13 @@
     "height": 68
   },
   "door_109": {
-    "gid": 31,
+    "gid": 32,
     "visible": true,
     "rotation": 0,
     "name": "door",
     "width": 81,
-    "x": 815.434973284246,
-    "y": 476.678336139989,
+    "x": 816.434973284246,
+    "y": 475.678336139989,
     "id": 109,
     "type": "Door",
     "properties": [
@@ -540,7 +540,7 @@
     "height": 68
   },
   "door_108": {
-    "gid": 24,
+    "gid": 25,
     "visible": true,
     "rotation": 0,
     "name": "door",
@@ -594,7 +594,7 @@
     "height": 68
   },
   "door_110": {
-    "gid": 10,
+    "gid": 11,
     "visible": true,
     "rotation": 0,
     "name": "door",
@@ -648,7 +648,7 @@
     "height": 68
   },
   "door_150": {
-    "gid": 32,
+    "gid": 33,
     "visible": true,
     "rotation": 0,
     "name": "laserDoor",
@@ -702,7 +702,7 @@
     "height": 105
   },
   "door_116": {
-    "gid": 26,
+    "gid": 27,
     "visible": true,
     "rotation": 0,
     "name": "door",
@@ -756,7 +756,7 @@
     "height": 105
   },
   "door_115": {
-    "gid": 26,
+    "gid": 27,
     "visible": true,
     "rotation": 0,
     "name": "door",
@@ -810,7 +810,7 @@
     "height": 105
   },
   "door_118": {
-    "gid": 26,
+    "gid": 27,
     "visible": true,
     "rotation": 0,
     "name": "door",
@@ -864,7 +864,7 @@
     "height": 105
   },
   "door_117": {
-    "gid": 26,
+    "gid": 27,
     "visible": true,
     "rotation": 0,
     "name": "door",
@@ -918,7 +918,7 @@
     "height": 105
   },
   "door_112": {
-    "gid": 25,
+    "gid": 26,
     "visible": true,
     "rotation": 0,
     "name": "door",
@@ -972,7 +972,7 @@
     "height": 105
   },
   "door_111": {
-    "gid": 25,
+    "gid": 26,
     "visible": true,
     "rotation": 0,
     "name": "door",
@@ -1026,7 +1026,7 @@
     "height": 105
   },
   "door_114": {
-    "gid": 25,
+    "gid": 26,
     "visible": true,
     "rotation": 0,
     "name": "door",
@@ -1080,7 +1080,7 @@
     "height": 105
   },
   "door_113": {
-    "gid": 25,
+    "gid": 26,
     "visible": true,
     "rotation": 0,
     "name": "door",
@@ -1134,7 +1134,7 @@
     "height": 105
   },
   "door_119": {
-    "gid": 26,
+    "gid": 27,
     "visible": true,
     "rotation": 0,
     "name": "door",
@@ -1188,7 +1188,7 @@
     "height": 105
   },
   "door_121": {
-    "gid": 11,
+    "gid": 12,
     "visible": true,
     "rotation": 0,
     "name": "door",
@@ -1242,7 +1242,7 @@
     "height": 105
   },
   "door_99": {
-    "gid": 30,
+    "gid": 31,
     "visible": true,
     "rotation": 0,
     "name": "door",
@@ -1296,7 +1296,7 @@
     "height": 68
   },
   "door_120": {
-    "gid": 26,
+    "gid": 27,
     "visible": true,
     "rotation": 0,
     "name": "door",

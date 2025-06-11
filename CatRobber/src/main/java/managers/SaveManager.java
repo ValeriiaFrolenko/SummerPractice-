@@ -1,5 +1,6 @@
 package managers;
 
+import entities.InteractiveObject;
 import entities.Player;
 import entities.Police;
 import entities.SecurityCamera;
@@ -7,6 +8,9 @@ import interfaces.GameObject;
 import interfaces.Interactable;
 import interfaces.Savable;
 import org.json.JSONObject;
+import puzzles.CodeLockPuzzle;
+import puzzles.LaserLockPuzzle;
+import puzzles.LockPickPuzzle;
 import puzzles.Puzzle;
 import utils.GameLoader;
 import utils.SaveFile;
@@ -58,14 +62,15 @@ public class SaveManager {
         saveData.put("gameState", gameState.toString());
         saveData.put("levelId", GameManager.getInstance().getCurrentLevelId());
         saveData.put("timestamp", java.time.LocalDateTime.now().toString());
-        // Зберігаємо об’єкти
+        saveData.put("noteCode", GameManager.getInstance().getNoteCode());
+        // Save other objects
         savePlayer(GameManager.getInstance().getPlayer());
         savePolice(GameManager.getInstance().getPolice());
         saveCameras(GameManager.getInstance().getCameras());
-        saveInteractables(GameManager.getInstance().getInteractables());
+        saveInteractiveObjects(GameManager.getInstance().getInteractables());
         savePuzzles(GameManager.getInstance().getPuzzles());
         saveProgress(GameManager.getInstance().getCurrentLevelId());
-        // Зберігаємо основний файл збереження
+        // Save main save file
         String filename = saveDirectory + "save_level_" + GameManager.getInstance().getCurrentLevelId() + ".json";
         saveJSON(saveData, filename);
         saveFiles.add(new SaveFile(filename, GameManager.getInstance().getCurrentLevelId(), saveData.getString("timestamp")));
@@ -97,25 +102,36 @@ public class SaveManager {
     }
 
     // Зберігає інтерактивні об’єкти
-    public void saveInteractables(List<Interactable> interactables) {
+    public void saveInteractiveObjects(List<Interactable> interactables) {
         JSONObject data = new JSONObject();
-        for (int i = 0; i < interactables.size(); i++) {
-            if (interactables.get(i) instanceof Savable) {
-                data.put("interactable_" + i, ((Savable) interactables.get(i)).getSerializableData());
+        int index = 0;
+        for (Interactable interactable : interactables) {
+            if (interactable instanceof InteractiveObject && interactable instanceof Savable) {
+                data.put("interactiveObjects_" + index, ((Savable) interactable).getSerializableData());
+                index++;
             }
         }
-        saveJSON(data, saveDirectory + "interactables_current.json");
+        saveJSON(data, saveDirectory + "interactiveObjects_current.json");
     }
 
     // Зберігає головоломки
     public void savePuzzles(List<Puzzle> puzzles) {
         JSONObject data = new JSONObject();
         for (int i = 0; i < puzzles.size(); i++) {
-            data.put("puzzle_" + i, puzzles.get(i).getSerializableData());
+            Puzzle puzzle = puzzles.get(i);
+            JSONObject puzzleData = puzzle.getSerializableData();
+            puzzleData.put("puzzleType", getPuzzleType(puzzle));
+            data.put("puzzle_" + i, puzzleData);
         }
         saveJSON(data, saveDirectory + "puzzles_current.json");
     }
 
+    private String getPuzzleType(Puzzle puzzle) {
+        if (puzzle instanceof CodeLockPuzzle) return "CodeLockPuzzle";
+        if (puzzle instanceof LockPickPuzzle) return "LockPickPuzzle";
+        if (puzzle instanceof LaserLockPuzzle) return "LaserLockPuzzle";
+        return "UNKNOWN";
+    }
     // Зберігає прогрес гри
     public void saveProgress(int levelId) {
         JSONObject data = new JSONObject();
@@ -143,36 +159,41 @@ public class SaveManager {
         }
         List<GameObject> objects = new ArrayList<>();
         String basePath = saveDirectory;
-        // Завантажуємо гравця
+        // Load player
         JSONObject playerData = gameLoader.loadJSON(basePath + "player_current.json");
         if (playerData != null) {
             objects.addAll(gameLoader.parseTiledJSON(playerData));
         }
-        // Завантажуємо поліцейських
+        // Load police
         JSONObject policeData = gameLoader.loadJSON(basePath + "police_current.json");
         if (policeData != null) {
-            objects.addAll((Collection<? extends GameObject>) gameLoader.parseTiledJSON(policeData));
+            objects.addAll(gameLoader.parseTiledJSON(policeData));
         }
-        // Завантажуємо камери
+        // Load cameras
         JSONObject camerasData = gameLoader.loadJSON(basePath + "cameras_current.json");
         if (camerasData != null) {
             objects.addAll(gameLoader.parseTiledJSON(camerasData));
         }
-        // Завантажуємо інтерактивні об’єкти
-        JSONObject interactablesData = gameLoader.loadJSON(basePath + "interactables_current.json");
-        if (interactablesData != null) {
-            objects.addAll(gameLoader.parseTiledJSON(interactablesData));
+        // Load interactables
+        JSONObject interactiveObjectsData = gameLoader.loadJSON(basePath + "interactiveObjects_current.json");
+        if (interactiveObjectsData != null) {
+            objects.addAll(gameLoader.parseTiledJSON(interactiveObjectsData));
         }
-        // Завантажуємо головоломки
+        // Load puzzles
         JSONObject puzzlesData = gameLoader.loadJSON(basePath + "puzzles_current.json");
         if (puzzlesData != null) {
-            objects.addAll(gameLoader.parseTiledJSON(puzzlesData));
+            for (String key : puzzlesData.keySet()) {
+                JSONObject puzzleObj = puzzlesData.getJSONObject(key);
+                Puzzle puzzle = gameLoader.createSinglePuzzle(puzzleObj);
+                if (puzzle != null) {
+                    GameManager.getInstance().getPuzzles().add(puzzle);
+                }
+            }
         }
-        // Передаємо об’єкти в GameManager
+        // Pass objects to GameManager
         GameManager.getInstance().setGameObjects(objects);
         GameManager.getInstance().setFromData(saveData);
     }
-
     // --- Геттери ---
 
     // Повертає список файлів збереження для меню

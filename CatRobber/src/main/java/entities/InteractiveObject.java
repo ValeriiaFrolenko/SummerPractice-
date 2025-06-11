@@ -15,6 +15,7 @@ import utils.GameLoader;
 import utils.Vector2D;
 
 public class InteractiveObject implements GameObject, Interactable {
+    private final String path = "interactiveObjects/";
     private double imageX;
     private double imageY;
     private double imageWidth;
@@ -24,14 +25,15 @@ public class InteractiveObject implements GameObject, Interactable {
     private Type type;
     private JSONObject properties;
 
-    public enum Type { NOTE, PICTURE, COMPUTER, LADDER, ELECTRICAL_PANEL, WITH_MONEY, FINAL_PRICE }
+    public enum Type { NOTE, PICTURE, COMPUTER, LADDER, ELECTRICAL_PANEL, WITH_MONEY, FINAL_PRIZE}
 
     public InteractiveObject(Vector2D position, JSONObject properties) {
-        this.properties = properties;
+        this.imageWidth = properties.optDouble("width", 32.0);
+        this.imageHeight = properties.optDouble("height", 32.0);
         this.imageX = position.x;
-        this.imageY = position.y;
+        this.imageY = position.y - imageHeight;
         this.type = Type.valueOf(properties.optString("type", "NOTE"));
-        this.spritePath = properties.optString("spritePath", "interactables/default.png");
+        this.spritePath = path + properties.getString("fileName");
         this.imageWidth = properties.optDouble("width", 32.0);
         this.imageHeight = properties.optDouble("height", 32.0);
         GameLoader loader = new GameLoader();
@@ -84,7 +86,7 @@ public class InteractiveObject implements GameObject, Interactable {
             case WITH_MONEY:
                 player.addMoney(100);
                 break;
-            case FINAL_PRICE:
+            case FINAL_PRIZE:
                 player.addMoney(500);
                 uiManager.createWindow(UIManager.WindowType.VICTORY, properties);
                 break;
@@ -107,9 +109,9 @@ public class InteractiveObject implements GameObject, Interactable {
 
     @Override
     public void render(GraphicsContext gc) {
-        gc.setFill(Color.BLUE);
-        gc.fillRect(imageX, imageY, imageWidth, imageHeight);
+
         if (sprite != null) {
+            gc.setImageSmoothing(false);
             gc.drawImage(sprite, imageX, imageY, imageWidth, imageHeight);
         }
 

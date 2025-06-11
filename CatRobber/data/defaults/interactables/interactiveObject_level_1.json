@@ -1,29 +1,5 @@
 {
-  "interactable_169": {
-    "gid": 2147483691,
-    "visible": true,
-    "rotation": 0,
-    "name": "finalPrize",
-    "width": 80,
-    "x": 531.666666666667,
-    "y": 484.666666666667,
-    "id": 169,
-    "type": "InteractiveObject",
-    "properties": [
-      {
-        "name": "fileName",
-        "type": "string",
-        "value": "finalPrize.png"
-      },
-      {
-        "name": "type",
-        "type": "string",
-        "value": "FINAL_PRIZE"
-      }
-    ],
-    "height": 80
-  },
-  "interactable_164": {
+  "interactiveObject164": {
     "gid": 39,
     "visible": true,
     "rotation": 0,
@@ -47,7 +23,7 @@
     ],
     "height": 80
   },
-  "interactable_165": {
+  "interactiveObject165": {
     "gid": 40,
     "visible": true,
     "rotation": 0,
@@ -71,7 +47,31 @@
     ],
     "height": 40
   },
-  "interactable_166": {
+  "interactiveObject169": {
+    "gid": 2147483691,
+    "visible": true,
+    "rotation": 0,
+    "name": "finalPrize",
+    "width": 80,
+    "x": 531.666666666667,
+    "y": 484.666666666667,
+    "id": 169,
+    "type": "InteractiveObject",
+    "properties": [
+      {
+        "name": "fileName",
+        "type": "string",
+        "value": "finalPrize.png"
+      },
+      {
+        "name": "type",
+        "type": "string",
+        "value": "FINAL_PRIZE"
+      }
+    ],
+    "height": 80
+  },
+  "interactiveObject166": {
     "gid": 41,
     "visible": true,
     "rotation": 0,
@@ -95,7 +95,7 @@
     ],
     "height": 50
   },
-  "interactable_167": {
+  "interactiveObject167": {
     "gid": 42,
     "visible": true,
     "rotation": 0,
