@@ -68,7 +68,7 @@ public class InteractiveObject implements GameObject, Interactable {
                     }
                 }
                 if (laserDoor != null) {
-                    LaserLockPuzzle puzzle = new LaserLockPuzzle(new JSONObject().put("solution", "laser"));
+                    LaserLockPuzzle puzzle = new LaserLockPuzzle(new JSONObject().put("solution", "2"));
                     puzzle.setLinkedDoor(laserDoor, (solved, door) -> {
                         if (solved) {
                             door.unlock();

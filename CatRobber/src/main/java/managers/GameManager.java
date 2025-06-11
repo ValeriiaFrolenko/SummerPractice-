@@ -140,6 +140,9 @@ public class GameManager implements Savable {
 
     // Рух гравця
     private void managePlayerMoving(InputHandler inputHandler, double deltaTime) {
+        if(gameState != GameState.PLAYING){
+            return;
+        }
         boolean isMoving = false;
         if (inputHandler.isKeyPressed(KeyCode.LEFT) || inputHandler.isKeyPressed(KeyCode.A)) {
             player.setDirection(Player.Direction.LEFT);

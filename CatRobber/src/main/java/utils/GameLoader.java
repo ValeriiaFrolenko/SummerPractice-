@@ -29,6 +29,7 @@ public class GameLoader {
             return new JSONObject(text.toString());
         } catch (IOException e) {
             System.err.println("Не можу прочитати файл: " + filename + ", помилка: " + e.getMessage());
+            System.out.println(System.getProperty("user.dir"));
             return null;
         }
     }

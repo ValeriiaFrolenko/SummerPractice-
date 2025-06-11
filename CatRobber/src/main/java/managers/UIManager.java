@@ -114,6 +114,7 @@ public class UIManager implements Renderable {
             uiNode.setLayoutX((canvas.getWidth() - ((Pane) uiNode).getPrefWidth()) / 2);
             uiNode.setLayoutY((canvas.getHeight() - ((Pane) uiNode).getPrefHeight()) / 2);
             GameManager.getInstance().setGameState(GameManager.GameState.PAUSED);
+
             System.out.println("Puzzle UI shown");
         }
     }
