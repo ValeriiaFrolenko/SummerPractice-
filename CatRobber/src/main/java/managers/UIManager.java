@@ -60,7 +60,16 @@ public class UIManager implements Renderable {
         switch (type) {
             case MENU:
                 currentWindow = new Menu(config);
+                // Додаємо меню до overlayPane
+                if (currentWindow.getRoot() != null) {
+                    overlayPane.getChildren().clear();
+                    overlayPane.getChildren().add(currentWindow.getRoot());
+                    // Меню займає весь екран
+                    currentWindow.getRoot().setLayoutX(0);
+                    currentWindow.getRoot().setLayoutY(0);
+                }
                 break;
+
             case SETTINGS:
                 currentWindow = new Settings(config);
                 break;
@@ -93,7 +102,7 @@ public class UIManager implements Renderable {
         if (currentWindow != null) {
             currentWindow.hide();
             currentWindow = null;
-            overlayPane.getChildren().clear();
+            overlayPane.getChildren().clear(); // Очищаємо overlay від меню
             GameManager.getInstance().setGameState(GameManager.GameState.PLAYING);
             if (GameWindow.getInstance().getPrimaryStage() != null) {
                 GameWindow.getInstance().getPrimaryStage().requestFocus();
