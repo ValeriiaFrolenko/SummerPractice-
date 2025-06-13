@@ -14,9 +14,9 @@ import java.util.Map;
 
 // Представляє гравця, який може рухатися, атакувати, взаємодіяти з об’єктами
 public class Player implements Animatable, GameObject, Interactable {
-    private boolean isAttacking;
-    private String attackAnimationType;
-    private double attackAnimationDuration; // Час відтворення анімації атаки
+    private boolean isAttacking; //прапорець, що вказує, чи перебуває об'єкт у стані атаки
+    private String attackAnimationType; //тип анімації атаки, яка відтворюється
+    private double attackAnimationDuration; // час відтворення анімації атаки
 
     // Поля
     private double imageX; // Верхній лівий кут зображення по X
@@ -37,21 +37,33 @@ public class Player implements Animatable, GameObject, Interactable {
     private Map<String, Image[]> animations; // Анімації, завантажені через GameLoader
     private String[] spritePaths; // Шляхи до спрайтів
     private boolean canMove; // Чи може гравець рухатися
-    private int detectionCount;
-    private int money;
+    private int detectionCount; //кількість разів, скільки гравець був помічений
+    private int money; //поточна кількість грошей, які має гравець
+
+    /** Встановлює напрямок руху
+     * @param direction новий напрямок об'єкта
+     **/
     public void setDirection(Direction direction) {
         this.direction = direction;
     }
 
+    /**
+     * Додає вказану кількість грошей до поточного балансу
+     * @param i кількість грошей для додавання
+     */
     public void addMoney(int i) {
         money+=i;
     }
 
-    // Напрями та стани гравця
+    /** Напрями та стани гравця **/
     public enum Direction { LEFT, RIGHT, UP, DOWN }
     public enum PlayerState { IDLE, RUN, HIT, CLIMB, INVISIBLE, SHOOT }
 
-    // Конструктор: ініціалізує гравця з JSON-даними
+    /**
+     * Конструктор класу Player, який ініціалізує об'єкт гравця з початковою позицією та параметрами, отриманими з JSON-даних
+     * @param position початкова позиція гравця (координати Vector2D)
+     * @param defaultData JSON-об'єкт, що містить параметри гравця (розміри, колізії, напрямок, кількість грошей тощо)
+     */
     public Player(Vector2D position, JSONObject defaultData) {
         // Ініціалізація позиції та розмірів із JSON
         double jsonImageX = position.getX();
@@ -99,7 +111,12 @@ public class Player implements Animatable, GameObject, Interactable {
 
     // --- Ініціалізація та оновлення ---
 
-    // Рухає гравця в заданому напрямку (викликається з GameManager.handleInput())
+    /**
+     * Рухає гравця в заданому напрямку з урахуванням часу, що минув
+     * Викликається з GameManager.handleInput()
+     * @param direction напрямок руху (LEFT або RIGHT)
+     * @param deltaTime час, що минув від останнього оновлення (в секундах)
+     */
     public void move(Direction direction, double deltaTime) {
         if (canMove) {
             this.direction = direction;
@@ -116,18 +133,29 @@ public class Player implements Animatable, GameObject, Interactable {
         }
     }
 
-    // Зупиняє рух гравця (викликається з GameManager.handleInput())
+    /**
+     * Зупиняє рух гравця
+     * Викликається з GameManager.handleInput()
+     */
     public void stopMovement() {
         setCanMove(false);
         setAnimationState("idle");
     }
 
-    // Дозволяє рух гравця (викликається з GameManager.checkCollisions())
+    /**
+     * Дозволяє рух гравця
+     * Викликається з GameManager.checkCollisions()
+     */
     public void allowMovement() {
         setCanMove(true);
     }
 
-    // Оновлює анімацію гравця (викликається з GameManager.update())
+    /**
+     * Оновлює анімацію гравця відповідно до часу, що минув
+     * Викликається з GameManager.update()
+     *
+     * @param deltaTime час, що минув від останнього оновлення анімації (в секундах)
+     */
     @Override
     public void updateAnimation(double deltaTime) {
         animationTime += deltaTime;
@@ -153,7 +181,13 @@ public class Player implements Animatable, GameObject, Interactable {
         }
     }
 
-    // Виконує атаку (ближню або дальню)
+    /**
+     * Виконує атаку гравця — ближню або дальню
+     * Якщо гравець зараз не атакує, починає анімацію атаки,
+     * встановлюючи відповідний тип анімації та тривалість анімації залежно від кількості кадрів
+     *
+     * @param isRanged якщо true — виконується дальня атака (shoot), якщо false — ближня атака (hit)
+     */
     public void attack(boolean isRanged) {
         if (!isAttacking) {
             isAttacking = true;
@@ -166,19 +200,21 @@ public class Player implements Animatable, GameObject, Interactable {
         }
     }
 
-    // Піднімається по драбині
-    public void climb(InteractiveObject ladder) {
-        setAnimationState("climb");
-    }
-
-    // Збільшує рівень виявлення
+    /**
+     * Метод, що збільшує рівень виявлення
+     */
     public void increaseDetection() {
 
     }
 
+    /**
+     * Телепортує гравця в нову кімнату через задані двері
+     * Позиція гравця коригується на фіксовану відстань у напрямку поточного руху, якщо двері не є лазерними
+     *
+     * @param door двері, через які відбувається телепортація
+     */
     public void teleportToRoom(Door door) {
         Direction currentDirection = this.getDirection();
-
         // Телепортуємо в тому напрямку, куди гравець рухається
        if (!door.isLaser()){
             adjustPlayerPosition(140.0, currentDirection);
@@ -186,7 +222,12 @@ public class Player implements Animatable, GameObject, Interactable {
         System.out.println("Teleported to room: x=" + getPosition().x + ", y=" + getPosition().y);
     }
 
-
+    /**
+     * Телепортує гравця на інший поверх через задані двері
+     * Напрямок телепортації визначається відповідно до напряму дверей ("up" або "down")
+     *
+     * @param door двері, через які відбувається телепортація на інший поверх
+     */
     public void teleportToFloor(Door door) {
         String doorDirection = door.direction;
         Direction teleportDirection;
@@ -206,6 +247,13 @@ public class Player implements Animatable, GameObject, Interactable {
         System.out.println("Teleported to floor: x=" + getPosition().x + ", y=" + getPosition().y);
     }
 
+    /**
+     * Коригує позицію гравця на певну відстань у вказаному напрямку
+     * Позиція гравця та позиція його зображення зміщуються на однакову величину
+     *
+     * @param offset відстань, на яку потрібно змістити гравця
+     * @param direction напрямок, у якому відбувається корекція позиції (LEFT, RIGHT, UP, DOWN)
+     */
     public void adjustPlayerPosition(double offset, Direction direction) {
         Vector2D currentPosition = getPosition(); // Отримуємо поточну позицію гравця
         Vector2D currentImaginePosition = getImagePosition(); // Отримуємо уявну позицію
@@ -231,7 +279,13 @@ public class Player implements Animatable, GameObject, Interactable {
 
     // --- Рендеринг ---
 
-    // Рендерить гравця на canvas (викликається з GameManager.render())
+    /**
+     * Відповідає за відображення гравця на канвасі
+     * Викликається з GameManager.render()
+     * Малює поточний кадр анімації гравця з урахуванням напрямку руху
+     *
+     * @param gc графічний контекст, на якому виконується малювання
+     */
     @Override
     public void render(GraphicsContext gc) {
         Image frame = getCurrentFrame();
@@ -259,7 +313,9 @@ public class Player implements Animatable, GameObject, Interactable {
         }
     }
 
-    // Повертає поточний кадр анімації
+    /**
+     * Метод, що повертає поточний кадр анімації
+     */
     @Override
     public Image getCurrentFrame() {
         Image[] frames = animations.getOrDefault(currentAnimation, animations.get("idle"));
@@ -272,7 +328,11 @@ public class Player implements Animatable, GameObject, Interactable {
 
     // --- Взаємодії ---
 
-    // Встановлює стан анімації
+    /**
+     * Встановлює поточний стан анімації гравця
+     * Якщо гравець не в стані атаки або ж намагаємося встановити анімацію атаки ("hit" або "shoot"), то змінює анімацію на вказану
+     * @param state назва стану анімації, який потрібно встановити
+     */
     @Override
     public void setAnimationState(String state) {
         if (!isAttacking || state.equals("hit") || state.equals("shoot")) {
@@ -284,13 +344,18 @@ public class Player implements Animatable, GameObject, Interactable {
         }
     }
 
-    // Взаємодія з гравцем (порожня, оскільки гравець не взаємодіє сам із собою)
+    /**
+     * Взаємодія з гравцем (порожня, оскільки гравець не взаємодіє сам із собою)
+     * @param player об'єкт гравця
+     */
     @Override
     public void interact(Player player) {
         // Порожня реалізація
     }
 
-    // Перевіряє можливість взаємодії (завжди false для гравця)
+    /**
+     * Метод, що перевіряє можливість взаємодії (завжди false для гравця)
+     */
     @Override
     public boolean canInteract(Player player) {
         return false;
@@ -298,7 +363,11 @@ public class Player implements Animatable, GameObject, Interactable {
 
     // --- Серіалізація ---
 
-    // Повертає JSON для збереження (викликається з SaveManager.savePlayer())
+    /**
+     * Повертає JSON-об’єкт з даними гравця для збереження стану (позицію, розміри, напрямок, стан, поточну анімацію, можливість руху та тип)
+     * Викликається з SaveManager.savePlayer()
+     * @return JSONObject з параметрами гравця
+     */
     @Override
     public JSONObject getSerializableData() {
         JSONObject data = new JSONObject();
@@ -318,7 +387,11 @@ public class Player implements Animatable, GameObject, Interactable {
         return data;
     }
 
-    // Відновлює стан із JSON (викликається з SaveManager.loadGame())
+    /**
+     * Відновлює стан гравця із JSON-об’єкта
+     * Викликається з SaveManager.loadGame()
+     * @param data JSONObject з параметрами для відновлення гравця
+     */
     @Override
     public void setFromData(JSONObject data) {
         double jsonImageX = data.optDouble("x", imageX);
@@ -344,90 +417,137 @@ public class Player implements Animatable, GameObject, Interactable {
 
     // --- Геттери/Сеттери ---
 
-    // Повертає тип об’єкта
+    /**
+     * Повертає тип об’єкта
+     * @return тип об'єкту "Player"
+     */
     @Override
     public String getType() {
         return "Player";
     }
 
-    // Повертає позицію (верхній лівий кут колізійної області)
+    /**
+     * Повертає позицію колізійної області (верхній лівий кут).
+     * @return позиція гравця як Vector2D
+     */
     @Override
     public Vector2D getPosition() {
         return new Vector2D(collX, collY);
     }
 
-    // Повертає уявну позицію (верхній лівий кут зображення)
+    /**
+     * Повертає уявну позицію зображення (верхній лівий кут).
+     * @return позиція зображення як Vector2D
+     */
     @Override
     public Vector2D getImagePosition() {
         return new Vector2D(imageX, imageY);
     }
 
-    // Встановлює позицію колізійної області
+    /**
+     * Встановлює позицію колізійної області.
+     * @param position нова позиція колізії
+     */
     @Override
     public void setPosition(Vector2D position) {
         this.collX = position.getX();
         this.collY = position.getY();
     }
 
-    // Встановлює уявну позицію зображення
+    /**
+     * Встановлює позицію зображення.
+     * @param position нова позиція зображення
+     */
     @Override
     public void setImagePosition(Vector2D position) {
         this.imageX = position.getX();
         this.imageY = position.getY();
     }
 
-    // Повертає межі колізійної області
+    /**
+     * Повертає межі колізійної області для обробки зіткнень.
+     * @return Bounds з позицією і розмірами колізії
+     */
     @Override
     public Bounds getBounds() {
         return new BoundingBox(collX, collY, collWidth, collHeight);
     }
 
-    // Повертає межі зображення
+    /**
+     * Повертає межі зображення для рендерингу.
+     * @return Bounds з позицією і розмірами зображення
+     */
     @Override
     public Bounds getImageBounds() {
         return new BoundingBox(imageX, imageY, imageWidth, imageHeight);
     }
 
-    // Повертає діапазон взаємодії
+    /**
+     * Повертає радіус або діапазон взаємодії гравця.
+     * Гравець не взаємодіє сам із собою, тому повертає 0.
+     * @return 0.0
+     */
     @Override
     public double getInteractionRange() {
-        return 0.0; // Гравець не взаємодіє сам із собою
+        return 0.0;
     }
 
-    // Повертає підказку для UI
+    /**
+     * Повертає підказку для користувача при взаємодії.
+     * Гравець не має підказки, тому повертає null.
+     * @return null
+     */
     @Override
     public String getInteractionPrompt() {
-        return null; // Гравець не має підказки
+        return null;
     }
 
-    // Повертає шар рендерингу
+    /**
+     * Повертає шар, на якому рендериться гравець.
+     * @return 2 - номер шару рендерингу
+     */
     @Override
     public int getRenderLayer() {
-        return 2; // Гравець рендериться на шарі 1
+        return 2; // Гравець рендериться на шарі 2
     }
 
-    // Перевіряє видимість
+    /**
+     * Перевіряє, чи гравець видимий (стан не INVISIBLE).
+     * @return true, якщо гравець видимий, інакше false
+     */
     @Override
     public boolean isVisible() {
         return state != PlayerState.INVISIBLE;
     }
 
-    // Повертає напрям
+    /**
+     * Повертає напрямок руху гравця.
+     * @return поточний напрямок
+     */
     public Direction getDirection() {
         return direction;
     }
 
-    // Перевіряє можливість руху
+    /**
+     * Перевіряє, чи гравець може рухатись.
+     * @return true, якщо гравець може рухатись
+     */
     public boolean isCanMove() {
         return canMove;
     }
 
-    // Встановлює можливість руху
+    /**
+     * Встановлює можливість руху гравця.
+     * @param canMove true, якщо гравець може рухатись, інакше false
+     */
     public void setCanMove(boolean canMove) {
         this.canMove = canMove;
     }
 
-    // Геттер для перевірки стану атаки
+    /**
+     * Повертає стан атаки гравця.
+     * @return true, якщо гравець виконує атаку
+     */
     public boolean isAttacking() {
         return isAttacking;
     }
