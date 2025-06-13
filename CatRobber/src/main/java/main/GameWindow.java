@@ -7,6 +7,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.input.KeyCode;
 import managers.*;
+import org.json.JSONObject;
 import utils.InputHandler;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
@@ -85,10 +86,10 @@ public class GameWindow {
 
         handleWindowEvents();
 
-        startNewGame(1);
-
+        showMainMenu();
         gameManager.updateBackgroundScale(scene.getWidth(), scene.getHeight());
     }
+
 
     // Ініціалізує менеджери гри
     public void initializeManagers() {
@@ -155,10 +156,15 @@ public class GameWindow {
     }
 
     private void startNewGame(int levelId) {
-        gameManager.loadLevel(levelId, true);
+        showMainMenu();
         gameManager.setGameState(GameManager.GameState.PLAYING); // Явно встановлюємо PLAYING
         // Додаємо збереження після створення нового рівня
         gameManager.saveGame();    }
+
+    private void showMainMenu() {
+        JSONObject menuConfig = new JSONObject();
+        uiManager.createWindow(UIManager.WindowType.MENU, menuConfig);
+    }
 
     private void loadSavedGame(int levelId) {
         gameManager.loadLevel(levelId, false);
