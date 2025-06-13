@@ -23,7 +23,14 @@ import java.util.List;
 public class GameLoader {
     // --- Завантаження ресурсів ---
 
-    // Завантажує JSON-файл
+    /**
+     * Завантажує JSON-файл за заданим ім’ям файлу
+     * Метод читає файл посимвольно і формує з нього рядок, після чого створює JSONObject з цього рядка
+     * Якщо файл не вдалося прочитати, виводить помилку і повертає null
+     *
+     * @param filename ім'я (шлях) JSON-файлу для завантаження
+     * @return JSONObject, який містить дані з файлу, або null у разі помилки
+     */
     public JSONObject loadJSON(String filename) {
         try (FileReader reader = new FileReader(filename)) {
             StringBuilder text = new StringBuilder();
@@ -39,7 +46,13 @@ public class GameLoader {
         }
     }
 
-    // Завантажує зображення
+    /**
+     * Завантажує зображення з одного з можливих шляхів.
+     * Перевіряє кілька варіантів розташування файлу
+     *
+     * @param path відносний або абсолютний шлях до зображення
+     * @return об'єкт Image, або null якщо зображення не знайдено
+     */
     public Image loadImage(String path) {
         try {
             String[] possiblePaths = {"assets/images/" + path, "assets/" + path, path};
@@ -67,7 +80,14 @@ public class GameLoader {
         }
     }
 
-    // Розбиває спрайт-лист на кадри
+    /**
+     * Розбиває спрайт-лист на окремі кадри
+     * Кожен кадр — це частина зображення, що розташована горизонтально в один ряд
+     *
+     * @param path шлях до файлу спрайт-листа
+     * @param frameCount кількість кадрів у спрайт-листі
+     * @return масив зображень (кадрів). Якщо не вдалося завантажити або виникла помилка, повертає порожній масив або масив з одним елементом — оригінальним спрайт-листом.
+     */
     public Image[] splitSpriteSheet(String path, int frameCount) {
         Image spriteSheet = loadImage(path);
         if (spriteSheet == null) {
@@ -103,12 +123,20 @@ public class GameLoader {
 
     // --- Створення об’єктів ---
 
-    // Парсить JSON у список об’єктів
+    /**
+     * Парсить JSON у список об’єктів
+     */
     public List<GameObject> parseTiledJSON(JSONObject tiledData) {
         return createObjectsFromJSON(tiledData);
     }
 
-    // Створює об’єкти з JSON
+    /**
+     * Створює список ігрових об'єктів (GameObject) та головоломок (Puzzle) на основі вхідних даних у форматі JSON.
+     * Усі знайдені головоломки додаються до менеджера головоломок гри.
+     *
+     * @param data JSON-об'єкт, що містить опис ігрових об'єктів
+     * @return список створених ігрових об'єктів (окрім головоломок)
+     */
     public List<GameObject> createObjectsFromJSON(JSONObject data) {
         List<GameObject> objects = new ArrayList<>();
         List<Puzzle> puzzles = new ArrayList<>();
@@ -158,7 +186,13 @@ public class GameLoader {
         GameManager.getInstance().getPuzzles().addAll(puzzles);
         return objects;
     }
-    // Створює окремий об’єкт із JSON
+
+    /**
+     * Створює окремий ігровий об'єкт (GameObject) на основі даних JSON.
+     *
+     * @param obj JSONObject, що містить дані про один ігровий об'єкт
+     * @return Створений об'єкт типу GameObject або null, якщо тип об'єкта не підтримується
+     */
     private GameObject createSingleObject(JSONObject obj) {
         String type = obj.getString("type");
         float x = obj.optFloat("x", 0.0f);
@@ -196,6 +230,11 @@ public class GameLoader {
         }
     }
 
+    /**
+     * Створює об'єкт головоломки (Puzzle) на основі JSON-даних
+     * @param obj JSONObject, що містить дані про головоломку
+     * @return Об'єкт Puzzle відповідного типу, або null, якщо тип не підтримується або obj не є головоломкою
+     */
     public Puzzle createSinglePuzzle(JSONObject obj) {
         String type = obj.getString("type");
         if (!type.equals("Puzzle")) {
@@ -237,7 +276,12 @@ public class GameLoader {
 
     // --- Створення дефолтних файлів ---
 
-    // Створює дефолтні файли для рівня (викликається з LevelManager.createDefaultFiles())
+    /**
+     * Створює структури JSON для різних типів ігрових об'єктів за даними рівня.
+     *
+     * @param levelData JSONObject, що містить дані рівня
+     * @param levelId Ціле число, що ідентифікує рівень
+     */
     public void createDefaultFiles(JSONObject levelData, int levelId) {
         String basePath = "data/defaults/";
         JSONObject playerData = new JSONObject();
@@ -322,7 +366,11 @@ public class GameLoader {
         saveJSON(interactableData, basePath + "interactables/interactiveObjects_level_" + levelId + ".json");
         saveJSON(puzzleData, basePath + "puzzles/puzzle_level_" + levelId + ".json"); // Зберігаємо головоломки
     }
-    // Створює директорію, якщо не існує
+
+    /**
+     * Створює директорію за вказаним шляхом, якщо вона ще не існує
+     * @param path шлях до директорії, яку потрібно створити
+     */
     private void createDirectoryIfNotExists(String path) {
         File directory = new File(path);
         if (!directory.exists()) {
@@ -334,7 +382,11 @@ public class GameLoader {
         }
     }
 
-    // Зберігає JSON у файл
+    /**
+     * Зберігає JSON-об'єкт у файл з заданою назвою
+     * @param data JSONObject для збереження у файл
+     * @param filename ім'я файлу (шлях), куди потрібно зберегти JSON
+     */
     private void saveJSON(JSONObject data, String filename) {
         try (FileWriter writer = new FileWriter(filename)) {
             writer.write(data.toString(2));
@@ -345,7 +397,12 @@ public class GameLoader {
 
     // --- Карта колізій ---
 
-    // Завантажує карту колізій із JSON
+    /**
+     * Завантажує список кімнат (Room) з JSON-даних рівня, використовуючи об'єкти типу "Room" зі шару об'єктів
+     *
+     * @param levelData JSONObject з даними рівня
+     * @return список Room, отриманих із карти колізій
+     */
     public List<GameManager.Room> loadCollisionMap(JSONObject levelData) {
         List<GameManager.Room> rooms = new ArrayList<>();
         if (levelData == null || !levelData.has("layers")) {
