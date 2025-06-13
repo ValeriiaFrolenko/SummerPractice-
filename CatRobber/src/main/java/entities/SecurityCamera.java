@@ -17,28 +17,31 @@ import java.util.List;
 
 public class SecurityCamera implements GameObject, Animatable {
     // Поля
-    private CameraDirection direction;
-    private String currentAnimation;
-    private Polygon fieldOfView;
-    private double animationTime;
-    private int animationFrame;
-    private boolean isAlert;
-    private double alertTimer;
-    private Image[] frames;
-    private String spritePath;
-    private double imageX;
-    private double imageY;
-    private double imageWidth;
-    private double imageHeight;
-    private double floorPointY;
+    private CameraDirection direction; //поточний напрямок, у якому дивиться камера
+    private String currentAnimation; //поточна анімація
+    private Polygon fieldOfView; //полігон, який представляє поле зору камери
+    private double animationTime; //час, який пройшов з моменту початку анімації
+    private int animationFrame; //поточний кадр анімації, який відображається
+    private boolean isAlert; //прапорець, чи знаходиться камера в стані тривоги
+    private double alertTimer; //таймер, що визначає, скільки часу камера буде залишатися в стані тривоги
+    private Image[] frames; //масив зображень (кадрів)
+    private String spritePath; //шлях до спрайту (зображення) камери
+    private double imageX, imageY, imageWidth, imageHeight; //координати, висота та ширина камери
+    private double floorPointY; //вертикальна координата точки, що вважається "підлогою" (нижня межа поля зору)
     private static final double ALERT_DURATION = 15.0; // Тривалість червоного трикутника
     private static final double FOV_HEIGHT = 100.0; // Висота трикутника (до підлоги)
     private static final double FOV_HALF_ANGLE = Math.toRadians(15.0); // Половина кута 30 градусів
     private static final double X_OFFSET = 13.0; // Зміщення по X для вершини трикутника
     private static final double DIRECTION_SWITCH_INTERVAL = 5.0; // Інтервал зміни напрямку (секунди)
 
+    /** Перелік напрямків камери **/
     public enum CameraDirection { LEFT, RIGHT }
 
+    /**
+     * Конструктор, що ініціалізує об'єкт камери на основі заданої позиції та початкових даних із JSON
+     * @param vector2D визначає координати нижнього лівого кута камери
+     * @param defaultData JSON-об'єкт із параметрами камери
+     */
     public SecurityCamera(Vector2D vector2D, JSONObject defaultData) {
         // Ініціалізація позиції та розмірів із JSON
         double jsonImageX = vector2D.getX();
@@ -64,7 +67,10 @@ public class SecurityCamera implements GameObject, Animatable {
         updateFieldOfView();
     }
 
-    // Оновлює полігон поля зору
+    /**
+     *  Оновлює полігон поля зору
+     *  Поле зору — це трикутник, який починається з нижнього краю камери та розходиться донизу до уявної "підлоги" на координаті floorPointY
+     */
     private void updateFieldOfView() {
         fieldOfView.getPoints().clear();
         double vertexX, vertexY;
@@ -96,7 +102,10 @@ public class SecurityCamera implements GameObject, Animatable {
         }
     }
 
-    // Оновлює анімацію камери
+    /**
+     * Метод оновлює анімацію камери під час кожного кадру гри
+     * @param deltaTime час, що пройшов з останнього кадру
+     */
     @Override
     public void updateAnimation(double deltaTime) {
         animationTime += deltaTime;
@@ -116,11 +125,6 @@ public class SecurityCamera implements GameObject, Animatable {
                 setAnimationState("normal");
             }
         }
-    }
-
-    // Оновлює кадр анімації
-    public void updateFrame() {
-        animationFrame = 0; // Завжди перший кадр
     }
 
     // Перевіряє, чи гравець у полі зору камери
@@ -151,6 +155,11 @@ public class SecurityCamera implements GameObject, Animatable {
     }
 
     // Рендерить камеру на canvas
+
+    /**
+     * Рендерить камеру на екран (canvas), враховуючи її напрямок та стан тривоги
+     * @param gc графічний контекст, на який виконується малювання
+     */
     @Override
     public void render(GraphicsContext gc) {
         Image frame = getCurrentFrame();
@@ -188,7 +197,9 @@ public class SecurityCamera implements GameObject, Animatable {
         }
     }
 
-    // Повертає поточний кадр анімації
+    /**
+     * Метод, що повертає поточний кадр анімації
+     */
     @Override
     public Image getCurrentFrame() {
         if (frames == null || frames.length == 0) {
@@ -198,7 +209,9 @@ public class SecurityCamera implements GameObject, Animatable {
         return frames[0]; // Завжди перший кадр
     }
 
-    // Встановлює стан анімації
+    /**
+     * Метод, що встановлює стан анімації
+     */
     @Override
     public void setAnimationState(String state) {
         if (!state.equals(currentAnimation)) {
@@ -209,6 +222,11 @@ public class SecurityCamera implements GameObject, Animatable {
     }
 
     // Повертає JSON для збереження
+
+    /**
+     * Метод, що дозволяє зберігати всю інформацію про камеру у файл (положення, розміри, напрямок, анімацію, тощо)
+     * @return об'єкт JSONObject, який містить серіалізовані дані камери
+     */
     @Override
     public JSONObject getSerializableData() {
         JSONObject data = new JSONObject();
@@ -224,7 +242,10 @@ public class SecurityCamera implements GameObject, Animatable {
         return data;
     }
 
-    // Відновлює стан із JSON
+    /**
+     * Встановлює стан камери на основі наданого об'єкта JSONObject
+     * @param data об'єкт JSONObject, який містить дані для відновлення стану камери
+     */
     @Override
     public void setFromData(JSONObject data) {
         this.imageX = data.optDouble("x", imageX);
@@ -243,21 +264,38 @@ public class SecurityCamera implements GameObject, Animatable {
     }
 
     // Геттери/Сеттери
+
+    /**
+     * Повертає тип об'єкта
+     * @return рядок, що описує тип об'єкта "Camera"
+     */
     @Override
     public String getType() {
         return "Camera";
     }
 
+    /**
+     * Повертає позицію камери у вигляді вектора
+     * @return об'єкт {@link Vector2D} з координатами позиції камери (imageX, imageY)
+     */
     @Override
     public Vector2D getPosition() {
         return new Vector2D(imageX, imageY);
     }
 
+    /**
+     * Повертає позицію зображення камери
+     * @return об'єкт Vector2D з координатами зображення камери
+     */
     @Override
     public Vector2D getImagePosition() {
         return new Vector2D(imageX, imageY);
     }
 
+    /**
+     * Встановлює позицію камери
+     * @param position нова позиція у вигляді об'єкта Vector2D
+     */
     @Override
     public void setPosition(Vector2D position) {
         this.imageX = position.getX();
@@ -265,6 +303,10 @@ public class SecurityCamera implements GameObject, Animatable {
         updateFieldOfView();
     }
 
+    /**
+     * Встановлює позицію зображення камери
+     * @param position нова позиція зображення у вигляді об'єкта Vector2D
+     */
     @Override
     public void setImagePosition(Vector2D position) {
         this.imageX = position.getX();
@@ -272,21 +314,37 @@ public class SecurityCamera implements GameObject, Animatable {
         updateFieldOfView();
     }
 
+    /**
+     * Повертає межі камери, який використовується для рендерингу та колізій
+     * @return об'єкт Bounds, що описує позицію та розміри камери
+     */
     @Override
     public Bounds getBounds() {
         return new BoundingBox(imageX, imageY, imageWidth, imageHeight);
     }
 
+    /**
+     * Повертає межі зображення камери
+     * @return об'єкт Bounds, що описує позицію та розміри зображення камери
+     */
     @Override
     public Bounds getImageBounds() {
         return new BoundingBox(imageX, imageY, imageWidth, imageHeight);
     }
 
+    /**
+     * Повертає рівень шару рендерингу, на якому буде відображатись камера
+     * @return 1 - значення рівня шару
+     */
     @Override
     public int getRenderLayer() {
         return 1;
     }
 
+    /**
+     * Повертає інформацію про видимість камери
+     * @return true, якщо камеру видно, інакше false
+     */
     @Override
     public boolean isVisible() {
         return true;

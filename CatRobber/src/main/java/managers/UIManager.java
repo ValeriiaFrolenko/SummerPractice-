@@ -9,6 +9,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.control.Label;
 import javafx.scene.Node;
+import puzzles.Puzzle;
 import ui.UIWindow;
 import ui.InteractiveObjectWindow;
 import ui.Menu;

@@ -113,10 +113,10 @@ public class CodeLockPuzzle extends Puzzle {
         pane.getChildren().add(lockView);
 
         // Хрестик для закриття - в межах зображення
-        Button closeButton = new Button("X");
+        Button closeButton = new Button("✖");
         closeButton.setStyle("-fx-font-size: 14; -fx-background-color: red; -fx-text-fill: white;");
-        closeButton.setLayoutX(imageWidth - 30); // В межах зображення
-        closeButton.setLayoutY(5);
+        closeButton.setLayoutX(imageWidth - 34); // В межах зображення
+        closeButton.setLayoutY(2);
         closeButton.setOnAction(e -> {
             System.out.println("CodeLockPuzzle closed");
             GameWindow.getInstance().getUIManager().hidePuzzleUI();

@@ -41,11 +41,20 @@ public class Police implements Animatable, GameObject, Interactable {
     private double alarmDuration = 3;
     private double frameDuration = 0.2;
 
+    /**
+     * Метод, що реалізує взаємодію між гравцем і поліцейським
+     * @param player об'єкт гравця
+     */
     @Override
     public void interact(Player player) {
         takeHit(false);
     }
 
+    /**
+     *
+     * @param player
+     * @return
+     */
     @Override
     public boolean canInteract(Player player) {
         Bounds playerBounds = player.getBounds();
@@ -57,27 +66,38 @@ public class Police implements Animatable, GameObject, Interactable {
         if (!hasOverlap) {
             return false;
         }
+        //якщо в одній кімнаті та поліцейський бачить гравця то взаємодія заборонена
         if (canSeePlayer && inSameRoom) {
             return false;
         }
         return true;
     }
 
+    /**
+     * Метод, що вказує максимальнк відстань, з якої гравець може взаємодіяти з поліцейським
+     * @return 0 - взаємодія можлива при безпосередньому зіткненні
+     */
     @Override
     public double getInteractionRange() {
         return 0;
     }
 
+    /**
+     * Повертає текст підказки для гравця
+     * @return рядок підказки
+     */
     @Override
     public String getInteractionPrompt() {
         return "Press Q to hit";
     }
 
-    // Напрями та стани поліцейського
+    /** Напрями та стани поліцейського **/
     public enum PoliceDirection { LEFT, RIGHT }
     public enum PoliceState { PATROL, CHASE, ALERT, STUNNED, IDLE }
 
-    // Конструктор: ініціалізує поліцейського з JSON-даними
+    /**
+     * Конструктор, що ініціалізує поліцейського з JSON-даними
+     */
     public Police(Vector2D position, JSONObject defaultData) {
         this.imageHeight = defaultData.getDouble("height");
         this.imageX = position.x;
@@ -105,7 +125,9 @@ public class Police implements Animatable, GameObject, Interactable {
 
     // --- Ініціалізація та оновлення ---
 
-    // Перевіряє, чи гравець у тій самій кімнаті
+    /**
+     * Перевіряє, чи гравець у тій самій кімнаті
+     */
     private boolean isPlayerInSameRoom(List<GameManager.Room> rooms, Player player) {
         Bounds playerBounds = player.getBounds();
         Bounds policeBounds = getBounds();
@@ -119,6 +141,13 @@ public class Police implements Animatable, GameObject, Interactable {
     }
 
     // Оновлює логіку поліцейського (викликається з GameManager.update())
+
+    /**
+     * Оновлює стан поліцейського на кожному кадрі гри
+     * @param deltaTime скільки часу пройшло з минулого кадру
+     * @param rooms список кімнат, у яких може перебувати гравець або поліцейський
+     * @param player об'єкт гравця
+     */
     public void update(double deltaTime, List<GameManager.Room> rooms, Player player) {
         System.out.println(state);
         // Оновлення стану оглушення
@@ -221,7 +250,12 @@ public class Police implements Animatable, GameObject, Interactable {
         }
     }
 
-    // Патрулює зі вказаною швидкістю
+    /**
+     * Рухає поліцейського у вказаному напрямку зі заданою швидкістю.
+     * Метод оновлює позиції зображення та колізійної області на основі напрямку руху.
+     * @param deltaTime час, що пройшов з останнього оновлення
+     * @param speed швидкість руху
+     */
     public void patrol(double deltaTime, double speed) {
         setAnimationState("patrol");
         double movement = speed * deltaTime;
@@ -237,6 +271,12 @@ public class Police implements Animatable, GameObject, Interactable {
     }
 
     // Оновлює анімацію поліцейського
+
+    /**
+     * Оновлює поточний кадр анімації поліцейського відповідно до часу,
+     * що пройшов з останнього оновлення. Анімація змінюється циклічно.
+     * @param deltaTime
+     */
     @Override
     public void updateAnimation(double deltaTime) {
         System.out.println(frameDuration);
@@ -248,13 +288,17 @@ public class Police implements Animatable, GameObject, Interactable {
         animationFrame = (int) (animationTime / frameDuration) % frameCount;
     }
 
-    // Зупиняє рух поліцейського
+    /**
+     * Зупиняє рух поліцейського, встановлюючи стан IDLE
+     */
     public void stopMovement() {
         state = PoliceState.IDLE;
         setAnimationState("idle");
     }
 
-    // Активує стан тривоги
+    /**
+     * Активує стан тривоги для поліцейського, змінює стан на ALERT
+     */
     public void alert() {
         if (state != PoliceState.ALERT) { // Активуємо лише якщо не в ALERT
             state = PoliceState.ALERT;
@@ -266,7 +310,11 @@ public class Police implements Animatable, GameObject, Interactable {
         }
     }
 
-    // Обробляє отримання удару
+    /**
+     * Обробляє отримання удару поліцейським.
+     * Переводить поліцейського у стан оглушення (STUNNED)
+     * @param isRanged isRanged true, якщо удар був дистанційним, false — якщо ближнім
+     */
     public void takeHit(boolean isRanged) {
         state = PoliceState.STUNNED;
         setAnimationState("stunned");
@@ -275,7 +323,11 @@ public class Police implements Animatable, GameObject, Interactable {
 
     // --- Рендеринг ---
 
-    // Рендерить поліцейського на canvas (викликається з GameManager.render())
+    /**
+     * Відмалює поліцейського на графічному контексті
+     * Викликається з GameManager.render()
+     * @param gc графічний контекст, на якому відбувається малювання
+     */
     @Override
     public void render(GraphicsContext gc) {
         Image frame = getCurrentFrame();
@@ -288,6 +340,7 @@ public class Police implements Animatable, GameObject, Interactable {
             double renderHeight = imageHeight;
 
             // Рендеримо основне зображення поліцейського
+            //якщо LEFT, то віддзеркалює зображення по горизонталі
             if (direction == PoliceDirection.LEFT) {
                 gc.save();
                 gc.translate(renderX + renderWidth, renderY);
@@ -334,7 +387,9 @@ public class Police implements Animatable, GameObject, Interactable {
 
     // --- Взаємодії ---
 
-    // Встановлює стан анімації
+    /**
+     * Метод, що встановлює стан анімації
+     */
     @Override
     public void setAnimationState(String state) {
         if (animations.containsKey(state) && !state.equals(currentAnimation)) {
@@ -346,13 +401,19 @@ public class Police implements Animatable, GameObject, Interactable {
 
     // --- Серіалізація ---
 
-    // Повертає JSON для збереження (викликається з SaveManager.savePolice())
+    /**
+     * Повертає JSON-об’єкт, що містить дані для збереження стану поліцейського.
+     * Викликається з SaveManager.savePolice().
+     * Дані включають позицію, розміри, напрямок, стан, анімацію і час оглушення.
+     *
+     * @return JSONObject із серіалізованими даними поліцейського
+     */
     @Override
     public JSONObject getSerializableData() {
         JSONObject data = new JSONObject();
         data.put("type", getType());
         data.put("x", imageX);
-        data.put("y", imageY + imageHeight); // Зберігаємо як нижній лівий кут
+        data.put("y", imageY + imageHeight); // Зберігаємо позицію як нижній лівий кут
         data.put("collX", collX);
         data.put("collY", collY);
         data.put("width", imageWidth);
@@ -366,7 +427,14 @@ public class Police implements Animatable, GameObject, Interactable {
         return data;
     }
 
-    // Відновлює стан із JSON (викликається з SaveManager.loadGame())
+    /**
+     * Відновлює стан поліцейського з JSON-даних.
+     * Викликається з SaveManager.loadGame().
+     * Конвертує координати позиції з нижнього лівого кута у верхній лівий.
+     * Проводить перевірку коректності значень напрямку та стану.
+     *
+     * @param data JSONObject із даними для відновлення стану поліцейського
+     */
     @Override
     public void setFromData(JSONObject data) {
         this.imageX = data.optDouble("x", imageX);
@@ -393,74 +461,117 @@ public class Police implements Animatable, GameObject, Interactable {
 
     // --- Геттери/Сеттери ---
 
-    // Повертає тип об’єкта
+    /**
+     * Повертає тип об'єкта
+     * @return рядок, що позначає тип об'єкта "Police"
+     */
     @Override
     public String getType() {
         return "Police";
     }
 
-    // Повертає позицію поліцейського
+    /**
+     * Повертає позицію поліцейського у вигляді вектора (колізійна позиція)
+     * @return Vector2D з координатами колізійної позиції
+     */
     @Override
     public Vector2D getPosition() {
         return new Vector2D(collX, collY);
     }
 
-    // Повертає уявну позицію (та ж, що й позиція)
+    /**
+     * Повертає уявну позицію поліцейського (позиція зображення)
+     * @return Vector2D з координатами позиції зображення
+     */
     @Override
     public Vector2D getImagePosition() {
         return new Vector2D(imageX, imageY);
     }
 
-    // Встановлює позицію поліцейського
+    /**
+     * Встановлює позицію поліцейського (колізійну)
+     * @param position вектор з новими координатами для колізійної позиції
+     */
     @Override
     public void setPosition(Vector2D position) {
         this.collX = position.x;
         this.collY = position.y;
     }
 
-    // Встановлює уявну позицію
+    /**
+     * Встановлює уявну позицію (позицію зображення) поліцейського
+     * @param position вектор з новими координатами для позиції зображення
+     */
     @Override
     public void setImagePosition(Vector2D position) {
         this.imageX = position.x;
         this.imageY = position.y;
     }
 
-    // Повертає межі для колізій
+    /**
+     * Повертає межі колізійної області поліцейського
+     * @return Bounds, що описує прямокутник колізії (collX, collY, collWidth, collHeight)
+     */
     @Override
     public Bounds getBounds() {
         return new BoundingBox(collX, collY, collWidth, collHeight);
     }
 
-    // Повертає межі для рендерингу
+    /**
+     * Повертає межі області зображення для рендерингу
+     * @return Bounds, що описує прямокутник зображення (imageX, imageY, imageWidth, imageHeight)
+     */
     @Override
     public Bounds getImageBounds() {
         return new BoundingBox(imageX, imageY, imageWidth, imageHeight);
     }
 
-    // Повертає шар рендерингу
+    /**
+     * Повертає номер шару, на якому виконується рендеринг поліцейського
+     * @return 1 — номер шару рендерингу
+     */
     @Override
     public int getRenderLayer() {
         return 1; // Поліцейські рендеряться на шарі 1
     }
 
-    // Перевіряє видимість
+    /**
+     * Перевіряє, чи є поліцейський видимим
+     * @return true — поліцейський завжди видимий
+     */
     @Override
     public boolean isVisible() {
-        return true; // Поліцейський завжди видимий
+        return true;
     }
 
+    /**
+     * Повертає напрямок руху поліцейського
+     * @return поточний напрямок поліцейського
+     */
     public PoliceDirection getDirection() {
         return direction;
     }
 
+    /**
+     * Встановлює напрямок руху поліцейського
+     * @param direction новий напрямок поліцейського
+     */
     public void setDirection(PoliceDirection direction) {
         this.direction = direction;
     }
 
+    /**
+     * Повертає поточний стан поліцейського
+     * @return поточний стан поліцейського
+     */
     public PoliceState getState() {
         return state;
     }
 
+    /**
+     * Встановлює поточний стан поліцейського
+     * @param state новий стан поліцейського
+     */
     public void setState(PoliceState state) {
         this.state = state;
     }
