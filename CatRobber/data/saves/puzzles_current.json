@@ -1,16 +1,16 @@
 {
   "puzzle_2": {
-    "puzzleType": "LockPickPuzzle",
+    "puzzleType": "CodeLockPuzzle",
     "state": "UNSOLVED",
     "type": "Puzzle"
   },
   "puzzle_1": {
-    "puzzleType": "LockPickPuzzle",
+    "puzzleType": "CodeLockPuzzle",
     "state": "UNSOLVED",
     "type": "Puzzle"
   },
   "puzzle_3": {
-    "puzzleType": "LaserLockPuzzle",
+    "puzzleType": "CodeLockPuzzle",
     "state": "UNSOLVED",
     "type": "Puzzle"
   },

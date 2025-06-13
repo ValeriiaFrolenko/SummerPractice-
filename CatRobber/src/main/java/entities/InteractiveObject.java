@@ -165,7 +165,7 @@ public class InteractiveObject implements GameObject, Interactable {
         data.put("width", imageWidth);
         data.put("height", imageHeight);
         data.put("fileName", properties.getString("fileName"));
-        data.put("Type", "interactiveObject");
+        data.put("type", "InteractiveObject");
 
         return data;
     }
