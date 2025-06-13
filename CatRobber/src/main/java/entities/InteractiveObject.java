@@ -15,17 +15,14 @@ import utils.GameLoader;
 import utils.Vector2D;
 
 public class InteractiveObject implements GameObject, Interactable {
-    private final String path = "interactiveObjects/";
-    private double imageX;
-    private double imageY;
-    private double imageWidth;
-    private double imageHeight;
-    private Image sprite;
-    private String spritePath;
+    private final String path = "interactiveObjects/"; //базовий шлях до папки зі спрайтами
+    private double imageX, imageY, imageWidth, imageHeight; //координати, висота та ширина об'єктів
+    private Image sprite; //об'єкт зображення
+    private String spritePath; //шлях до файлу із зображенням
     private Type type;
     private JSONObject properties;
 
-    public enum Type { NOTE, PICTURE, COMPUTER, LADDER, ELECTRICAL_PANEL, WITH_MONEY, FINAL_PRIZE}
+    public enum Type { NOTE, PICTURE, COMPUTER, ELECTRICAL_PANEL, WITH_MONEY, FINAL_PRIZE}
 
     public InteractiveObject(Vector2D position, JSONObject properties) {
         this.imageWidth = properties.optDouble("width", 32.0);
@@ -57,9 +54,6 @@ public class InteractiveObject implements GameObject, Interactable {
             case COMPUTER:
                 uiManager.createWindow(UIManager.WindowType.COMPUTER, properties);
                 break;
-            case LADDER:
-                // TODO: Реалізувати взаємодію для драбини
-                break;
             case ELECTRICAL_PANEL:
                 // Знаходимо лазерні двері серед інтерактивних об’єктів
                 Door laserDoor = null;
@@ -70,7 +64,7 @@ public class InteractiveObject implements GameObject, Interactable {
                     }
                 }
                 if (laserDoor != null) {
-                    LaserLockPuzzle puzzle = new LaserLockPuzzle(new JSONObject().put("solution", "2"));
+                    LaserLockPuzzle puzzle = new LaserLockPuzzle(new JSONObject().put("solution", "laser"));
                     puzzle.setLinkedDoor(laserDoor, (solved, door) -> {
                         if (solved) {
                             door.unlock();

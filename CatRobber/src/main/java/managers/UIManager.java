@@ -9,6 +9,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.control.Label;
 import javafx.scene.Node;
+import puzzles.Puzzle;
 import ui.UIWindow;
 import ui.InteractiveObjectWindow;
 import ui.Menu;
@@ -114,7 +115,6 @@ public class UIManager implements Renderable {
             uiNode.setLayoutX((canvas.getWidth() - ((Pane) uiNode).getPrefWidth()) / 2);
             uiNode.setLayoutY((canvas.getHeight() - ((Pane) uiNode).getPrefHeight()) / 2);
             GameManager.getInstance().setGameState(GameManager.GameState.PAUSED);
-
             System.out.println("Puzzle UI shown");
         }
     }

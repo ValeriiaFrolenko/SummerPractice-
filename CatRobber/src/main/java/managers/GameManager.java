@@ -144,7 +144,7 @@ public class GameManager implements Savable {
         if (inputHandler.isKeyPressed(KeyCode.E)) {
             if (closestInteractable != null && closestInteractable instanceof Door) {
                 Door door = (Door) closestInteractable;
-                door.open(player);
+                door.open();
             }
         }
     }
