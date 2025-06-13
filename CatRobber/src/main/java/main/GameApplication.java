@@ -18,6 +18,8 @@ public class GameApplication extends Application {
         launch(args); // Запускає JavaFX-додаток, викликаючи метод start()
     }
 
+
+
     // Ініціалізує гру, викликається JavaFX після запуску
     @Override
     public void start(Stage primaryStage) {

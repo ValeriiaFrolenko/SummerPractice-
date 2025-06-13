@@ -149,11 +149,17 @@ public class CodeLockPuzzle extends Puzzle {
         // Гарантуємо фокус
         pane.setFocusTraversable(true);
         pane.requestFocus();
-        pane.setOnMouseClicked(e -> pane.requestFocus());
-
+        pane.setMouseTransparent(false); // Забезпечуємо, що pane приймає події миші
+        pane.setOnMouseClicked(e -> {
+            System.out.println("Mouse clicked on CodeLockPuzzle pane at (" + e.getX() + ", " + e.getY() + ")");
+            pane.requestFocus(); // Повертаємо фокус при кліку
+        });
+        pane.setOnMouseMoved(e -> {
+            System.out.println("Mouse moved on CodeLockPuzzle pane at (" + e.getX() + ", " + e.getY() + ")");
+        });
         // Обробка клавіатури
         pane.setOnKeyPressed(event -> {
-            System.out.println("Клавіша натиснута: " + event.getCode());
+
             KeyCode key = event.getCode();
 
             if (key.isDigitKey() && enteredCode.length() < 4) {

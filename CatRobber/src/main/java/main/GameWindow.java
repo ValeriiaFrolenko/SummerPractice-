@@ -65,6 +65,11 @@ public class GameWindow {
         root.getChildren().add(uiManager.getMenuPane());
 
         scene = new Scene(root, 1280, 640);
+        scene.setOnMouseMoved(e -> System.out.println("Mouse moved on scene: " + e.getX() + ", " + e.getY()));
+        scene.setOnMouseClicked(e -> System.out.println("Mouse clicked on scene at (" + e.getX() + ", " + e.getY() + ")"));
+        root.setMouseTransparent(false); // Забезпечуємо інтерактивність кореневої панелі
+        root.setFocusTraversable(true);
+        root.requestFocus();
         primaryStage.setTitle("CatRobber");
         primaryStage.setScene(scene);
         primaryStage.show();
@@ -153,6 +158,7 @@ public class GameWindow {
 
     private void showMainMenu() {
         JSONObject menuConfig = new JSONObject();
+        primaryStage.requestFocus();
         uiManager.createWindow(UIManager.WindowType.MENU, menuConfig);
     }
 

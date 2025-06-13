@@ -280,31 +280,51 @@ public class Menu implements UIWindow {
         transition.setOnFinished(e -> {
             splashPane.setVisible(false);
             menuVisible = true;
+
+            // ВАЖЛИВО: Після переходу запитуємо фокус знову
+            javafx.application.Platform.runLater(() -> {
+                rootPane.requestFocus();
+                System.out.println("Focus requested after transition to menu");
+            });
         });
         transition.play();
     }
 
     private void showLevelSelect() {
         menuPane.setVisible(false);
+        menuVisible = false;
         levelSelectPane.setVisible(true);
+        levelSelectionVisible = true;
+
         FadeTransition levelFadeIn = new FadeTransition(Duration.seconds(0.4), levelSelectPane);
         levelFadeIn.setFromValue(0.0);
         levelFadeIn.setToValue(1.0);
+        levelFadeIn.setOnFinished(e -> {
+            javafx.application.Platform.runLater(() -> {
+                rootPane.requestFocus();
+                System.out.println("Focus requested after showing level select");
+            });
+        });
         levelFadeIn.play();
-        levelSelectionVisible = true;
     }
 
     private void showMainMenu() {
         levelSelectPane.setVisible(false);
+        levelSelectionVisible = false;
         menuPane.setVisible(true);
+        menuVisible = true;
+
         FadeTransition menuFadeIn = new FadeTransition(Duration.seconds(0.4), menuPane);
         menuFadeIn.setFromValue(0.0);
         menuFadeIn.setToValue(1.0);
+        menuFadeIn.setOnFinished(e -> {
+            javafx.application.Platform.runLater(() -> {
+                rootPane.requestFocus();
+                System.out.println("Focus requested after showing main menu");
+            });
+        });
         menuFadeIn.play();
-        levelSelectionVisible = false;
-        menuVisible = true;
     }
-
     private Button createCuteButton(String text, Color color) {
         Button button = new Button(text);
         button.setFont(FontManager.getInstance().getFont("Hardpixel", 22));
@@ -405,8 +425,18 @@ public class Menu implements UIWindow {
         }
         rootPane.setVisible(true);
         rootPane.setFocusTraversable(true);
-        rootPane.requestFocus();
+
+        // Встановлюємо обробник подій лише на rootPane
         rootPane.setOnKeyPressed(this::handleInput);
+
+        // Додаємо дебагування фокусу
+        javafx.application.Platform.runLater(() -> {
+            rootPane.requestFocus();
+            System.out.println("Menu: rootPane focus requested, has focus: " + rootPane.isFocused());
+            rootPane.focusedProperty().addListener((obs, oldVal, newVal) ->
+                    System.out.println("Menu: rootPane focus changed: " + newVal));
+        });
+
         if (showingSplash) {
             splashPane.setVisible(true);
             menuPane.setVisible(false);
@@ -417,7 +447,6 @@ public class Menu implements UIWindow {
     @Override
     public void hide() {
         rootPane.setVisible(false);
-        uiManager.hideMenu(); // Викликаємо hideMenu замість hideCurrentWindow
         System.out.println("Menu hidden, menuPane children: " + uiManager.getMenuPane().getChildren().size());
     }
 
@@ -425,16 +454,23 @@ public class Menu implements UIWindow {
     public Node getRoot() {
         return rootPane;
     }
-
     public void handleInput(KeyEvent event) {
+        System.out.println("Key pressed: " + event.getCode() +
+                ", showingSplash: " + showingSplash +
+                ", levelSelectionVisible: " + levelSelectionVisible +
+                ", menuVisible: " + menuVisible);
+
         if (showingSplash) {
             transitionToMenu();
+            event.consume();
         } else if (event.getCode() == KeyCode.ESCAPE) {
             if (levelSelectionVisible) {
                 showMainMenu();
-            } else {
-                hide(); // Закриваємо меню замість System.exit(0)
+            } else if (menuVisible) {
+                uiManager.hideMenu();
             }
+            event.consume();
         }
     }
+
 }
