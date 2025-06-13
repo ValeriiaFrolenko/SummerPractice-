@@ -1,1 +1,7 @@
-{"levelId": 0}
+{
+  "completedLevels": [],
+  "currentLevelId": 1,
+  "totalMoney": 0,
+  "noteCode": "6614",
+  "gameState": "PLAYING"
+}

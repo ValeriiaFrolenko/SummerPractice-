@@ -2,7 +2,10 @@ package managers;
 
 import interfaces.GameObject;
 import org.json.JSONObject;
+import puzzles.Puzzle;
 import utils.GameLoader;
+
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -33,23 +36,24 @@ public class LevelManager {
         String levelFile = "data/levels/level" + id + "/level" + id + ".tmj";
         JSONObject levelData = gameLoader.loadJSON(levelFile);
         if (levelData == null) {
-            System.out.println("Failed to load level " + id);
+            System.err.println("Failed to load level " + id);
             return;
         }
         levels.put(id, levelData);
         // Завантажуємо карту колізій
         collisionMap = gameLoader.loadCollisionMap(levelData);
+        // Встановлюємо фон
+        String backgroundPath = "background/level" + id + "/rooms.png";
+        GameManager.getInstance().setBackgroundImage(backgroundPath);
         // Завантажуємо об’єкти
-        List<GameObject> objects = gameLoader.parseTiledJSON(levelData);
-        GameManager.getInstance().setGameObjects(objects);
-        GameManager.getInstance().setCollisionMap(collisionMap);
-        // Завантажуємо збереження або дефолтні дані
         if (isNewGame) {
-            createDefaultFiles(levelData);
+            createDefaultFiles(levelData); // Генеруємо дефолтні файли
             loadFromDefaults();
         } else {
             loadFromSave();
         }
+        // Встановлюємо карту колізій
+        GameManager.getInstance().setCollisionMap(collisionMap);
     }
 
     // Створює дефолтні файли для нового рівня
@@ -58,38 +62,63 @@ public class LevelManager {
     }
 
     // Завантажує збереження
-    public void loadFromSave() {
-        String saveFile = "data/saves/save_level_" + currentLevelId + ".json";
-        saveManager.loadGame(saveFile);
-        if (GameManager.getInstance().getGameObjects().isEmpty()) {
+    private void loadFromSave() {
+        String saveFile = "data/saves/game_progress.json";
+        File file = new File(saveFile);
+        if (file.exists()) {
+            saveManager.loadGame(saveFile);
+            System.out.println("game loaded");
+        } else {
             loadFromDefaults();
         }
     }
-
     // Завантажує дефолтні об’єкти
     private void loadFromDefaults() {
-        String basePath = "data/defaults/";
         List<GameObject> objects = new ArrayList<>();
-        String[] fileTypes = {
-                "player/player_level_" + currentLevelId + ".json",
-                "police/police_level_" + currentLevelId + ".json",
-                "doors/door_level_" + currentLevelId + ".json",
-                "cameras/cameras_level_" + currentLevelId + ".json",
-                "interactables/interactiveObjects_level_" + currentLevelId + ".json",
-                "puzzles/puzzle_level_" + currentLevelId + ".json"
-        };
-        for (String fileType : fileTypes) {
-            String filePath = basePath + fileType;
-            JSONObject data = gameLoader.loadJSON(filePath);
-            if (data != null) {
-                List<GameObject> typeObjects = gameLoader.createObjectsFromJSON(data);
-                objects.addAll(typeObjects);
-            } else {
-                System.out.println("Failed to load default file: " + filePath);
+        // Гравець
+        JSONObject playerData = gameLoader.loadJSON("data/defaults/player/player_level_" + currentLevelId + ".json");
+        if (playerData != null) {
+            objects.addAll(gameLoader.parseTiledJSON(playerData));
+        }
+        // Поліцейські
+        JSONObject policeData = gameLoader.loadJSON("data/defaults/police/police_level_" + currentLevelId + ".json");
+        if (policeData != null) {
+            objects.addAll(gameLoader.parseTiledJSON(policeData));
+        }
+        // Камери
+        JSONObject cameraData = gameLoader.loadJSON("data/defaults/cameras/cameras_level_" + currentLevelId + ".json");
+        if (cameraData != null) {
+            objects.addAll(gameLoader.parseTiledJSON(cameraData));
+        }
+        JSONObject doorData = gameLoader.loadJSON("data/defaults/doors/door_level_" + currentLevelId + ".json");
+        if (doorData != null) {
+            objects.addAll(gameLoader.parseTiledJSON(doorData));
+            System.out.println("двері створено LEVEL MANAGER");
+
+        }
+        // Інтерактивні об’єкти
+        JSONObject interactiveData = gameLoader.loadJSON("data/defaults/interactiveObjects/interactiveObjects_level_" + currentLevelId + ".json");
+        if (interactiveData != null) {
+            objects.addAll(gameLoader.parseTiledJSON(interactiveData));
+        }
+        // Головоломки
+        JSONObject puzzleData = gameLoader.loadJSON("data/defaults/puzzles/puzzles_level_" + currentLevelId + ".json");
+        System.out.println("Файл головоломок існує: " + (puzzleData != null));
+        if (puzzleData != null) {
+            System.out.println("Кількість ключів у файлі: " + puzzleData.keySet().size());
+            System.out.println("Ключі: " + puzzleData.keySet());
+            // решта коду
+        }
+        if (puzzleData != null) {
+            for (String key : puzzleData.keySet()) {
+                JSONObject puzzleObj = puzzleData.getJSONObject(key);
+                Puzzle puzzle = gameLoader.createSinglePuzzle(puzzleObj);
+                if (puzzle != null) {
+                    GameManager.getInstance().getPuzzles().add(puzzle);
+                }
             }
         }
         GameManager.getInstance().setGameObjects(objects);
-        GameManager.getInstance().setCollisionMap(collisionMap);
     }
 
     // --- Геттери ---

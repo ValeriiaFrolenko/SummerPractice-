@@ -23,6 +23,7 @@ public class InteractiveObject implements GameObject, Interactable {
     private JSONObject properties; //додаткові властивості об’єкта у форматі JSON
 
     /** Перелік можливих типів інтерактивних об'єктів **/
+
     public enum Type { NOTE, PICTURE, COMPUTER, ELECTRICAL_PANEL, WITH_MONEY, FINAL_PRIZE}
 
     /**
@@ -31,11 +32,12 @@ public class InteractiveObject implements GameObject, Interactable {
      * @param properties об'єкт JSON, що містить властивості інтерактивного об'єкта
      */
     public InteractiveObject(Vector2D position, JSONObject properties) {
+        this.properties = properties;
         this.imageWidth = properties.optDouble("width", 32.0);
         this.imageHeight = properties.optDouble("height", 32.0);
         this.imageX = position.x;
         this.imageY = position.y - imageHeight;
-        this.type = Type.valueOf(properties.optString("type", "NOTE"));
+        this.type = Type.valueOf(properties.optString("typeObj", "NOTE"));
         this.spritePath = path + properties.getString("fileName");
         this.imageWidth = properties.optDouble("width", 32.0);
         this.imageHeight = properties.optDouble("height", 32.0);
@@ -157,12 +159,14 @@ public class InteractiveObject implements GameObject, Interactable {
     @Override
     public JSONObject getSerializableData() {
         JSONObject data = new JSONObject();
-        data.put("type", type.toString());
+        data.put("typeObj", type.toString());
         data.put("x", imageX);
-        data.put("y", imageY);
+        data.put("y", imageY+imageHeight);
         data.put("width", imageWidth);
         data.put("height", imageHeight);
-        data.put("spritePath", spritePath);
+        data.put("fileName", properties.getString("fileName"));
+        data.put("Type", "interactiveObject");
+
         return data;
     }
 
@@ -173,14 +177,14 @@ public class InteractiveObject implements GameObject, Interactable {
     @Override
     public void setFromData(JSONObject data) {
         this.imageX = data.optDouble("x", imageX);
-        this.imageY = data.optDouble("y", imageY);
+        this.imageY = data.optDouble("y", imageY) - imageHeight;
         this.imageWidth = data.optDouble("width", imageWidth);
         this.imageHeight = data.optDouble("height", imageHeight);
-        this.spritePath = data.optString("spritePath", spritePath);
+        this.spritePath = data.optString("fileName", spritePath);
         try {
-            this.type = Type.valueOf(data.optString("type", type.toString()));
+            this.type = Type.valueOf(data.optString("typeObj", type.toString()));
         } catch (IllegalArgumentException e) {
-            System.err.println("Невірне значення типу: " + data.optString("type") + ". Залишаю поточний.");
+            System.err.println("Невірне значення типу: " + data.optString("typeObj") + ". Залишаю поточний.");
         }
         GameLoader loader = new GameLoader();
         this.sprite = loader.loadImage(spritePath);

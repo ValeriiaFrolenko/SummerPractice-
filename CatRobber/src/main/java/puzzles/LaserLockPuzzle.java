@@ -47,7 +47,16 @@ public class LaserLockPuzzle extends Puzzle {
         Pane pane = new Pane();
         pane.setPrefSize(512, 640);
         pane.setBackground(Background.EMPTY);
-
+        pane.setMouseTransparent(false); // Забезпечуємо, що pane приймає події миші
+        pane.setFocusTraversable(true); // Дозволяємо фокус
+        pane.requestFocus(); // Запитуємо фокус
+        pane.setOnMouseClicked(e -> {
+            System.out.println("Mouse clicked on LaserLockPuzzle pane at (" + e.getX() + ", " + e.getY() + ")");
+            pane.requestFocus(); // Повертаємо фокус при кліку
+        });
+        pane.setOnMouseMoved(e -> {
+            System.out.println("Mouse moved on LaserLockPuzzle pane at (" + e.getX() + ", " + e.getY() + ")");
+        });
         GameLoader gameLoader = new GameLoader();
         Image backgroundImage = gameLoader.loadImage("puzzles/laserLock/shield.png");
         if (backgroundImage != null) {

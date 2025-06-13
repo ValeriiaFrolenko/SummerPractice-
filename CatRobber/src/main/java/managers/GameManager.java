@@ -7,16 +7,16 @@ import javafx.geometry.Bounds;
 import javafx.scene.image.Image;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.KeyCode;
+import javafx.scene.paint.Color;
 import main.GameWindow;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import puzzles.Puzzle;
 import utils.GameLoader;
 import utils.InputHandler;
 import utils.Vector2D;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
+
+import java.util.*;
 
 // Клас GameManager керує логікою гри, включаючи об'єкти, стан, колізії, взаємодії
 public class GameManager implements Savable {
@@ -44,9 +44,23 @@ public class GameManager implements Savable {
     private boolean isGlobalAlert; // Прапорець глобальної тривоги
     private double globalAlertTimer; // Таймер глобальної тривоги
     private static final double GLOBAL_ALERT_DURATION = 3.0; // Тривалість глобальної тривоги (секунди)
+    private List<Integer> completedLevels; // Список пройдених рівнів
+    private int totalMoney; // Загальна кількість грошей
+    private int currentLevelId; // Поточний рівень
+    private GameLoader gameLoader = new GameLoader(); // Додано поле
 
     public void setGameState(GameState gameState) {
         this.gameState = gameState;
+    }
+
+    public List<Door> getDoors() {
+        List<Door> doors = new ArrayList<>();
+        for (Interactable interactable: interactables){
+            if (interactable instanceof Door){
+                doors.add((Door) interactable);
+            }
+        }
+        return doors;
     }
 
     // Перелік станів гри
@@ -82,20 +96,25 @@ public class GameManager implements Savable {
     // Конструктор, ініціалізує менеджери та списки
     public GameManager() {
         noteCode = String.valueOf(0000);
-        gameObjects = new ArrayList<>(); // Створюємо список для всіх ігрових об’єктів
-        renderableObjects = new ArrayList<>(); // Створюємо список для об’єктів із рендерингом
-        animatableObjects = new ArrayList<>(); // Створюємо список для об’єктів з анімаціями
-        police = new ArrayList<>(); // Створюємо список для поліцейських
-        cameras = new ArrayList<>(); // Створюємо список для камер
-        interactables = new ArrayList<>(); // Створюємо список для інтерактивних об’єктів
-        puzzles = new ArrayList<>(); // Створюємо список для головоломок
-        collisionMap = new ArrayList<>(); // Створюємо список для карти колізій
-        rooms = new ArrayList<>(); // Створюємо список для кімнат
-        levelManager = new LevelManager(); // Створюємо LevelManager для управління рівнями
-        saveManager = new SaveManager(); // Створюємо SaveManager для збереження гри
-        gameState = GameState.MENU; // Встановлюємо початковий стан MENU
-        isGlobalAlert = false; // Ініціалізуємо глобальну тривогу
-        globalAlertTimer = 0.0; // Ініціалізуємо таймер тривоги
+        gameObjects = new ArrayList<>();
+        renderableObjects = new ArrayList<>();
+        animatableObjects = new ArrayList<>();
+        police = new ArrayList<>();
+        cameras = new ArrayList<>();
+        interactables = new ArrayList<>();
+        puzzles = new ArrayList<>();
+        collisionMap = new ArrayList<>();
+        rooms = new ArrayList<>();
+        levelManager = new LevelManager();
+        saveManager = new SaveManager();
+        gameState = GameState.MENU;
+        isGlobalAlert = false;
+        globalAlertTimer = 0.0;
+        completedLevels = new ArrayList<>();
+        totalMoney = 0;
+        currentLevelId = 1;
+        backgroundImage = null;
+        loadProgress(); // Завантажуємо прогрес
     }
 
     // Повертає єдиний екземпляр GameManager (патерн Singleton)
@@ -105,6 +124,7 @@ public class GameManager implements Savable {
         }
         return instance; // Повертаємо екземпляр для використання в GameWindow
     }
+
 
     public void registerInteractionCallback(InputHandler inputHandler) {
         inputHandler.registerCallback(KeyCode.E, () -> {
@@ -196,9 +216,9 @@ public class GameManager implements Savable {
         police.clear();
         cameras.clear();
         interactables.clear();
-        puzzles.clear();
         // Add new objects
         gameObjects.addAll(objects);
+        int door =0;
         for (GameObject obj : objects) {
             if (obj instanceof Renderable) renderableObjects.add((Renderable) obj);
             if (obj instanceof Animatable) animatableObjects.add((Animatable) obj);
@@ -206,7 +226,10 @@ public class GameManager implements Savable {
             if (obj instanceof Police) police.add((Police) obj);
             if (obj instanceof SecurityCamera) cameras.add((SecurityCamera) obj);
             if (obj instanceof Interactable) interactables.add((Interactable) obj);
-            if (obj instanceof Puzzle) puzzles.add((Puzzle) obj);
+            if (obj instanceof Door) door++;
+        }
+        if (door==0){
+            System.out.println("НЕМАЄ ДВЕРЕЙ");
         }
     }
     
@@ -261,6 +284,7 @@ public class GameManager implements Savable {
 
     // Оновлює логіку гри, викликається з GameWindow.update()
     public void update(double deltaTime) {
+        System.out.println("Game state: " + gameState);
         if (gameState != GameState.PLAYING) {
             return;
         }
@@ -314,7 +338,7 @@ public class GameManager implements Savable {
 
     // Малює контури кімнат (для тестування), викликається з GameWindow.render()
     public void drawRoomOutlines(GraphicsContext gc) {
-        gc.setStroke(javafx.scene.paint.Color.RED); // Встановлюємо червоний колір для контурів
+        gc.setStroke(Color.RED); // Встановлюємо червоний колір для контурів
         gc.setLineWidth(2); // Встановлюємо товщину лінії
 
         for (Room room : rooms) {
@@ -445,9 +469,10 @@ public class GameManager implements Savable {
             if (interactable.canInteract(player)) {
                 closestInteractable = interactable;
                 // Показуємо підказку лише якщо немає відкритого вікна
-                if (uiManager.getCurrentWindow() == null) {
+                //if (uiManager.getCurrentWindow() == null) {
+                    System.out.println("Game state: " + gameState);
                     uiManager.showInteractionPrompt(interactable.getInteractionPrompt());
-                }
+                //}
                 break;
             }
         }
@@ -466,28 +491,95 @@ public class GameManager implements Savable {
     }
 
     // Зберігає гру через SaveManager
+
     public void saveGame() {
-        saveManager.saveGame(gameState); // Викликаємо збереження, передаючи поточний стан
+        saveManager.saveGame(gameState);
     }
+
+
 
     // Реалізує інтерфейс Savable: повертає дані для збереження
+
     @Override
     public JSONObject getSerializableData() {
-        JSONObject data = new JSONObject(); // Створюємо JSON-об’єкт
-        data.put("gameState", gameState.toString()); // Додаємо стан гри
-        data.put("currentLevelId", levelManager.getCurrentLevelId()); // Додаємо ID рівня
-        data.put("noteCode", getSerializableData());
-        return data; // Повертаємо дані для SaveManager
+        JSONObject data = new JSONObject();
+        data.put("gameState", gameState.toString());
+        data.put("currentLevelId", currentLevelId);
+        data.put("noteCode", noteCode);
+        data.put("completedLevels", completedLevels);
+        data.put("totalMoney", totalMoney);
+        return data;
     }
 
-    // Реалізує інтерфейс Savable: відновлює дані зі збереження
     @Override
     public void setFromData(JSONObject data) {
-        gameState = GameState.valueOf(data.getString("gameState")); // Відновлюємо стан гри
-        int levelId = data.getInt("currentLevelId");// Отримуємо ID рівня
+        gameState = GameState.valueOf(data.getString("gameState"));
+        currentLevelId = data.getInt("currentLevelId");
         noteCode = data.getString("noteCode");
-        loadLevel(levelId, false); // Завантажуємо рівень як збережену гру
+        completedLevels = new ArrayList<>();
+        for (Object level : data.getJSONArray("completedLevels")) {
+            completedLevels.add((Integer) level);
+        }
+        totalMoney = data.getInt("totalMoney");
+        saveManager.saveGame(gameState);
     }
+
+    public void completeLevel(int levelId) {
+        if (!completedLevels.contains(levelId)) {
+            completedLevels.add(levelId);
+            currentLevelId = levelId + 1; // Наступний рівень
+            saveManager.saveGame(gameState); // Зберігаємо стан гри
+        }
+}
+
+    public void addMoney(int amount) {
+        totalMoney += amount;
+        saveProgress();
+        saveGame(); // Зберігаємо стан гри
+    }
+
+    public int getTotalMoney() {
+        return totalMoney;
+    }
+
+    public List<Integer> getCompletedLevels() {
+        return new ArrayList<>(completedLevels);
+    }
+
+
+    public void setCurrentLevelId(int levelId) {
+        this.currentLevelId = levelId;
+        saveProgress();
+    }
+
+    public Image getBackgroundImage() {
+        return backgroundImage;
+    }
+
+    public void setBackgroundImage(String path) {
+        GameLoader loader = new GameLoader();
+        backgroundImage = loader.loadImage(path);
+    }
+
+    private void loadProgress() {
+        JSONObject progressData = gameLoader.loadJSON("data/saves/game_progress.json");
+        if (progressData != null) {
+            totalMoney = progressData.optInt("totalMoney", 0);
+            currentLevelId = progressData.optInt("currentLevelId", 1);
+            JSONArray completed = progressData.optJSONArray("completedLevels");
+            if (completed != null) {
+                for (int i = 0; i < completed.length(); i++) {
+                    completedLevels.add(completed.getInt(i));
+                }
+            }
+        }
+    }
+
+    void saveProgress() {
+        saveManager.saveGame(gameState);
+    }
+
+
 
     // Повертає ID поточного рівня
     public int getCurrentLevelId() {
