@@ -7,8 +7,10 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import org.json.JSONObject;
+import ui.ShopItem;
 import utils.GameLoader;
 import utils.Vector2D;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,36 +18,32 @@ import java.util.Map;
 public class Player implements Animatable, GameObject, Interactable {
     private boolean isAttacking;
     private String attackAnimationType;
-    private double attackAnimationDuration; // Час відтворення анімації атаки
+    private double attackAnimationDuration;
 
     // Поля
-    private double imageX; // Верхній лівий кут зображення по X
-    private double imageY; // Верхній лівий кут зображення по Y
-    private double collX; // Верхній лівий кут колізійної області по X
-    private double collY; // Верхній лівий кут колізійної області по Y
-    private double imageWidth; // Ширина зображення, з JSON
-    private double imageHeight; // Висота зображення, з JSON
-    private double collWidth; // Ширина колізійної області, з JSON
-    private double collHeight; // Висота колізійної області, з JSON
-    private Direction direction; // Напрям (LEFT, RIGHT), з JSON
-    private PlayerState state; // Стан (IDLE, RUN, HIT, CLIMB, INVISIBLE, SHOOT), з JSON
-    private double speed; // Швидкість руху
-    private boolean isVisible; // Видимість гравця
-    private String currentAnimation; // Поточна анімація ("idle", "run", "hit", "shoot")
-    private int animationFrame; // Поточний кадр анімації
-    private double animationTime; // Час для анімації
-    private Map<String, Image[]> animations; // Анімації, завантажені через GameLoader
-    private String[] spritePaths; // Шляхи до спрайтів
-    private boolean canMove; // Чи може гравець рухатися
+    private double imageX;
+    private double imageY;
+    private double collX;
+    private double collY;
+    private double imageWidth;
+    private double imageHeight;
+    private double collWidth;
+    private double collHeight;
+    private Direction direction;
+    private PlayerState state;
+    private double speed;
+    private boolean isVisible;
+    private String currentAnimation;
+    private int animationFrame;
+    private double animationTime;
+    private Map<String, Image[]> animations;
+    private String[] spritePaths;
+    private boolean canMove;
     private int detectionCount;
     private int money;
-    public void setDirection(Direction direction) {
-        this.direction = direction;
-    }
-
-    public void addMoney(int i) {
-        money+=i;
-    }
+    private Map<ShopItem, Integer> inventory; // Інвентар: предмет -> кількість
+    private Map<ShopItem, Boolean> itemUsage; // Стан використання: предмет -> чи використовується
+    private JSONObject mapData; // Дані карти для синхронізації
 
     // Напрями та стани гравця
     public enum Direction { LEFT, RIGHT, UP, DOWN }
@@ -67,8 +65,13 @@ public class Player implements Animatable, GameObject, Interactable {
         this.imageY = jsonImageY - imageHeight;
         this.collX = jsonCollX;
         this.collY = jsonCollY;
-        this.detectionCount = defaultData.getInt("detectionCount");
-        this.money = defaultData.getInt("money");
+        this.detectionCount = defaultData.optInt("detectionCount", 0);
+        this.money = defaultData.optInt("money", 0);
+        this.inventory = new HashMap<>();
+        this.itemUsage = new HashMap<>();
+        this.mapData = defaultData; // Зберігаємо дані карти
+        // Ініціалізація інвентарю з mapData
+        initializeInventory();
         // Ініціалізація інших параметрів
         this.canMove = defaultData.optBoolean("canMove", true);
         String directionStr = defaultData.optString("direction", "RIGHT").toUpperCase();
@@ -97,9 +100,112 @@ public class Player implements Animatable, GameObject, Interactable {
         animations.put("shoot", loader.splitSpriteSheet(spritePaths[3], 2));
     }
 
+    // Ініціалізує інвентар із mapData
+    private void initializeInventory() {
+        // Перевіряємо наявність предметів у mapData
+        for (String key : new String[]{"invisibility", "key", "speedBoost", "gun"}) {
+            int quantity = mapData.optInt(key, 0);
+            if (quantity > 0) {
+                // Шукаємо існуючий ShopItem у inventory
+                ShopItem item = findItemByMapKey(key);
+                if (item != null) {
+                    inventory.put(item, quantity);
+                    itemUsage.put(item, false); // За замовчуванням не використовується
+                }
+            }
+        }
+    }
+
+    // Знаходить ShopItem за ключем mapData
+    private ShopItem findItemByMapKey(String mapKey) {
+        for (ShopItem item : inventory.keySet()) {
+            String itemMapKey = getMapKeyForItem(item);
+            if (mapKey.equals(itemMapKey)) {
+                return item;
+            }
+        }
+        return null;
+    }
+
+    // --- Логіка покупок ---
+
+    // Купує предмет
+    public boolean buyItem(ShopItem item) {
+        if (money >= item.getPrice()) {
+            money -= item.getPrice();
+            inventory.put(item, inventory.getOrDefault(item, 0) + 1);
+            itemUsage.putIfAbsent(item, false); // Предмет куплений, але не використовується
+            // Оновлення mapData
+            updateMapData(item);
+            System.out.println("Гравець купив: " + item.getName() + " за " + item.getPrice() + " монет");
+            System.out.println("Залишок грошей: " + money);
+            return true;
+        } else {
+            System.out.println("Недостатньо грошей для покупки: " + item.getName() + ". Потрібно: " + item.getPrice() + ", є: " + money);
+            return false;
+        }
+    }
+
+    // Оновлює mapData після покупки
+    private void updateMapData(ShopItem item) {
+        String mapKey = getMapKeyForItem(item);
+        if (mapKey != null) {
+            int currentQuantity = inventory.getOrDefault(item, 0);
+            mapData.put(mapKey, currentQuantity);
+        }
+        mapData.put("money", money);
+    }
+
+    // Повертає ключ карти для предмета
+    private String getMapKeyForItem(ShopItem item) {
+        switch (item.getName()) {
+            case "Невидимість": return "invisibility";
+            case "Універсальний ключ": return "key";
+            case "Буст швидкості": return "speedBoost";
+            case "Пістолет": return "gun";
+            default: return null;
+        }
+    }
+
+    // Повертає кількість грошей
+    public int getMoney() {
+        return money;
+    }
+
+    // Додає гроші
+    public void addMoney(int amount) {
+        money += amount;
+        mapData.put("money", money);
+        System.out.println("Додано " + amount + " монет. Загалом: " + money);
+    }
+
+    // Повертає інвентар
+    public Map<ShopItem, Integer> getInventory() {
+        return inventory;
+    }
+
+    // Встановлює стан використання предмета
+    public void setItemUsage(ShopItem item, boolean isUsed) {
+        if (inventory.containsKey(item)) {
+            itemUsage.put(item, isUsed);
+            System.out.println("Предмет " + item.getName() + " тепер " + (isUsed ? "використовується" : "не використовується"));
+        } else {
+            System.out.println("Предмет " + item.getName() + " не знайдено в інвентарі");
+        }
+    }
+
+    // Перевіряє, чи використовується предмет
+    public boolean isItemUsed(ShopItem item) {
+        return itemUsage.getOrDefault(item, false);
+    }
+
     // --- Ініціалізація та оновлення ---
 
-    // Рухає гравця в заданому напрямку (викликається з GameManager.handleInput())
+    public void setDirection(Direction direction) {
+        this.direction = direction;
+    }
+
+    // Рухає гравця в заданому напрямку
     public void move(Direction direction, double deltaTime) {
         if (canMove) {
             this.direction = direction;
@@ -116,18 +222,18 @@ public class Player implements Animatable, GameObject, Interactable {
         }
     }
 
-    // Зупиняє рух гравця (викликається з GameManager.handleInput())
+    // Зупиняє рух гравця
     public void stopMovement() {
         setCanMove(false);
         setAnimationState("idle");
     }
 
-    // Дозволяє рух гравця (викликається з GameManager.checkCollisions())
+    // Дозволяє рух гравця
     public void allowMovement() {
         setCanMove(true);
     }
 
-    // Оновлює анімацію гравця (викликається з GameManager.update())
+    // Оновлює анімацію гравця
     @Override
     public void updateAnimation(double deltaTime) {
         animationTime += deltaTime;
@@ -135,33 +241,29 @@ public class Player implements Animatable, GameObject, Interactable {
         if (frames == null || frames.length == 0) return;
 
         if (isAttacking) {
-            // Для анімації атаки відтворюємо всі кадри
             attackAnimationDuration -= deltaTime;
-            double frameDuration = 0.2; // Тривалість одного кадру
+            double frameDuration = 0.2;
             int frameCount = frames.length;
             animationFrame = (int) (animationTime / frameDuration) % frameCount;
             if (attackAnimationDuration <= 0) {
-                // Завершення анімації атаки
                 isAttacking = false;
-                setAnimationState("idle"); // Повертаємося до idle після атаки
+                setAnimationState("idle");
             }
         } else {
-            // Звичайна анімація
             double frameDuration = 0.2;
             int frameCount = frames.length;
             animationFrame = (int) (animationTime / frameDuration) % frameCount;
         }
     }
 
-    // Виконує атаку (ближню або дальню)
+    // Виконує атаку
     public void attack(boolean isRanged) {
         if (!isAttacking) {
             isAttacking = true;
             setAnimationState(isRanged ? "shoot" : "hit");
-            // Встановлюємо тривалість анімації залежно від кількості кадрів
             Image[] frames = animations.get(currentAnimation);
             if (frames != null) {
-                attackAnimationDuration = frames.length * 0.2; // 0.2 сек на кадр
+                attackAnimationDuration = frames.length * 0.2;
             }
         }
     }
@@ -173,65 +275,56 @@ public class Player implements Animatable, GameObject, Interactable {
 
     // Збільшує рівень виявлення
     public void increaseDetection() {
-
+        // Реалізація відсутня
     }
 
     public void teleportToRoom(Door door) {
         Direction currentDirection = this.getDirection();
-
-        // Телепортуємо в тому напрямку, куди гравець рухається
-       if (!door.isLaser()){
+        if (!door.isLaser()) {
             adjustPlayerPosition(140.0, currentDirection);
-        }// Телепортуємо в напрямку руху гравця
+        }
         System.out.println("Teleported to room: x=" + getPosition().x + ", y=" + getPosition().y);
     }
-
 
     public void teleportToFloor(Door door) {
         String doorDirection = door.direction;
         Direction teleportDirection;
-
-        // Для поверхів - той самий напрямок руху
         if (doorDirection.equals("up")) {
-            teleportDirection = Direction.UP; // Якщо двері верхні, продовжуємо вгору
+            teleportDirection = Direction.UP;
         } else if (doorDirection.equals("down")) {
-            teleportDirection = Direction.DOWN; // Якщо двері нижні, продовжуємо вниз
+            teleportDirection = Direction.DOWN;
         } else {
-            return; // Некоректний напрямок
+            return;
         }
-
-        stopMovement(); // Зупиняємо рух і анімацію
-        setAnimationState("idle"); // Скидаємо анімацію на idle
-        adjustPlayerPosition(120, teleportDirection); // Телепортуємо в тому ж напрямку
+        stopMovement();
+        setAnimationState("idle");
+        adjustPlayerPosition(120, teleportDirection);
         System.out.println("Teleported to floor: x=" + getPosition().x + ", y=" + getPosition().y);
     }
 
     public void adjustPlayerPosition(double offset, Direction direction) {
-        Vector2D currentPosition = getPosition(); // Отримуємо поточну позицію гравця
-        Vector2D currentImaginePosition = getImagePosition(); // Отримуємо уявну позицію
-        double adjustmentX = 0; // Зміщення по X
-        double adjustmentY = 0; // Зміщення по Y
-        double backOffDistance = offset; // Відстань відступу
-        if (direction == Player.Direction.LEFT) {
+        Vector2D currentPosition = getPosition();
+        Vector2D currentImaginePosition = getImagePosition();
+        double adjustmentX = 0;
+        double adjustmentY = 0;
+        double backOffDistance = offset;
+        if (direction == Direction.LEFT) {
             adjustmentX = -backOffDistance;
-        } else if (direction == Player.Direction.RIGHT) {
+        } else if (direction == Direction.RIGHT) {
             adjustmentX = backOffDistance;
         } else if (direction == Direction.DOWN) {
             adjustmentY = backOffDistance;
-        } else if (direction == Player.Direction.UP) {
+        } else if (direction == Direction.UP) {
             adjustmentY = -backOffDistance;
         }
-
-        // Оновлюємо позицію гравця
         Vector2D newPosition = new Vector2D(currentPosition.x + adjustmentX, currentPosition.y + adjustmentY);
-        setPosition(newPosition); // Встановлюємо нову позицію
+        setPosition(newPosition);
         Vector2D newImaginePosition = new Vector2D(currentImaginePosition.x + adjustmentX, currentImaginePosition.y + adjustmentY);
-        setImagePosition(newImaginePosition); // Встановлюємо нову позицію зображення
+        setImagePosition(newImaginePosition);
     }
 
     // --- Рендеринг ---
 
-    // Рендерить гравця на canvas (викликається з GameManager.render())
     @Override
     public void render(GraphicsContext gc) {
         Image frame = getCurrentFrame();
@@ -251,7 +344,6 @@ public class Player implements Animatable, GameObject, Interactable {
             } else {
                 gc.drawImage(frame, renderX, renderY, renderWidth, renderHeight);
             }
-            // Малюємо червону рамку для колізійної області
             Bounds collBounds = getBounds();
             gc.setStroke(Color.RED);
             gc.setLineWidth(2);
@@ -259,7 +351,6 @@ public class Player implements Animatable, GameObject, Interactable {
         }
     }
 
-    // Повертає поточний кадр анімації
     @Override
     public Image getCurrentFrame() {
         Image[] frames = animations.getOrDefault(currentAnimation, animations.get("idle"));
@@ -270,9 +361,8 @@ public class Player implements Animatable, GameObject, Interactable {
         return frames[animationFrame];
     }
 
-    // --- Взаємодії ---
+    // --- Взаємодія ---
 
-    // Встановлює стан анімації
     @Override
     public void setAnimationState(String state) {
         if (!isAttacking || state.equals("hit") || state.equals("shoot")) {
@@ -284,13 +374,11 @@ public class Player implements Animatable, GameObject, Interactable {
         }
     }
 
-    // Взаємодія з гравцем (порожня, оскільки гравець не взаємодіє сам із собою)
     @Override
     public void interact(Player player) {
         // Порожня реалізація
     }
 
-    // Перевіряє можливість взаємодії (завжди false для гравця)
     @Override
     public boolean canInteract(Player player) {
         return false;
@@ -298,12 +386,11 @@ public class Player implements Animatable, GameObject, Interactable {
 
     // --- Серіалізація ---
 
-    // Повертає JSON для збереження (викликається з SaveManager.savePlayer())
     @Override
     public JSONObject getSerializableData() {
         JSONObject data = new JSONObject();
         data.put("x", imageX);
-        data.put("y", imageY + imageHeight); // Зберігаємо як нижній лівий кут
+        data.put("y", imageY + imageHeight);
         data.put("collX", collX);
         data.put("collY", collY);
         data.put("width", imageWidth);
@@ -314,11 +401,26 @@ public class Player implements Animatable, GameObject, Interactable {
         data.put("state", state.toString());
         data.put("currentAnimation", currentAnimation);
         data.put("canMove", canMove);
+        data.put("detectionCount", detectionCount);
+        data.put("money", money);
+        // Синхронізація інвентарю з mapData
+        for (Map.Entry<ShopItem, Integer> entry : inventory.entrySet()) {
+            String mapKey = getMapKeyForItem(entry.getKey());
+            if (mapKey != null) {
+                data.put(mapKey, entry.getValue());
+            }
+        }
+        // Серіалізація стану використання
+        JSONObject usageData = new JSONObject();
+        for (Map.Entry<ShopItem, Boolean> entry : itemUsage.entrySet()) {
+            usageData.put(entry.getKey().getName(), entry.getValue());
+        }
+        data.put("itemUsage", usageData);
+        data.put("type", "Player");
         data.put("type", "Player");
         return data;
     }
 
-    // Відновлює стан із JSON (викликається з SaveManager.loadGame())
     @Override
     public void setFromData(JSONObject data) {
         double jsonImageX = data.optDouble("x", imageX);
@@ -333,7 +435,22 @@ public class Player implements Animatable, GameObject, Interactable {
         this.imageHeight = data.optDouble("height", imageHeight);
         this.collWidth = data.optDouble("widthColl", collWidth);
         this.collHeight = data.optDouble("hightColl", collHeight);
-        this.canMove = data.optBoolean("canMove", canMove);
+        this.canMove = data.optBoolean("canMove", true);
+        this.detectionCount = data.optInt("detectionCount", 0);
+        this.money = data.optInt("money", 0);
+        this.mapData = data;
+        // Оновлення інвентарю
+        initializeInventory();
+        // Відновлення itemUsage
+        JSONObject usageData = data.optJSONObject("itemUsage");
+        if (usageData != null) {
+            for (ShopItem item : inventory.keySet()) {
+                String name = item.getName();
+                if (usageData.has(name)) {
+                    itemUsage.put(item, usageData.getBoolean(name));
+                }
+            }
+        }
         String directionStr = data.optString("direction", direction.toString()).toUpperCase();
         try {
             this.direction = Direction.valueOf(directionStr);
@@ -342,92 +459,77 @@ public class Player implements Animatable, GameObject, Interactable {
         }
     }
 
-    // --- Геттери/Сеттери ---
+    // --- Гетери/Сетери ---
 
-    // Повертає тип об’єкта
     @Override
     public String getType() {
         return "Player";
     }
 
-    // Повертає позицію (верхній лівий кут колізійної області)
     @Override
     public Vector2D getPosition() {
         return new Vector2D(collX, collY);
     }
 
-    // Повертає уявну позицію (верхній лівий кут зображення)
     @Override
     public Vector2D getImagePosition() {
         return new Vector2D(imageX, imageY);
     }
 
-    // Встановлює позицію колізійної області
     @Override
     public void setPosition(Vector2D position) {
         this.collX = position.getX();
         this.collY = position.getY();
     }
 
-    // Встановлює уявну позицію зображення
     @Override
     public void setImagePosition(Vector2D position) {
         this.imageX = position.getX();
         this.imageY = position.getY();
     }
 
-    // Повертає межі колізійної області
     @Override
     public Bounds getBounds() {
         return new BoundingBox(collX, collY, collWidth, collHeight);
     }
 
-    // Повертає межі зображення
     @Override
     public Bounds getImageBounds() {
         return new BoundingBox(imageX, imageY, imageWidth, imageHeight);
     }
 
-    // Повертає діапазон взаємодії
     @Override
     public double getInteractionRange() {
-        return 0.0; // Гравець не взаємодіє сам із собою
+        return 0.0;
     }
 
-    // Повертає підказку для UI
     @Override
     public String getInteractionPrompt() {
-        return null; // Гравець не має підказки
+        return null;
     }
 
-    // Повертає шар рендерингу
     @Override
     public int getRenderLayer() {
-        return 2; // Гравець рендериться на шарі 1
+        return 2;
     }
 
-    // Перевіряє видимість
     @Override
     public boolean isVisible() {
         return state != PlayerState.INVISIBLE;
     }
 
-    // Повертає напрям
     public Direction getDirection() {
         return direction;
     }
 
-    // Перевіряє можливість руху
     public boolean isCanMove() {
         return canMove;
     }
 
-    // Встановлює можливість руху
     public void setCanMove(boolean canMove) {
         this.canMove = canMove;
     }
 
-    // Геттер для перевірки стану атаки
     public boolean isAttacking() {
         return isAttacking;
     }

@@ -109,9 +109,9 @@ public class GameLoader {
     }
 
     // Створює об’єкти з JSON
-    public List<GameObject> createObjectsFromJSON(JSONObject data) {
-        List<GameObject> objects = new ArrayList<>();
-        List<Puzzle> puzzles = new ArrayList<>();
+    public List createObjectsFromJSON(JSONObject data) {
+        List objects = new ArrayList<>();
+        List puzzles = new ArrayList<>();
 
         // Перевіряємо, чи JSON є Tiled-форматом (має "layers")
         if (data.has("layers")) {
@@ -137,18 +137,27 @@ public class GameLoader {
                 }
             }
         } else {
-            // Якщо JSON не має "layers", обробляємо як набір об’єктів (наприклад, збереження)
+            // Якщо JSON не має "layers", обробляємо як набір об'єктів (наприклад, збереження)
             for (String key : data.keySet()) {
-                JSONObject obj = data.getJSONObject(key);
-                if (obj.getString("type").equals("Puzzle")) {
-                    Puzzle puzzle = createSinglePuzzle(obj);
-                    if (puzzle != null) {
-                        puzzles.add(puzzle);
-                    }
-                } else {
-                    GameObject gameObject = createSingleObject(obj);
-                    if (gameObject != null) {
-                        objects.add(gameObject);
+                Object value = data.get(key);
+
+                // Перевіряємо, чи значення є JSONObject
+                if (value instanceof JSONObject) {
+                    JSONObject obj = (JSONObject) value;
+
+                    // Перевіряємо, чи об'єкт має поле "type"
+                    if (obj.has("type")) {
+                        if (obj.getString("type").equals("Puzzle")) {
+                            Puzzle puzzle = createSinglePuzzle(obj);
+                            if (puzzle != null) {
+                                puzzles.add(puzzle);
+                            }
+                        } else {
+                            GameObject gameObject = createSingleObject(obj);
+                            if (gameObject != null) {
+                                objects.add(gameObject);
+                            }
+                        }
                     }
                 }
             }
@@ -163,7 +172,28 @@ public class GameLoader {
         String type = obj.getString("type");
         float x = obj.optFloat("x", 0.0f);
         float y = obj.optFloat("y", 0.0f);
+
+        // Створюємо properties і копіюємо ВСІ поля з оригінального об'єкта
         JSONObject properties = new JSONObject();
+
+        // Копіюємо всі існуючі поля
+        for (String key : obj.keySet()) {
+            properties.put(key, obj.get(key));
+        }
+
+        // Додаємо/перезаписуємо координати
+        properties.put("x", x);
+        properties.put("y", y);
+
+        // Додаємо розміри, якщо є
+        if (obj.has("width")) {
+            properties.put("width", obj.getDouble("width"));
+        }
+        if (obj.has("height")) {
+            properties.put("height", obj.getDouble("height"));
+        }
+
+        // Обробляємо додаткові properties (якщо є)
         if (obj.has("properties")) {
             JSONArray props = obj.getJSONArray("properties");
             for (int i = 0; i < props.length(); i++) {
@@ -171,31 +201,24 @@ public class GameLoader {
                 properties.put(prop.getString("name"), prop.get("value"));
             }
         }
-        properties.put("x", x);
-        properties.put("y", y);
-        if (obj.has("width")) {
-            properties.put("width", obj.getDouble("width"));
-        }
-        if (obj.has("height")) {
-            properties.put("height", obj.getDouble("height"));
-        }
+
         switch (type) {
             case "Player":
                 return new Player(new Vector2D(x, y), properties);
             case "Police":
                 return new Police(new Vector2D(x, y), properties);
             case "Door":
+                System.out.println("двері створено gameloader");
                 return new Door(new Vector2D(x, y), properties);
             case "Camera":
                 return new SecurityCamera(new Vector2D(x, y), properties);
             case "InteractiveObject":
                 return new InteractiveObject(new Vector2D(x, y), properties);
             default:
-                System.err.println("Невідомий тип об’єкта: " + type);
+                System.err.println("Невідомий тип об'єкта: " + type);
                 return null;
         }
     }
-
     public Puzzle createSinglePuzzle(JSONObject obj) {
         String type = obj.getString("type");
         if (!type.equals("Puzzle")) {
@@ -222,12 +245,16 @@ public class GameLoader {
         puzzleData.put("state", properties.optString("state", "UNSOLVED"));
         puzzleData.put("x", properties.optFloat("x", 0.0f));
         puzzleData.put("y", properties.optFloat("y", 0.0f));
-         switch (puzzleType) {
+        puzzleData.put("type", "Puzzle");
+        switch (puzzleType) {
             case "CodeLockPuzzle":
+                System.out.println("Створено головоломку");
                 return new CodeLockPuzzle(puzzleData);
             case "LockPickPuzzle":
+                System.out.println("Створено головоломку");
                 return new LockPickPuzzle(puzzleData);
             case "LaserLockPuzzle":
+                System.out.println("Створено головоломку");
                 return new LaserLockPuzzle(puzzleData);
             default:
                 System.err.println("Невідомий тип головоломки: " + puzzleType);
@@ -246,8 +273,6 @@ public class GameLoader {
         JSONObject cameraData = new JSONObject();
         JSONObject interactableData = new JSONObject();
         JSONObject puzzleData = new JSONObject(); // Додаємо для головоломок
-        int doorCount = 0;
-        int puzzleCount = 0; // Лічильник для головоломок
 
         JSONArray layers = levelData.getJSONArray("layers");
         for (int i = 0; i < layers.length(); i++) {
@@ -267,17 +292,15 @@ public class GameLoader {
                             break;
                         case "Door":
                             doorData.put("door_" + id, obj);
-                            doorCount++;
                             break;
                         case "Camera":
                             cameraData.put("camera_" + id, obj);
                             break;
                         case "InteractiveObject":
-                            interactableData.put("interactiveObjects" + id, obj);
+                            interactableData.put("interactiveObjects_" + id, obj);
                             break;
                         case "Puzzle":
-                            puzzleData.put("puzzle_" + id, obj);
-                            puzzleCount++;
+                            puzzleData.put("puzzles_" + id, obj);
                             break;
                     }
                 }
@@ -290,8 +313,8 @@ public class GameLoader {
                 basePath + "police/police_level_" + levelId + ".json",
                 basePath + "doors/door_level_" + levelId + ".json",
                 basePath + "cameras/cameras_level_" + levelId + ".json",
-                basePath + "interactables/interactiveObjects_level_" + levelId + ".json",
-                basePath + "puzzles/puzzle_level_" + levelId + ".json"
+                basePath + "interactiveObjects/interactiveObjects_level_" + levelId + ".json",
+                basePath + "puzzles/puzzles_level_" + levelId + ".json"
         };
 
         // Видаляємо старі файли
@@ -311,7 +334,7 @@ public class GameLoader {
         createDirectoryIfNotExists(basePath + "police/");
         createDirectoryIfNotExists(basePath + "doors/");
         createDirectoryIfNotExists(basePath + "cameras/");
-        createDirectoryIfNotExists(basePath + "interactables/");
+        createDirectoryIfNotExists(basePath + "interactiveObjects/");
         createDirectoryIfNotExists(basePath + "puzzles/"); // Додаємо директорію для головоломок
 
         // Зберігаємо файли
@@ -319,8 +342,8 @@ public class GameLoader {
         saveJSON(policeData, basePath + "police/police_level_" + levelId + ".json");
         saveJSON(doorData, basePath + "doors/door_level_" + levelId + ".json");
         saveJSON(cameraData, basePath + "cameras/cameras_level_" + levelId + ".json");
-        saveJSON(interactableData, basePath + "interactables/interactiveObjects_level_" + levelId + ".json");
-        saveJSON(puzzleData, basePath + "puzzles/puzzle_level_" + levelId + ".json"); // Зберігаємо головоломки
+        saveJSON(interactableData, basePath + "interactiveObjects/interactiveObjects_level_" + levelId + ".json");
+        saveJSON(puzzleData, basePath + "puzzles/puzzles_level_" + levelId + ".json"); // Зберігаємо головоломки
     }
     // Створює директорію, якщо не існує
     private void createDirectoryIfNotExists(String path) {

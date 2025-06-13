@@ -1,1 +1,11 @@
-{}
+{"camera_0": {
+  "isAlert": true,
+  "floorPointY": 130,
+  "currentAnimation": "alert",
+  "x": 647,
+  "width": 67.9654974644651,
+  "y": 62,
+  "type": "Camera",
+  "height": 33.9827487322325,
+  "direction": "RIGHT"
+}}

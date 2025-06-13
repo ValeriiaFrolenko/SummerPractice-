@@ -1,1 +1,47 @@
-{}
+{
+  "interactiveObjects_0": {
+    "fileName": "electricalPanel.png",
+    "x": 402.4986267089844,
+    "width": 44,
+    "y": 219.95018005371094,
+    "typeObj": "ELECTRICAL_PANEL",
+    "type": "InteractiveObject",
+    "height": 40
+  },
+  "interactiveObjects_4": {
+    "fileName": "boxes.png",
+    "x": 246.8011016845703,
+    "width": 120,
+    "y": 250.36485290527344,
+    "typeObj": "WITH_MONEY",
+    "type": "InteractiveObject",
+    "height": 80
+  },
+  "interactiveObjects_3": {
+    "fileName": "safe.png",
+    "x": 1180.8348388671875,
+    "width": 50,
+    "y": 362.11651611328125,
+    "typeObj": "WITH_MONEY",
+    "type": "InteractiveObject",
+    "height": 40
+  },
+  "interactiveObjects_2": {
+    "fileName": "finalPrize.png",
+    "x": 531.6666870117188,
+    "width": 80,
+    "y": 484.6666564941406,
+    "typeObj": "FINAL_PRIZE",
+    "type": "InteractiveObject",
+    "height": 80
+  },
+  "interactiveObjects_1": {
+    "fileName": "note.png",
+    "x": 173.90467834472656,
+    "width": 50,
+    "y": 320.8509216308594,
+    "typeObj": "NOTE",
+    "type": "InteractiveObject",
+    "height": 50
+  }
+}

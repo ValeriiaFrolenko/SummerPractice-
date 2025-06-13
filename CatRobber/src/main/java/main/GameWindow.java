@@ -32,8 +32,10 @@ public class GameWindow {
     private long lastFrameTime;
 
     // Конструктор
-    public GameWindow(Stage primaryStage) {
+    public GameWindow(Stage primaryStage, GameManager gameManager, SaveManager saveManager) {
         this.primaryStage = primaryStage;
+        this.gameManager = gameManager;
+        this.saveManager = saveManager;
         primaryStage.setResizable(false);
         instance = this; // Зберігаємо екземпляр
     }
@@ -54,14 +56,13 @@ public class GameWindow {
 
         FontManager.getInstance().initializeFonts();
 
-        gameManager = GameManager.getInstance();
         uiManager = new UIManager(canvas);
         soundManager = new SoundManager();
-        saveManager = new SaveManager();
 
         Group root = new Group();
         root.getChildren().add(canvas);
         root.getChildren().add(uiManager.getOverlayPane());
+        root.getChildren().add(uiManager.getMenuPane());
 
         scene = new Scene(root, 1280, 640);
         primaryStage.setTitle("CatRobber");
@@ -90,25 +91,12 @@ public class GameWindow {
         gameManager.updateBackgroundScale(scene.getWidth(), scene.getHeight());
     }
 
-
-    // Ініціалізує менеджери гри
-    public void initializeManagers() {
-
-        gameManager = GameManager.getInstance();
-        uiManager = new UIManager(canvas);
-        soundManager = new SoundManager();
-        saveManager = new SaveManager();
-        inputHandler = new InputHandler(scene);
-        inputHandler.setupKeyHandlers();
-        inputHandler.setupMouseHandlers();
-    }
-
     // Повертає UIManager
     public UIManager getUIManager() {
         return uiManager;
     }
 
-    // Решта методів без змін
+    // Запускає ігровий цикл
     public void startGameLoop() {
         isRunning = true;
         animationTimer = new AnimationTimer() {
@@ -150,7 +138,9 @@ public class GameWindow {
 
     public void cleanup() {
         isRunning = false;
-        animationTimer.stop();
+        if (animationTimer != null) {
+            animationTimer.stop();
+        }
         gameManager.saveGame();
         soundManager.stopAllSounds();
     }
@@ -158,8 +148,8 @@ public class GameWindow {
     private void startNewGame(int levelId) {
         showMainMenu();
         gameManager.setGameState(GameManager.GameState.PLAYING); // Явно встановлюємо PLAYING
-        // Додаємо збереження після створення нового рівня
-        gameManager.saveGame();    }
+        gameManager.saveGame(); // Зберігаємо після створення нового рівня
+    }
 
     private void showMainMenu() {
         JSONObject menuConfig = new JSONObject();

@@ -219,7 +219,7 @@ public class SecurityCamera implements GameObject, Animatable {
         data.put("height", imageHeight);
         data.put("floorPointY", floorPointY);
         data.put("direction", direction.toString());
-        data.put("animation", currentAnimation);
+        data.put("currentAnimation", currentAnimation);
         data.put("isAlert", isAlert);
         return data;
     }

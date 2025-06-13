@@ -27,7 +27,7 @@ public class LaserLockPuzzle extends Puzzle {
 
     public LaserLockPuzzle(JSONObject defaultData) {
         super(defaultData);
-        isCorrectWireNumber = Integer.parseInt((String) solution);
+        isCorrectWireNumber = 1;
     }
 
     @Override

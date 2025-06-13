@@ -1864,7 +1864,7 @@
                          "value":"boxes.png"
                         }, 
                         {
-                         "name":"type",
+                         "name":"typeObj",
                          "type":"string",
                          "value":"WITH_MONEY"
                         }],
@@ -1887,7 +1887,7 @@
                          "value":"safe.png"
                         }, 
                         {
-                         "name":"type",
+                         "name":"typeObj",
                          "type":"string",
                          "value":"WITH_MONEY"
                         }],
@@ -1910,7 +1910,7 @@
                          "value":"note.png"
                         }, 
                         {
-                         "name":"type",
+                         "name":"typeObj",
                          "type":"string",
                          "value":"NOTE"
                         }],
@@ -1933,7 +1933,7 @@
                          "value":"electricalPanel.png"
                         }, 
                         {
-                         "name":"type",
+                         "name":"typeObj",
                          "type":"string",
                          "value":"ELECTRICAL_PANEL"
                         }],
@@ -1956,7 +1956,7 @@
                          "value":"finalPrize.png"
                         }, 
                         {
-                         "name":"type",
+                         "name":"typeObj",
                          "type":"string",
                          "value":"FINAL_PRIZE"
                         }],
@@ -1973,14 +1973,14 @@
                  "name":"puzzle",
                  "properties":[
                         {
+                         "name":"puzzleType",
+                         "type":"string",
+                         "value":"LaserLockPuzzle"
+                        }, 
+                        {
                          "name":"state",
                          "type":"string",
                          "value":"UNSOLVED"
-                        }, 
-                        {
-                         "name":"type",
-                         "type":"string",
-                         "value":"LaserLockPuzzle"
                         }],
                  "rotation":0,
                  "type":"Puzzle",
@@ -1995,14 +1995,14 @@
                  "name":"puzzle",
                  "properties":[
                         {
+                         "name":"puzzleType",
+                         "type":"string",
+                         "value":"LockPickPuzzle"
+                        }, 
+                        {
                          "name":"state",
                          "type":"string",
                          "value":"UNSOLVED"
-                        }, 
-                        {
-                         "name":"type",
-                         "type":"string",
-                         "value":"LockPickPuzzle"
                         }],
                  "rotation":0,
                  "type":"Puzzle",
@@ -2017,14 +2017,14 @@
                  "name":"puzzle",
                  "properties":[
                         {
+                         "name":"puzzleType",
+                         "type":"string",
+                         "value":"LockPickPuzzle"
+                        }, 
+                        {
                          "name":"state",
                          "type":"string",
                          "value":"UNSOLVED"
-                        }, 
-                        {
-                         "name":"type",
-                         "type":"string",
-                         "value":"LockPickPuzzle"
                         }],
                  "rotation":0,
                  "type":"Puzzle",
@@ -2039,14 +2039,14 @@
                  "name":"puzzle",
                  "properties":[
                         {
+                         "name":"puzzleType",
+                         "type":"string",
+                         "value":"CodeLockPuzzle"
+                        }, 
+                        {
                          "name":"state",
                          "type":"string",
                          "value":"UNSOLVED"
-                        }, 
-                        {
-                         "name":"type",
-                         "type":"string",
-                         "value":"CodeLockPuzzle"
                         }],
                  "rotation":0,
                  "type":"Puzzle",

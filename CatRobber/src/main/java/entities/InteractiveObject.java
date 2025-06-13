@@ -25,14 +25,15 @@ public class InteractiveObject implements GameObject, Interactable {
     private Type type;
     private JSONObject properties;
 
-    public enum Type { NOTE, PICTURE, COMPUTER, LADDER, ELECTRICAL_PANEL, WITH_MONEY, FINAL_PRIZE}
+    public enum Type { NOTE, PICTURE, COMPUTER,  ELECTRICAL_PANEL, WITH_MONEY, FINAL_PRIZE}
 
     public InteractiveObject(Vector2D position, JSONObject properties) {
+        this.properties = properties;
         this.imageWidth = properties.optDouble("width", 32.0);
         this.imageHeight = properties.optDouble("height", 32.0);
         this.imageX = position.x;
         this.imageY = position.y - imageHeight;
-        this.type = Type.valueOf(properties.optString("type", "NOTE"));
+        this.type = Type.valueOf(properties.optString("typeObj", "NOTE"));
         this.spritePath = path + properties.getString("fileName");
         this.imageWidth = properties.optDouble("width", 32.0);
         this.imageHeight = properties.optDouble("height", 32.0);
@@ -40,6 +41,7 @@ public class InteractiveObject implements GameObject, Interactable {
         this.sprite = loader.loadImage(spritePath);
     }
 
+    // У InteractiveObject.java, замінити метод interact
     @Override
     public void interact(Player player) {
         UIManager uiManager = GameWindow.getInstance().getUIManager();
@@ -57,11 +59,7 @@ public class InteractiveObject implements GameObject, Interactable {
             case COMPUTER:
                 uiManager.createWindow(UIManager.WindowType.COMPUTER, properties);
                 break;
-            case LADDER:
-                // TODO: Реалізувати взаємодію для драбини
-                break;
             case ELECTRICAL_PANEL:
-                // Знаходимо лазерні двері серед інтерактивних об’єктів
                 Door laserDoor = null;
                 for (Interactable obj : GameManager.getInstance().getInteractables()) {
                     if (obj instanceof Door && ((Door) obj).isLaser()) {
@@ -74,7 +72,7 @@ public class InteractiveObject implements GameObject, Interactable {
                     puzzle.setLinkedDoor(laserDoor, (solved, door) -> {
                         if (solved) {
                             door.unlock();
-                            uiManager.hidePuzzleUI(); // Закриваємо UI головоломки
+                            uiManager.hidePuzzleUI();
                         }
                     });
                     uiManager.showPuzzleUI(puzzle.getUI());
@@ -84,10 +82,11 @@ public class InteractiveObject implements GameObject, Interactable {
                 }
                 break;
             case WITH_MONEY:
-                player.addMoney(100);
+                GameManager.getInstance().addMoney(100);
                 break;
             case FINAL_PRIZE:
-                player.addMoney(500);
+                GameManager.getInstance().addMoney(500);
+                GameManager.getInstance().completeLevel(GameManager.getInstance().getCurrentLevelId());
                 uiManager.createWindow(UIManager.WindowType.VICTORY, properties);
                 break;
         }
@@ -137,26 +136,27 @@ public class InteractiveObject implements GameObject, Interactable {
     @Override
     public JSONObject getSerializableData() {
         JSONObject data = new JSONObject();
-        data.put("type", type.toString());
+        data.put("typeObj", type.toString());
         data.put("x", imageX);
-        data.put("y", imageY);
+        data.put("y", imageY + imageHeight);
         data.put("width", imageWidth);
         data.put("height", imageHeight);
-        data.put("spritePath", spritePath);
+        data.put("fileName", properties.getString("fileName"));
+        data.put("type", "InteractiveObject");
         return data;
     }
 
     @Override
     public void setFromData(JSONObject data) {
-        this.imageX = data.optDouble("x", imageX);
-        this.imageY = data.optDouble("y", imageY);
         this.imageWidth = data.optDouble("width", imageWidth);
         this.imageHeight = data.optDouble("height", imageHeight);
-        this.spritePath = data.optString("spritePath", spritePath);
+        this.imageX = data.optDouble("x", imageX);
+        this.imageY = data.optDouble("y", imageY) - imageHeight;
+        this.spritePath = data.optString("fileName", spritePath);
         try {
-            this.type = Type.valueOf(data.optString("type", type.toString()));
+            this.type = Type.valueOf(data.optString("typeObj", type.toString()));
         } catch (IllegalArgumentException e) {
-            System.err.println("Невірне значення типу: " + data.optString("type") + ". Залишаю поточний.");
+            System.err.println("Невірне значення типу: " + data.optString("typeObj") + ". Залишаю поточний.");
         }
         GameLoader loader = new GameLoader();
         this.sprite = loader.loadImage(spritePath);

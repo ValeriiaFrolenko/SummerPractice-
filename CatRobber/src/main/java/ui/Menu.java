@@ -5,50 +5,40 @@ import javafx.animation.ScaleTransition;
 import javafx.animation.SequentialTransition;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.geometry.Side;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.effect.DropShadow;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.LinearGradient;
 import javafx.scene.paint.Stop;
-import javafx.scene.shape.Circle;
-import javafx.scene.shape.Polygon;
-import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 import managers.FontManager;
 import managers.GameManager;
-import managers.SaveManager;
 import managers.UIManager;
 import org.json.JSONObject;
+import utils.GameLoader;
+import main.GameWindow;
 
 public class Menu implements UIWindow {
-    // Основні поля
     private VBox menuPane;
     private VBox splashPane;
+    private VBox levelSelectPane;
     private StackPane rootPane;
-    private Button startHeistButton;
-    private Button selectLocationButton;
-    private Button exitButton;
-    private Button confirmLevelButton;
-    private ComboBox<String> locationChoice;
     private boolean showingSplash = true;
     private boolean menuVisible = false;
     private boolean levelSelectionVisible = false;
-    private int selectedLevel = 1;
-
-    // Анімації та ефекти
-    private FadeTransition splashFade;
-    private ScaleTransition logoScale;
+    private ComboBox<String> locationChoice;
+    private GameLoader gameLoader = new GameLoader();
+    private UIManager uiManager;
 
     public Menu(JSONObject defaultData) {
+        uiManager = GameWindow.getInstance().getUIManager();
         createSplashScreen();
-        createMenuUI();
+        createMainMenuUI();
+        createLevelSelectUI();
         createRootPane();
         startSplashSequence();
     }
@@ -58,23 +48,18 @@ public class Menu implements UIWindow {
         splashPane.setAlignment(Pos.CENTER);
         splashPane.setPrefSize(1280, 640);
 
-        // Зістарений теплий фон (імітація старого паперу)
         Stop[] stops = {
-                new Stop(0, Color.web("#3C2F2F")), // Темний коричневий
-                new Stop(0.3, Color.web("#2A2525")), // Приглушений коричневий
-                new Stop(0.7, Color.web("#3C2F2F")), // Зістарений відтінок
-                new Stop(1, Color.web("#1E1A1A"))  // Темний знизу
+                new Stop(0, Color.web("#3C2F2F")),
+                new Stop(0.3, Color.web("#2A2525")),
+                new Stop(0.7, Color.web("#3C2F2F")),
+                new Stop(1, Color.web("#1E1A1A"))
         };
         LinearGradient gradient = new LinearGradient(0, 0, 0, 1, true, null, stops);
-        Background splashBg = new Background(new BackgroundFill(gradient, null, null));
-        splashPane.setBackground(splashBg);
+        splashPane.setBackground(new Background(new BackgroundFill(gradient, null, null)));
 
-        // Заголовок гри в зістареному стилі
         Label gameTitle = new Label("КОТОГРАБІЖНИК");
         gameTitle.setFont(FontManager.getInstance().getFont("Hardpixel", 56));
-        gameTitle.setTextFill(Color.web("#EAD9C2")); // Кремовий
-
-        // Тінь для заголовка
+        gameTitle.setTextFill(Color.web("#EAD9C2"));
         DropShadow titleShadow = new DropShadow();
         titleShadow.setColor(Color.web("#8B5A2B"));
         titleShadow.setOffsetX(3);
@@ -82,12 +67,9 @@ public class Menu implements UIWindow {
         titleShadow.setRadius(8);
         gameTitle.setEffect(titleShadow);
 
-        // Смайлик лапи в зістареному стилі
         Label catPaw = new Label("🐾");
         catPaw.setFont(FontManager.getInstance().getFont("Hardpixel", 120));
         catPaw.setTextFill(Color.web("#EAD9C2"));
-
-        // Тінь для лапи
         DropShadow pawShadow = new DropShadow();
         pawShadow.setColor(Color.web("#8B5A2B"));
         pawShadow.setOffsetX(4);
@@ -95,17 +77,14 @@ public class Menu implements UIWindow {
         pawShadow.setRadius(10);
         catPaw.setEffect(pawShadow);
 
-        // Підпис у теплих тонах
         Label subtitle = new Label("СТЕЛС • ГРАБІЖ • ПРИГОДИ");
         subtitle.setFont(FontManager.getInstance().getFont("Hardpixel", 24));
-        subtitle.setTextFill(Color.web("#D4A76A")); // Світло-коричневий
+        subtitle.setTextFill(Color.web("#D4A76A"));
 
-        // Підказка в зістареному стилі
         Label pressAnyKey = new Label(">>> НАТИСНІТЬ БУДЬ-ЯКУ КЛАВІШУ <<<");
         pressAnyKey.setFont(FontManager.getInstance().getFont("Hardpixel", 20));
-        pressAnyKey.setTextFill(Color.web("#8B5A5A")); // Приглушений червоний
+        pressAnyKey.setTextFill(Color.web("#8B5A5A"));
 
-        // Блимання підказки
         FadeTransition blinkTransition = new FadeTransition(Duration.seconds(1.2), pressAnyKey);
         blinkTransition.setFromValue(1.0);
         blinkTransition.setToValue(0.5);
@@ -118,140 +97,87 @@ public class Menu implements UIWindow {
         VBox.setMargin(subtitle, new Insets(0, 0, 60, 0));
 
         splashPane.getChildren().addAll(gameTitle, catPaw, subtitle, pressAnyKey);
+        splashPane.setVisible(true);
     }
 
-    private Pane createCuteCatIcon() {
-        Pane catPane = new Pane();
-        catPane.setPrefSize(150, 150);
-
-        // Тіло кота (овал)
-        Circle catBody = new Circle(60, 80, 45);
-        catBody.setFill(Color.web("#4A4A4A"));
-        catBody.setStroke(Color.web("#FFE066"));
-        catBody.setStrokeWidth(2);
-
-        // Голова кота
-        Circle catHead = new Circle(60, 35, 30);
-        catHead.setFill(Color.web("#5A5A5A"));
-        catHead.setStroke(Color.web("#FFE066"));
-        catHead.setStrokeWidth(2);
-
-        // Вушка (трикутники)
-        Polygon leftEar = new Polygon();
-        leftEar.getPoints().addAll(new Double[]{
-                40.0, 20.0,  // верх
-                25.0, 5.0,   // ліво
-                40.0, 5.0    // право
-        });
-        leftEar.setFill(Color.web("#5A5A5A"));
-        leftEar.setStroke(Color.web("#FFE066"));
-        leftEar.setStrokeWidth(2);
-
-        Polygon rightEar = new Polygon();
-        rightEar.getPoints().addAll(new Double[]{
-                80.0, 20.0,  // верх
-                80.0, 5.0,   // ліво
-                95.0, 5.0    // право
-        });
-        rightEar.setFill(Color.web("#5A5A5A"));
-        rightEar.setStroke(Color.web("#FFE066"));
-        rightEar.setStrokeWidth(2);
-
-        // Очі (зелені, яскраві)
-        Circle leftEye = new Circle(50, 30, 6);
-        leftEye.setFill(Color.web("#00FF88"));
-        Circle rightEye = new Circle(70, 30, 6);
-        rightEye.setFill(Color.web("#00FF88"));
-
-        // Зіниці
-        Circle leftPupil = new Circle(50, 30, 3);
-        leftPupil.setFill(Color.BLACK);
-        Circle rightPupil = new Circle(70, 30, 3);
-        rightPupil.setFill(Color.BLACK);
-
-        // Ніс (трикутник)
-        Polygon nose = new Polygon();
-        nose.getPoints().addAll(new Double[]{
-                60.0, 38.0,  // верх
-                55.0, 45.0,  // ліво
-                65.0, 45.0   // право
-        });
-        nose.setFill(Color.web("#FF6B9D"));
-
-        // Маска грабіжника
-        Rectangle mask = new Rectangle(35, 25, 50, 15);
-        mask.setFill(Color.web("#1A1A1A"));
-        mask.setArcWidth(10);
-        mask.setArcHeight(10);
-
-        // Хвіст
-        Circle tail = new Circle(10, 70, 8);
-        tail.setFill(Color.web("#4A4A4A"));
-        tail.setStroke(Color.web("#FFE066"));
-        tail.setStrokeWidth(2);
-
-        // Лапки
-        Circle leftPaw = new Circle(35, 110, 12);
-        leftPaw.setFill(Color.web("#4A4A4A"));
-        leftPaw.setStroke(Color.web("#FFE066"));
-        leftPaw.setStrokeWidth(2);
-
-        Circle rightPaw = new Circle(85, 110, 12);
-        rightPaw.setFill(Color.web("#4A4A4A"));
-        rightPaw.setStroke(Color.web("#FFE066"));
-        rightPaw.setStrokeWidth(2);
-
-        catPane.getChildren().addAll(tail, catBody, catHead, leftEar, rightEar,
-                leftEye, rightEye, leftPupil, rightPupil,
-                mask, nose, leftPaw, rightPaw);
-
-        return catPane;
-    }
-
-    private void createMenuUI() {
-        menuPane = new VBox(25);
+    private void createMainMenuUI() {
+        menuPane = new VBox(30);
         menuPane.setAlignment(Pos.CENTER);
         menuPane.setPrefSize(1280, 640);
         menuPane.setVisible(false);
 
-        // Зістарений фон меню
-        Stop[] menuStops = new Stop[] {
+        Stop[] stops = {
                 new Stop(0, Color.web("#3C2F2F")),
                 new Stop(0.5, Color.web("#2A2525")),
                 new Stop(1, Color.web("#1E1A1A"))
         };
-        LinearGradient menuGradient = new LinearGradient(0, 0, 0, 1, true, null, menuStops);
-        Background menuBg = new Background(new BackgroundFill(menuGradient, null, null));
-        menuPane.setBackground(menuBg);
+        LinearGradient gradient = new LinearGradient(0, 0, 0, 1, true, null, stops);
+        menuPane.setBackground(new Background(new BackgroundFill(gradient, null, null)));
 
-        // Заголовок меню
-        Label menuTitle = new Label("ВИБІР МІСІЇ");
-        menuTitle.setFont(FontManager.getInstance().getFont("Hardpixel", 42));
-        menuTitle.setTextFill(Color.web("#EAD9C2"));
+        Label title = new Label("КОТОГРАБІЖНИК");
+        title.setFont(FontManager.getInstance().getFont("Hardpixel", 64));
+        title.setTextFill(Color.web("#EAD9C2"));
+        DropShadow titleShadow = new DropShadow();
+        titleShadow.setColor(Color.web("#8B5A2B"));
+        titleShadow.setOffsetX(3);
+        titleShadow.setOffsetY(3);
+        titleShadow.setRadius(8);
+        title.setEffect(titleShadow);
 
-        DropShadow menuTitleShadow = new DropShadow();
-        menuTitleShadow.setColor(Color.web("#8B5A2B"));
-        menuTitleShadow.setOffsetX(2);
-        menuTitleShadow.setOffsetY(2);
-        menuTitleShadow.setRadius(6);
-        menuTitle.setEffect(menuTitleShadow);
+        Label subtitle = new Label("🐾 Ласкаво просимо до штабу котячих злодіїв! 🐾");
+        subtitle.setFont(FontManager.getInstance().getFont("Hardpixel", 24));
+        subtitle.setTextFill(Color.web("#D4A76A"));
 
-        // Кнопки в зістареному стилі
-        startHeistButton = createCuteButton("ПОЧАТИ ГРАБІЖ", Color.web("#4A7043"));
-        selectLocationButton = createCuteButton("ВИБРАТИ ЛОКАЦІЮ", Color.web("#8B5A5A"));
-        exitButton = createCuteButton("ВИЙТИ З ГРИ", Color.web("#7B3F3F"));
-        confirmLevelButton = createCuteButton("ПІДТВЕРДИТИ ВИБІР", Color.web("#5C4B6A"));
+        Button continueButton = createCuteButton("ПРОДОВЖИТИ", Color.web("#4A7043"));
+        Button selectLevelButton = createCuteButton("ВИБРАТИ РІВЕНЬ", Color.web("#5A5A5A"));
+        Button shopButton = createCuteButton("КРАМНИЦЯ", Color.web("#7B3F3F"));
+        Button exitButton = createCuteButton("ВИЙТИ", Color.web("#3C3C3C"));
 
-        // Вибір локації в зістареному стилі
+        continueButton.setOnAction(e -> continueGame());
+        selectLevelButton.setOnAction(e -> showLevelSelect());
+        shopButton.setOnAction(e -> openShop());
+        exitButton.setOnAction(e -> System.exit(0));
+
+        VBox.setMargin(title, new Insets(0, 0, 20, 0));
+        VBox.setMargin(subtitle, new Insets(0, 0, 40, 0));
+
+        menuPane.getChildren().addAll(title, subtitle, continueButton, selectLevelButton, shopButton, exitButton);
+    }
+
+    private void createLevelSelectUI() {
+        levelSelectPane = new VBox(30);
+        levelSelectPane.setAlignment(Pos.CENTER);
+        levelSelectPane.setPrefSize(1280, 640);
+        levelSelectPane.setVisible(false);
+
+        Stop[] stops = {
+                new Stop(0, Color.web("#3C2F2F")),
+                new Stop(0.5, Color.web("#2A2525")),
+                new Stop(1, Color.web("#1E1A1A"))
+        };
+        LinearGradient gradient = new LinearGradient(0, 0, 0, 1, true, null, stops);
+        levelSelectPane.setBackground(new Background(new BackgroundFill(gradient, null, null)));
+
+        Label levelTitle = new Label("ВИБІР ЦІЛІ");
+        levelTitle.setFont(FontManager.getInstance().getFont("Hardpixel", 42));
+        levelTitle.setTextFill(Color.web("#EAD9C2"));
+        DropShadow levelTitleShadow = new DropShadow();
+        levelTitleShadow.setColor(Color.web("#8B5A2B"));
+        levelTitleShadow.setOffsetX(2);
+        levelTitleShadow.setOffsetY(2);
+        levelTitleShadow.setRadius(6);
+        levelTitle.setEffect(levelTitleShadow);
+
+        Label subtitle = new Label("🎯 Що будемо грабувати сьогодні, мурлико? 🎯");
+        subtitle.setFont(FontManager.getInstance().getFont("Hardpixel", 20));
+        subtitle.setTextFill(Color.web("#D4A76A"));
+
         locationChoice = new ComboBox<>();
-        locationChoice.getItems().addAll(
-                "БУДИНОК — Легкий: Тестовий злом для котів-новачків",
-                "МУЗЕЙ — Середній: Перехитри охорону і викради артефакт МяуРа",
-                "БАНК — Важкий: Проникни в банк корму «Whiskas & Co.»"
-
-        );
-
-// Стиль як у кнопки
+        JSONObject progress = gameLoader.loadJSON("data/saves/game_progress.json");
+        locationChoice.getItems().add("🏠 БУДИНОК — Легко: Розминка для котячих лапок");
+        locationChoice.getItems().add("🏛️ МУЗЕЙ — Середньо: Викрадемо артефакт МяуРа");
+        locationChoice.getItems().add("🏦 БАНК — Важко: Найбільший корм у місті чекає!");
+        locationChoice.setValue(locationChoice.getItems().get(0));
         locationChoice.setStyle(
                 "-fx-background-color: #2F2F2F;" +
                         "-fx-border-color: #D4A76A;" +
@@ -261,36 +187,26 @@ public class Menu implements UIWindow {
                         "-fx-font-family: 'Hardpixel';" +
                         "-fx-font-size: 18px;" +
                         "-fx-text-fill: #EAD9C2;" +
-                        "-fx-pref-width: 500px;" +
+                        "-fx-pref-width: 550px;" +
                         "-fx-pref-height: 50px;"
         );
 
-// Обробка вибору
-        locationChoice.setOnAction(e -> {
-            String selected = locationChoice.getValue();
-            updateSelectedLevel();
-        });
-
-        locationChoice.setCellFactory(lv -> {
-            ListCell<String> cell = new ListCell<>() {
-                @Override
-                protected void updateItem(String item, boolean empty) {
-                    super.updateItem(item, empty);
-                    setText(item);
-                    if (!empty) {
-                        setStyle(
-                                "-fx-background-color: #2F2F2F;" +
-                                        "-fx-text-fill: #EAD9C2;" +
-                                        "-fx-font-family: 'Hardpixel';" +
-                                        "-fx-font-size: 18px;"
-                        );
-                    }
+        locationChoice.setCellFactory(lv -> new ListCell<>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                setText(item);
+                if (!empty) {
+                    setStyle(
+                            "-fx-background-color: #2F2F2F;" +
+                                    "-fx-text-fill: #EAD9C2;" +
+                                    "-fx-font-family: 'Hardpixel';" +
+                                    "-fx-font-size: 18px;"
+                    );
                 }
-            };
-            return cell;
+            }
         });
 
-// СТИЛІ ДЛЯ ОБРАНОГО ЕЛЕМЕНТА
         locationChoice.setButtonCell(new ListCell<>() {
             @Override
             protected void updateItem(String item, boolean empty) {
@@ -307,25 +223,86 @@ public class Menu implements UIWindow {
             }
         });
 
-        // Кнопка підтвердження вибору рівня
-        confirmLevelButton.setVisible(false);
+        Button confirmButton = createCuteButton("ПІДТВЕРДИТИ", Color.web("#4A7043"));
+        confirmButton.setOnAction(e -> {
+            int selectedLevel = getSelectedLevel();
+            startLevel(selectedLevel);
+        });
 
-        // Контейнер для кнопок
-        VBox buttonContainer = new VBox(20);
-        buttonContainer.setAlignment(Pos.CENTER);
-        buttonContainer.getChildren().addAll(
-                startHeistButton,
-                selectLocationButton,
-                locationChoice,
-                confirmLevelButton,
-                exitButton
-        );
+        Button backButton = createCuteButton("ПОВЕРНУТИСЯ", Color.web("#7B3F3F"));
+        backButton.setOnAction(e -> showMainMenu());
 
-        VBox.setMargin(menuTitle, new Insets(0, 0, 40, 0));
+        VBox.setMargin(levelTitle, new Insets(0, 0, 20, 0));
+        VBox.setMargin(subtitle, new Insets(0, 0, 30, 0));
+        VBox.setMargin(locationChoice, new Insets(0, 0, 20, 0));
+        VBox.setMargin(confirmButton, new Insets(0, 0, 20, 0));
 
-        menuPane.getChildren().addAll(menuTitle, buttonContainer);
+        levelSelectPane.getChildren().addAll(levelTitle, subtitle, locationChoice, confirmButton, backButton);
+    }
 
-        setupButtonActions();
+    private void createRootPane() {
+        rootPane = new StackPane();
+        rootPane.setPrefSize(1280, 640);
+        Stop[] stops = {
+                new Stop(0, Color.web("#3C2F2F")),
+                new Stop(1, Color.web("#1E1A1A"))
+        };
+        LinearGradient gradient = new LinearGradient(0, 0, 0, 1, true, null, stops);
+        rootPane.setBackground(new Background(new BackgroundFill(gradient, null, null)));
+        rootPane.getChildren().addAll(splashPane, menuPane, levelSelectPane);
+    }
+
+    private void startSplashSequence() {
+        Label catPaw = (Label) splashPane.getChildren().get(1);
+        ScaleTransition logoScale = new ScaleTransition(Duration.seconds(1.2), catPaw);
+        logoScale.setFromX(0.5);
+        logoScale.setFromY(0.5);
+        logoScale.setToX(1.0);
+        logoScale.setToY(1.0);
+        logoScale.setDelay(Duration.seconds(0.3));
+        logoScale.play();
+    }
+
+    private void transitionToMenu() {
+        if (!showingSplash) return;
+        showingSplash = false;
+
+        FadeTransition splashFadeOut = new FadeTransition(Duration.seconds(0.6), splashPane);
+        splashFadeOut.setFromValue(1.0);
+        splashFadeOut.setToValue(0.0);
+
+        menuPane.setVisible(true);
+        FadeTransition menuFadeIn = new FadeTransition(Duration.seconds(0.6), menuPane);
+        menuFadeIn.setFromValue(0.0);
+        menuFadeIn.setToValue(1.0);
+
+        SequentialTransition transition = new SequentialTransition(splashFadeOut, menuFadeIn);
+        transition.setOnFinished(e -> {
+            splashPane.setVisible(false);
+            menuVisible = true;
+        });
+        transition.play();
+    }
+
+    private void showLevelSelect() {
+        menuPane.setVisible(false);
+        levelSelectPane.setVisible(true);
+        FadeTransition levelFadeIn = new FadeTransition(Duration.seconds(0.4), levelSelectPane);
+        levelFadeIn.setFromValue(0.0);
+        levelFadeIn.setToValue(1.0);
+        levelFadeIn.play();
+        levelSelectionVisible = true;
+    }
+
+    private void showMainMenu() {
+        levelSelectPane.setVisible(false);
+        menuPane.setVisible(true);
+        FadeTransition menuFadeIn = new FadeTransition(Duration.seconds(0.4), menuPane);
+        menuFadeIn.setFromValue(0.0);
+        menuFadeIn.setToValue(1.0);
+        menuFadeIn.play();
+        levelSelectionVisible = false;
+        menuVisible = true;
     }
 
     private Button createCuteButton(String text, Color color) {
@@ -333,7 +310,6 @@ public class Menu implements UIWindow {
         button.setFont(FontManager.getInstance().getFont("Hardpixel", 22));
         button.setPrefSize(420, 60);
 
-        // Зістарений стиль кнопки
         String baseStyle = String.format(
                 "-fx-background-color: #2A2525;" +
                         "-fx-text-fill: %s;" +
@@ -342,13 +318,11 @@ public class Menu implements UIWindow {
                         "-fx-border-radius: 15px;" +
                         "-fx-background-radius: 15px;" +
                         "-fx-cursor: hand;" +
-                        "-fx-font-weight: bold;" +
                         "-fx-font-family: 'Hardpixel';" +
                         "-fx-font-size: 22px;",
                 toHexString(Color.web("#EAD9C2")), toHexString(color)
         );
 
-        // Стиль при наведенні
         String hoverTextColor = color.equals(Color.web("#4A7043")) ? "#1E1A1A" : "#EAD9C2";
         String hoverStyle = String.format(
                 "-fx-background-color: %s;" +
@@ -358,15 +332,12 @@ public class Menu implements UIWindow {
                         "-fx-border-radius: 15px;" +
                         "-fx-background-radius: 15px;" +
                         "-fx-cursor: hand;" +
-                        "-fx-font-weight: bold;" +
                         "-fx-font-family: 'Hardpixel';" +
                         "-fx-font-size: 22px;",
                 toHexString(color), hoverTextColor
         );
 
         button.setStyle(baseStyle);
-
-        // Тінь для кнопок
         DropShadow buttonShadow = new DropShadow();
         buttonShadow.setColor(Color.web("#8B5A2B"));
         buttonShadow.setOffsetX(2);
@@ -374,7 +345,6 @@ public class Menu implements UIWindow {
         buttonShadow.setRadius(5);
         button.setEffect(buttonShadow);
 
-        // Ефекти при наведенні
         button.setOnMouseEntered(e -> {
             button.setStyle(hoverStyle);
             DropShadow hoverShadow = new DropShadow();
@@ -393,93 +363,31 @@ public class Menu implements UIWindow {
         return button;
     }
 
-    private void createRootPane() {
-        rootPane = new StackPane();
-        rootPane.setPrefSize(1280, 640);
-        // Зістарений фон
-        Stop[] rootStops = new Stop[] {
-                new Stop(0, Color.web("#3C2F2F")),
-                new Stop(1, Color.web("#1E1A1A"))
-        };
-        LinearGradient rootGradient = new LinearGradient(0, 0, 0, 1, true, null, rootStops);
-        Background rootBg = new Background(new BackgroundFill(rootGradient, null, null));
-        rootPane.setBackground(rootBg);
-        rootPane.getChildren().addAll(splashPane, menuPane);
+    private void continueGame() {
+        JSONObject progress = gameLoader.loadJSON("data/saves/game_progress.json");
+        int currentLevel = progress != null ? progress.optInt("currentLevelId", 1) : 1;
+        GameManager.getInstance().loadLevel(currentLevel, false);
+        hide();
     }
 
-    private void startSplashSequence() {
-        // Анімація появи лапи
-        Label catPaw = (Label) splashPane.getChildren().get(1);
-        logoScale = new ScaleTransition(Duration.seconds(1.2), catPaw);
-        logoScale.setFromX(0.5);
-        logoScale.setFromY(0.5);
-        logoScale.setToX(1.0);
-        logoScale.setToY(1.0);
-
-        // Затримка перед можливістю пропуску
-        logoScale.setDelay(Duration.seconds(0.3));
-        logoScale.play();
+    private void startLevel(int levelId) {
+        GameManager.getInstance().loadLevel(levelId, true);
+        hide();
     }
 
-    private void transitionToMenu() {
-        if (!showingSplash) return;
-
-        showingSplash = false;
-
-        // Зникнення заставки
-        FadeTransition splashFadeOut = new FadeTransition(Duration.seconds(0.6), splashPane);
-        splashFadeOut.setFromValue(1.0);
-        splashFadeOut.setToValue(0.0);
-
-        // Поява меню
-        menuPane.setVisible(true);
-        FadeTransition menuFadeIn = new FadeTransition(Duration.seconds(0.6), menuPane);
-        menuFadeIn.setFromValue(0.0);
-        menuFadeIn.setToValue(1.0);
-
-        SequentialTransition transition = new SequentialTransition(splashFadeOut, menuFadeIn);
-        transition.setOnFinished(e -> {
-            splashPane.setVisible(false);
-            menuVisible = true;
-        });
-
-        transition.play();
+    private void openShop() {
+        JSONObject progress = gameLoader.loadJSON("data/saves/game_progress.json");
+        int totalMoney = progress != null ? progress.optInt("totalMoney", 0) : 0;
+        uiManager.createWindow(UIManager.WindowType.SHOP, new JSONObject());
+        hide();
     }
 
-    private void setupButtonActions() {
-        startHeistButton.setOnAction(e -> startHeist());
-        selectLocationButton.setOnAction(e -> toggleLocationSelection());
-        confirmLevelButton.setOnAction(e -> confirmLocationChoice());
-        exitButton.setOnAction(e -> System.exit(0));
-
-        locationChoice.setOnAction(e -> updateSelectedLevel());
-    }
-
-    private void toggleLocationSelection() {
-        levelSelectionVisible = !levelSelectionVisible;
-        locationChoice.setVisible(levelSelectionVisible);
-        confirmLevelButton.setVisible(levelSelectionVisible);
-
-        if (levelSelectionVisible) {
-            selectLocationButton.setText("ПРИХОВАТИ ЛОКАЦІЇ");
-        } else {
-            selectLocationButton.setText("ВИБРАТИ ЛОКАЦІЮ");
-        }
-    }
-
-    private void updateSelectedLevel() {
+    private int getSelectedLevel() {
         String selected = locationChoice.getValue();
-        if (selected.contains("БУДИНОК")) {
-            selectedLevel = 1;
-        } else if (selected.contains("МУЗЕЙ")) {
-            selectedLevel = 2;
-        } else if (selected.contains("БАНК")) {
-            selectedLevel = 3;
-        }
-    }
-
-    private void confirmLocationChoice() {
-        startLevel(selectedLevel);
+        if (selected.contains("БУДИНОК")) return 1;
+        if (selected.contains("МУЗЕЙ")) return 2;
+        if (selected.contains("БАНК")) return 3;
+        return 1;
     }
 
     private String toHexString(Color color) {
@@ -489,60 +397,44 @@ public class Menu implements UIWindow {
                 (int) (color.getBlue() * 255));
     }
 
-    public void handleInput(KeyEvent event) {
-        if (showingSplash) {
-            // Будь-яка клавіша пропускає заставку
-            transitionToMenu();
-        } else if (menuVisible) {
-            // Навігація в меню
-            if (event.getCode() == KeyCode.ESCAPE) {
-                System.exit(0);
-            }
-        }
-    }
-
-    public void startHeist() {
-        // Почати з збереженого місця або з першого рівня
-        continueGame();
-    }
-
-    public void startLevel(int levelId) {
-        System.out.println("Починаємо рівень: " + levelId);
-        GameManager.getInstance().loadLevel(levelId, true);
-        hide();
-    }
-
-    public void continueGame() {
-        System.out.println("Продовжуємо грабіж...");
-        // Завантажуємо збережену гру або починаємо з першого рівня
-        GameManager.getInstance().loadLevel(1, false);
-        hide();
-    }
-
     @Override
     public void show() {
-        if (rootPane != null) {
-            rootPane.setVisible(true);
-            // Фокус для обробки клавіш
-            rootPane.setFocusTraversable(true);
-            rootPane.requestFocus();
-
-            // Встановлюємо обробник клавіш
-            rootPane.setOnKeyPressed(this::handleInput);
+        if (!uiManager.getMenuPane().getChildren().contains(rootPane)) {
+            uiManager.getMenuPane().getChildren().add(rootPane);
+            System.out.println("Menu shown, menuPane children: " + uiManager.getMenuPane().getChildren().size());
+        }
+        rootPane.setVisible(true);
+        rootPane.setFocusTraversable(true);
+        rootPane.requestFocus();
+        rootPane.setOnKeyPressed(this::handleInput);
+        if (showingSplash) {
+            splashPane.setVisible(true);
+            menuPane.setVisible(false);
+            levelSelectPane.setVisible(false);
         }
     }
 
     @Override
     public void hide() {
-        if (rootPane != null) {
-            rootPane.setVisible(false);
-        }
-        // Повертаємо фокус грі і знімаємо паузу
-        GameManager.getInstance().setGameState(GameManager.GameState.PLAYING);
+        rootPane.setVisible(false);
+        uiManager.hideMenu(); // Викликаємо hideMenu замість hideCurrentWindow
+        System.out.println("Menu hidden, menuPane children: " + uiManager.getMenuPane().getChildren().size());
     }
 
     @Override
     public Node getRoot() {
         return rootPane;
+    }
+
+    public void handleInput(KeyEvent event) {
+        if (showingSplash) {
+            transitionToMenu();
+        } else if (event.getCode() == KeyCode.ESCAPE) {
+            if (levelSelectionVisible) {
+                showMainMenu();
+            } else {
+                hide(); // Закриваємо меню замість System.exit(0)
+            }
+        }
     }
 }

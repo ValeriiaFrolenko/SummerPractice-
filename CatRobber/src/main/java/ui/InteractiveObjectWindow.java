@@ -116,6 +116,8 @@ public class InteractiveObjectWindow implements UIWindow {
         System.out.println("Window hidden: " + windowType);
     }
 
+
+
     @Override
     public Node getRoot() {
         return root;
