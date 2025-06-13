@@ -343,7 +343,7 @@ public class SecurityCamera implements GameObject, Animatable {
 
     /**
      * Повертає інформацію про видимість камери
-     * @return завжди true, оскільки камера завжди видима
+     * @return true, якщо камеру видно, інакше false
      */
     @Override
     public boolean isVisible() {

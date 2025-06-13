@@ -19,11 +19,17 @@ public class InteractiveObject implements GameObject, Interactable {
     private double imageX, imageY, imageWidth, imageHeight; //координати, висота та ширина об'єктів
     private Image sprite; //об'єкт зображення
     private String spritePath; //шлях до файлу із зображенням
-    private Type type;
-    private JSONObject properties;
+    private Type type; //тип інтерективного об'єкта
+    private JSONObject properties; //додаткові властивості об’єкта у форматі JSON
 
+    /** Перелік можливих типів інтерактивних об'єктів **/
     public enum Type { NOTE, PICTURE, COMPUTER, ELECTRICAL_PANEL, WITH_MONEY, FINAL_PRIZE}
 
+    /**
+     * Конструктор, що створює новий інтерактивний об'єкт на основі заданої позиції та властивостей
+     * @param position початкова позиція об'єкта у вигляді вектора Vector2D
+     * @param properties об'єкт JSON, що містить властивості інтерактивного об'єкта
+     */
     public InteractiveObject(Vector2D position, JSONObject properties) {
         this.imageWidth = properties.optDouble("width", 32.0);
         this.imageHeight = properties.optDouble("height", 32.0);
@@ -37,6 +43,10 @@ public class InteractiveObject implements GameObject, Interactable {
         this.sprite = loader.loadImage(spritePath);
     }
 
+    /**
+     * Обробляє взаємодію гравця з інтерактивним об'єктом
+     * @param player гравець, який взаємодіє з об'єктом
+     */
     @Override
     public void interact(Player player) {
         UIManager uiManager = GameWindow.getInstance().getUIManager();
@@ -87,6 +97,11 @@ public class InteractiveObject implements GameObject, Interactable {
         }
     }
 
+    /**
+     * Перевіряє, чи може гравець взаємодіяти з об'єктом
+     * @param player гравець, для якого перевіряється можливість взаємодії
+     * @return true - якщо гравець знаходиться в зоні взаємодії з об'єктом, інакше - false
+     */
     @Override
     public boolean canInteract(Player player) {
         Bounds playerBounds = player.getBounds();
@@ -101,6 +116,13 @@ public class InteractiveObject implements GameObject, Interactable {
         return extendedBounds.intersects(objectBounds);
     }
 
+    /**
+     * Метод, що відображає інтерактивний об'єкт на графічному контексті
+     * Малює спрайт об'єкта з заданими координатами та розмірами
+     * Якщо цей об'єкт є найближчим для взаємодії з гравцем,
+     * навколо нього додається додаткове виділення у вигляді білих "кутів"
+     * @param gc графічний контекст, на якому виконується малювання
+     */
     @Override
     public void render(GraphicsContext gc) {
 
@@ -128,6 +150,10 @@ public class InteractiveObject implements GameObject, Interactable {
         }
     }
 
+    /**
+     * Повертає JSON-об’єкт, що містить серіалізовані дані інтерактивного об’єкта
+     * @return JSONObject, що містить серіалізовані поля об’єкта
+     */
     @Override
     public JSONObject getSerializableData() {
         JSONObject data = new JSONObject();
@@ -140,6 +166,10 @@ public class InteractiveObject implements GameObject, Interactable {
         return data;
     }
 
+    /**
+     * Відновлює стан інтерактивного об’єкта з JSON-даних
+     * @param data JSONObject, що містить серіалізовані поля об’єкта
+     */
     @Override
     public void setFromData(JSONObject data) {
         this.imageX = data.optDouble("x", imageX);
@@ -156,60 +186,106 @@ public class InteractiveObject implements GameObject, Interactable {
         this.sprite = loader.loadImage(spritePath);
     }
 
+    /**
+     * Повертає тип інтерактивного об'єкта у вигляді рядка
+     * @return рядок, що представляє тип об'єкта
+     */
     @Override
     public String getType() {
         return type.toString();
     }
 
+    /**
+     * Повертає позицію об'єкта у вигляді вектора
+     * @return позиція (x, y) об'єкта
+     */
     @Override
     public Vector2D getPosition() {
         return new Vector2D(imageX, imageY);
     }
 
+    /**
+     * Повертає позицію зображення об'єкта
+     * @return позиція (x, y) зображення об'єкта
+     */
     @Override
     public Vector2D getImagePosition() {
         return new Vector2D(imageX, imageY);
     }
 
+    /**
+     * Встановлює позицію об'єкта
+     * @param position нова позиція у вигляді вектора (x, y)
+     */
     @Override
     public void setPosition(Vector2D position) {
         this.imageX = position.x;
         this.imageY = position.y;
     }
 
+    /**
+     * Встановлює позицію зображення об'єкта
+     * @param position нова позиція зображення у вигляді вектора (x, y)
+     */
     @Override
     public void setImagePosition(Vector2D position) {
         this.imageX = position.x;
         this.imageY = position.y;
     }
 
+    /**
+     * Повертає межі об'єкта у вигляді BoundingBox
+     * @return об'єкт типу Bounds, що описує межі об'єкта
+     */
     @Override
     public Bounds getBounds() {
         return new BoundingBox(imageX, imageY, imageWidth, imageHeight);
     }
 
+    /**
+     * Повертає межі зображення об'єкта
+     * @return об'єкт типу Bounds, що описує межі зображення об'єкта
+     */
     @Override
     public Bounds getImageBounds() {
         return new BoundingBox(imageX, imageY, imageWidth, imageHeight);
     }
 
+    /**
+     * Повертає радіус взаємодії з об'єктом
+     * @return відстань (у пікселях) для взаємодії з об'єктом
+     */
     @Override
     public double getInteractionRange() {
         return 50.0;
     }
 
+    /**
+     * Повертає підказку, яка відображається гравцю для взаємодії з об'єктом
+     * @return текст підказки
+     */
     @Override
     public String getInteractionPrompt() {
         return "Press E to interact with object";
     }
 
+    /**
+     * Повертає рівень відмалювання (шар), на якому розташований об'єкт
+     * Визначає порядок відображення об'єктів
+     * @return 1 - номер шару відмалювання
+     */
     @Override
     public int getRenderLayer() {
         return 1;
     }
 
+    /**
+     * Визначає, чи є об'єкт видимим
+     * @return true, якщо об'єкт видно, інакше false
+     */
     @Override
     public boolean isVisible() {
         return true;
     }
+
 }
