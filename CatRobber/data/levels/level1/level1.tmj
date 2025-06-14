@@ -1579,12 +1579,12 @@
                         {
                          "name":"collX",
                          "type":"float",
-                         "value":70
+                         "value":59.43
                         }, 
                         {
                          "name":"collY",
                          "type":"float",
-                         "value":307
+                         "value":65.2
                         }, 
                         {
                          "name":"currentAnimation",
@@ -1645,8 +1645,8 @@
                  "type":"Player",
                  "visible":true,
                  "width":100.948246196698,
-                 "x":42.5525357997892,
-                 "y":375.100775251752
+                 "x":33.5525357997892,
+                 "y":135.100775251752
                 }, 
                 {
                  "gid":13,
@@ -1773,8 +1773,8 @@
                  "type":"PlayerCOLISSION",
                  "visible":true,
                  "width":40.7406431019961,
-                 "x":69.4257263314337,
-                 "y":306.204420482757
+                 "x":59.4257263314337,
+                 "y":65.204420482757
                 }, 
                 {
                  "height":68,
@@ -1976,12 +1976,7 @@
                          "name":"puzzleType",
                          "type":"string",
                          "value":"LaserLockPuzzle"
-                        },
-                        {
-                         "name":"solution",
-                         "type":"int",
-                         "value":2
-                        },
+                        }, 
                         {
                          "name":"solution",
                          "type":"int",

@@ -98,10 +98,10 @@ public class InteractiveObject implements GameObject, Interactable {
                 }
                 break;
             case WITH_MONEY:
-                player.addMoney(100);
+                GameManager.getInstance().addMoney(100);
                 break;
             case FINAL_PRIZE:
-                player.addMoney(500);
+                GameManager.getInstance().addMoney(500);
                 uiManager.createWindow(UIManager.WindowType.VICTORY, properties);
                 break;
         }

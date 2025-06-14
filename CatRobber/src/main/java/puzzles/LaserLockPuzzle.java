@@ -14,9 +14,6 @@ import managers.GameManager;
 import org.json.JSONObject;
 import utils.GameLoader;
 
-import java.io.FileWriter;
-import java.io.IOException;
-
 public class LaserLockPuzzle extends Puzzle {
     private ImageView cutterView;
     private final GameManager manager = GameManager.getInstance();
@@ -37,10 +34,12 @@ public class LaserLockPuzzle extends Puzzle {
 
     @Override
     public Node getUI() {
+        // Якщо пазл вирішений, не відкриваємо UI
         if (state == PuzzleState.SOLVED) {
             return null;
         }
 
+        // Створюємо UI, якщо пазл не вирішений
         Pane pane = new Pane();
         pane.setPrefSize(512, 640);
         pane.setBackground(Background.EMPTY);
@@ -74,7 +73,7 @@ public class LaserLockPuzzle extends Puzzle {
         Image cutterOpenImage = gameLoader.loadImage("puzzles/laserLock/cutter_opened.png");
         Image cutterClosedImage = gameLoader.loadImage("puzzles/laserLock/cutter_closed.png");
 
-        if(cutterOpenImage != null) {
+        if (cutterOpenImage != null) {
             cutterView = new ImageView(cutterOpenImage);
             cutterView.setFitWidth(770);
             cutterView.setFitHeight(770);
@@ -121,7 +120,6 @@ public class LaserLockPuzzle extends Puzzle {
                         handleWireCut(false);
                     }
                     e.consume();
-
                 });
 
                 pane.getChildren().add(wireView);
@@ -132,7 +130,7 @@ public class LaserLockPuzzle extends Puzzle {
             cutterView.toFront();
         }
 
-        javafx.application.Platform.runLater(() -> {
+        Platform.runLater(() -> {
             pane.requestFocus();
             System.out.println("LaserLockPuzzle focus requested");
         });
@@ -144,16 +142,36 @@ public class LaserLockPuzzle extends Puzzle {
         if (correct) {
             PauseTransition pause = new PauseTransition(Duration.millis(500));
             pause.setOnFinished(e -> {
-                solve(solution);
+                solve(solution); // Встановлюємо стан SOLVED
+                GameWindow.getInstance().getUIManager().hidePuzzleUI(); // Закриваємо UI
             });
             pause.play();
         } else {
             manager.alert();
             PauseTransition pause = new PauseTransition(Duration.millis(1000));
             pause.setOnFinished(e -> {
-                solve(solution);
+                // Не викликаємо solve(), щоб пазл залишився NOT_SOLVED
+                // Скидаємо UI, закриваючи його
+                GameWindow.getInstance().getUIManager().hidePuzzleUI();
+                // Скидаємо стан дротів (відновлюємо початкові зображення)
+                resetWires();
             });
             pause.play();
+        }
+    }
+
+    // Метод для скидання стану дротів
+    private void resetWires() {
+        // Скидаємо зображення дротів до початкового стану
+        GameLoader gameLoader = new GameLoader();
+        for (int i = 0; i < 3; i++) {
+            int wireIndex = i + 1;
+            String wirePath = "puzzles/laserLock/level" + manager.getCurrentLevelId() + "/wire" + wireIndex + ".png";
+            Image wireImage = gameLoader.loadImage(wirePath);
+            if (wireImage != null && cutterView != null) {
+                // Відновлюємо початкове зображення різця
+                cutterView.setImage(gameLoader.loadImage("puzzles/laserLock/cutter_opened.png"));
+            }
         }
     }
 }
