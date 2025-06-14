@@ -87,6 +87,16 @@ public class CodeLockPuzzle extends Puzzle {
         attemptsLabel.setText("Спроби: " + globalAttempts);
     }
 
+    // Метод для забезпечення фокусу
+    private void ensureFocus() {
+        if (pane != null) {
+            javafx.application.Platform.runLater(() -> {
+                pane.requestFocus();
+                System.out.println("Фокус встановлено на pane");
+            });
+        }
+    }
+
     @Override
     public Node getUI() {
         pane = new Pane();
@@ -121,6 +131,8 @@ public class CodeLockPuzzle extends Puzzle {
             System.out.println("CodeLockPuzzle closed");
             GameWindow.getInstance().getUIManager().hidePuzzleUI();
         });
+        // Важливо: не дозволяємо кнопці забирати фокус
+        closeButton.setFocusTraversable(false);
         pane.getChildren().add(closeButton);
 
         // Дисплей для введених цифр - зверху з відступом 50 пікселів
@@ -130,6 +142,7 @@ public class CodeLockPuzzle extends Puzzle {
         codeDisplay.setStyle("-fx-font-weight: bold;");
         codeDisplay.setLayoutX(imageWidth / 2 - 80); // Центруємо по горизонталі
         codeDisplay.setLayoutY(50); // Відступ зверху 50 пікселів
+        codeDisplay.setFocusTraversable(false); // Не дозволяємо забирати фокус
         updateCodeDisplay(); // Ініціалізуємо відображення
         pane.getChildren().add(codeDisplay);
 
@@ -140,25 +153,27 @@ public class CodeLockPuzzle extends Puzzle {
         attemptsLabel.setStyle("-fx-font-weight: bold;");
         attemptsLabel.setLayoutX(10);
         attemptsLabel.setLayoutY(imageHeight - 30); // Внизу зліва
+        attemptsLabel.setFocusTraversable(false); // Не дозволяємо забирати фокус
         pane.getChildren().add(attemptsLabel);
 
         // Очищуємо введений код при кожному відкритті (але зберігаємо спроби)
         enteredCode.setLength(0);
         updateCodeDisplay();
 
-        // Гарантуємо фокус
+        // Налаштовуємо pane для отримання фокусу
         pane.setFocusTraversable(true);
-        pane.requestFocus();
-        pane.setMouseTransparent(false); // Забезпечуємо, що pane приймає події миші
+        pane.setStyle("-fx-background-color: transparent;"); // Прозорий фон
+
+        // Обробка кліків миші для встановлення фокусу
         pane.setOnMouseClicked(e -> {
             System.out.println("Mouse clicked on CodeLockPuzzle pane at (" + e.getX() + ", " + e.getY() + ")");
-            pane.requestFocus(); // Повертаємо фокус при кліку
+            pane.requestFocus();
+            e.consume(); // Споживаємо подію
         });
-        pane.setOnMouseMoved(e -> {
-            System.out.println("Mouse moved on CodeLockPuzzle pane at (" + e.getX() + ", " + e.getY() + ")");
-        });
+
         // Обробка клавіатури
         pane.setOnKeyPressed(event -> {
+            System.out.println("Key pressed: " + event.getCode());
 
             KeyCode key = event.getCode();
 
@@ -181,27 +196,53 @@ public class CodeLockPuzzle extends Puzzle {
                 updateCodeDisplay();
                 System.out.println("Видалено цифру, поточний код: " + enteredCode);
             }
+
+            event.consume(); // Споживаємо подію
         });
 
-        // Додаємо слухач для гарантії фокусу після відображення
+        // Слухач для автоматичного встановлення фокусу після додавання до сцени
         pane.sceneProperty().addListener((obs, oldScene, newScene) -> {
             if (newScene != null) {
-                // Встановлюємо фокус відразу після додавання до сцени
-                javafx.application.Platform.runLater(() -> {
-                    pane.requestFocus();
-                    System.out.println("Фокус встановлено на pane автоматично");
-                });
+                System.out.println("Pane додано до сцени");
 
+                // Встановлюємо фокус з затримкою
+                Timeline focusTimeline = new Timeline(new KeyFrame(Duration.millis(100), e -> {
+                    ensureFocus();
+                }));
+                focusTimeline.play();
+
+                // Додатковий слухач для вікна
                 newScene.getWindow().showingProperty().addListener((showObs, wasShowing, isShowing) -> {
                     if (isShowing) {
-                        javafx.application.Platform.runLater(() -> {
-                            pane.requestFocus();
-                            System.out.println("Фокус встановлено на pane після показу вікна");
-                        });
+                        System.out.println("Вікно показано");
+                        Timeline windowFocusTimeline = new Timeline(new KeyFrame(Duration.millis(200), e -> {
+                            ensureFocus();
+                        }));
+                        windowFocusTimeline.play();
                     }
                 });
             }
         });
+
+        // Слухач для отримання/втрати фокусу
+        pane.focusedProperty().addListener((obs, wasFocused, isFocused) -> {
+            System.out.println("Pane focus changed: " + isFocused);
+            if (!isFocused) {
+                // Якщо фокус втрачено, спробуємо його повернути через короткий час
+                Timeline refocusTimeline = new Timeline(new KeyFrame(Duration.millis(50), e -> {
+                    if (!pane.isFocused()) {
+                        ensureFocus();
+                    }
+                }));
+                refocusTimeline.play();
+            }
+        });
+
+        // Додатковий механізм для гарантії фокусу
+        Timeline initialFocusTimeline = new Timeline(new KeyFrame(Duration.millis(50), e -> {
+            ensureFocus();
+        }));
+        initialFocusTimeline.play();
 
         return pane;
     }

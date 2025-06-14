@@ -1,6 +1,7 @@
 package ui;
 
 import javafx.scene.Node;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -14,74 +15,130 @@ import managers.UIManager;
 import org.json.JSONObject;
 import java.util.Random;
 
-public class InteractiveObjectWindow implements UIWindow {
+public class InteractiveObjectWindow {
     private Pane root;
-    private UIManager uiManager;
     private UIManager.WindowType windowType;
 
-    public InteractiveObjectWindow(UIManager uiManager, UIManager.WindowType windowType, JSONObject config) {
-        this.uiManager = uiManager;
+    public InteractiveObjectWindow(UIManager.WindowType windowType, JSONObject config) {
         this.windowType = windowType;
         this.root = new Pane();
         initializeUI(config);
-        System.out.println("InteractiveObjectWindow created: " + windowType);
     }
 
     private void initializeUI(JSONObject config) {
         root.setPrefSize(400, 300);
+        root.setMinSize(400, 300);
+        root.setMaxSize(400, 300);
 
-        // Налаштування rootPane
-        root.setMouseTransparent(false);
+        // Налаштування rootPane - ВИПРАВЛЕНО
+        root.setMouseTransparent(false);  // Дозволяємо реакцію на мишку
         root.setFocusTraversable(true);
-        root.setPickOnBounds(true); // ВАЖЛИВО: дозволяє кліки по всій області
+        root.setPickOnBounds(true);       // Дозволяємо кліки по всій області
+        root.setDisable(false);           // Переконуємось що компонент активний
 
         // Фон з напівпрозорістю
         root.setBackground(new Background(new BackgroundFill(
                 javafx.scene.paint.Color.rgb(0, 0, 0, 0.8), CornerRadii.EMPTY, Insets.EMPTY)));
 
-        // Обробник кліку для root - споживає події, щоб вони не проходили далі
+        // Обробник кліку для root - ВИПРАВЛЕНО
         root.setOnMouseClicked(e -> {
-            System.out.println("Mouse clicked on InteractiveObjectWindow root: " + windowType + " at (" + e.getX() + ", " + e.getY() + ")");
             root.requestFocus();
             e.consume(); // Споживаємо подію
         });
 
-        // Заголовок
         Label title = new Label(getWindowTitle());
         title.setFont(FontManager.getInstance().getFont("EpsilonCTT", 20));
         title.setTextFill(javafx.scene.paint.Color.WHITE);
         title.setLayoutX(20);
         title.setLayoutY(20);
-        title.setMouseTransparent(false);
+        title.setMouseTransparent(false); // Дозволяємо взаємодію
+        title.setDisable(false);          // Переконуємось що активний
+
         title.setOnMouseClicked(e -> {
-            System.out.println("Mouse clicked on title Label: " + windowType);
             e.consume();
         });
+
+        // Додаємо hover ефект для заголовка
+        title.setOnMouseEntered(e -> {
+            title.setStyle("-fx-text-fill: #CCCCCC;");
+        });
+
+        title.setOnMouseExited(e -> {
+            title.setStyle("-fx-text-fill: white;");
+        });
+
         root.getChildren().add(title);
 
-        // Кнопка закриття
+        // Кнопка закриття - ВИПРАВЛЕНО
         Button closeButton = new Button("✖");
         closeButton.setFont(FontManager.getInstance().getFont("EpsilonCTT", 16));
         closeButton.setStyle("-fx-background-color: #ff4444; -fx-text-fill: white; -fx-border-radius: 3; -fx-background-radius: 3;");
         closeButton.setLayoutX(360);
         closeButton.setLayoutY(10);
         closeButton.setPrefSize(30, 30);
+        closeButton.setMouseTransparent(false); // Дозволяємо взаємодію
+        closeButton.setDisable(false);          // Переконуємось що активна
+
         closeButton.setOnAction(e -> {
-            System.out.println("Close button clicked: " + windowType);
-            uiManager.hideCurrentWindow();
+
+            // Спершу пробуємо стандартний спосіб
+            try {
+                UIManager.getInstance().hideInteractiveObjectUI();
+            } catch (Exception ex) {
+                System.out.println("Error calling hideInteractiveObjectUI(): " + ex.getMessage());
+            }
+
+            // Потім пробуємо прямий спосіб
+            try {
+                closeWindow();
+            } catch (Exception ex) {
+                System.out.println("Error in direct closeWindow(): " + ex.getMessage());
+            }
         });
+
         closeButton.setOnMouseClicked(e -> {
-            System.out.println("Close button mouse clicked: " + windowType);
+            // Прямий спосіб закриття
+            try {
+                closeWindow();
+            } catch (Exception ex) {
+            }
             e.consume();
         });
+
+        // Hover ефект для кнопки закриття
+        closeButton.setOnMouseEntered(e -> {
+            closeButton.setStyle("-fx-background-color: #ff6666; -fx-text-fill: white; -fx-border-radius: 3; -fx-background-radius: 3;");
+        });
+
+        closeButton.setOnMouseExited(e -> {
+            closeButton.setStyle("-fx-background-color: #ff4444; -fx-text-fill: white; -fx-border-radius: 3; -fx-background-radius: 3;");
+        });
+
         root.getChildren().add(closeButton);
 
         // Контент залежно від типу вікна
         createWindowContent();
 
-        // Запитуємо фокус після створення
+        // Запитуємо фокус після створення - ВИПРАВЛЕНО
         javafx.application.Platform.runLater(() -> {
             root.requestFocus();
+        });
+
+        // Додаємо обробник клавіші ESC для закриття
+        root.setOnKeyPressed(e -> {
+            if (e.getCode() == javafx.scene.input.KeyCode.ESCAPE) {
+                try {
+                    UIManager.getInstance().hideInteractiveObjectUI();
+                } catch (Exception ex) {
+                    System.out.println("Error closing with ESC: " + ex.getMessage());
+                    try {
+                        UIManager.getInstance().forceHideInteractiveObjectUI();
+                    } catch (Exception ex2) {
+                        System.out.println("Force close with ESC failed: " + ex2.getMessage());
+                    }
+                }
+                e.consume();
+            }
         });
     }
 
@@ -131,6 +188,8 @@ public class InteractiveObjectWindow implements UIWindow {
         codeLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #2C1810;");
         codeLabel.setLayoutX(20);
         codeLabel.setLayoutY(60);
+        codeLabel.setMouseTransparent(false); // ВИПРАВЛЕНО
+        codeLabel.setDisable(false);
         root.getChildren().add(codeLabel);
 
         Label noteContent = new Label(randomCode);
@@ -138,11 +197,22 @@ public class InteractiveObjectWindow implements UIWindow {
         noteContent.setStyle("-fx-font-weight: bold; -fx-text-fill: #2C1810;");
         noteContent.setLayoutX(125);
         noteContent.setLayoutY(132);
-        noteContent.setMouseTransparent(false);
+        noteContent.setMouseTransparent(false); // ВИПРАВЛЕНО
+        noteContent.setDisable(false);
+
         noteContent.setOnMouseClicked(e -> {
-            System.out.println("Mouse clicked on note content: " + randomCode);
             e.consume();
         });
+
+        // Hover ефект для коду
+        noteContent.setOnMouseEntered(e -> {
+            noteContent.setStyle("-fx-font-weight: bold; -fx-text-fill: #1A0C06; -fx-background-color: rgba(255,255,255,0.3);");
+        });
+
+        noteContent.setOnMouseExited(e -> {
+            noteContent.setStyle("-fx-font-weight: bold; -fx-text-fill: #2C1810;");
+        });
+
         root.getChildren().add(noteContent);
     }
 
@@ -152,11 +222,22 @@ public class InteractiveObjectWindow implements UIWindow {
         pictureContent.setTextFill(javafx.scene.paint.Color.WHITE);
         pictureContent.setLayoutX(20);
         pictureContent.setLayoutY(60);
-        pictureContent.setMouseTransparent(false);
+        pictureContent.setMouseTransparent(false); // ВИПРАВЛЕНО
+        pictureContent.setDisable(false);
+
         pictureContent.setOnMouseClicked(e -> {
-            System.out.println("Mouse clicked on picture content");
             e.consume();
         });
+
+        // Hover ефект
+        pictureContent.setOnMouseEntered(e -> {
+            pictureContent.setStyle("-fx-text-fill: #CCCCCC;");
+        });
+
+        pictureContent.setOnMouseExited(e -> {
+            pictureContent.setStyle("-fx-text-fill: white;");
+        });
+
         root.getChildren().add(pictureContent);
     }
 
@@ -166,11 +247,22 @@ public class InteractiveObjectWindow implements UIWindow {
         computerContent.setTextFill(javafx.scene.paint.Color.WHITE);
         computerContent.setLayoutX(20);
         computerContent.setLayoutY(60);
-        computerContent.setMouseTransparent(false);
+        computerContent.setMouseTransparent(false); // ВИПРАВЛЕНО
+        computerContent.setDisable(false);
+
         computerContent.setOnMouseClicked(e -> {
-            System.out.println("Mouse clicked on computer content");
             e.consume();
         });
+
+        // Hover ефект
+        computerContent.setOnMouseEntered(e -> {
+            computerContent.setStyle("-fx-text-fill: #CCCCCC;");
+        });
+
+        computerContent.setOnMouseExited(e -> {
+            computerContent.setStyle("-fx-text-fill: white;");
+        });
+
         root.getChildren().add(computerContent);
     }
 
@@ -182,29 +274,43 @@ public class InteractiveObjectWindow implements UIWindow {
         endGameContent.setTextFill(javafx.scene.paint.Color.WHITE);
         endGameContent.setLayoutX(20);
         endGameContent.setLayoutY(100);
-        endGameContent.setMouseTransparent(false);
+        endGameContent.setMouseTransparent(false); // ВИПРАВЛЕНО
+        endGameContent.setDisable(false);
+
         endGameContent.setOnMouseClicked(e -> {
-            System.out.println("Mouse clicked on end game content: " + windowType);
             e.consume();
         });
+
         root.getChildren().add(endGameContent);
 
-        // Додаткова кнопка для перезапуску або виходу
+        // Додаткова кнопка для перезапуску або виходу - ВИПРАВЛЕНО
         Button actionButton = new Button(windowType == UIManager.WindowType.VICTORY ? "Наступний рівень" : "Спробувати знову");
         actionButton.setFont(FontManager.getInstance().getFont("EpsilonCTT", 14));
         actionButton.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-border-radius: 5; -fx-background-radius: 5;");
         actionButton.setLayoutX(20);
         actionButton.setLayoutY(200);
         actionButton.setPrefSize(150, 30);
+        actionButton.setMouseTransparent(false); // ВИПРАВЛЕНО
+        actionButton.setDisable(false);
+
         actionButton.setOnAction(e -> {
-            System.out.println("Action button clicked: " + windowType);
             // Тут можна додати логіку для перезапуску або переходу на наступний рівень
-            uiManager.hideCurrentWindow();
+            UIManager.getInstance().hideInteractiveObjectUI();
         });
+
         actionButton.setOnMouseClicked(e -> {
-            System.out.println("Action button mouse clicked: " + windowType);
             e.consume();
         });
+
+        // Hover ефект для action кнопки
+        actionButton.setOnMouseEntered(e -> {
+            actionButton.setStyle("-fx-background-color: #5CBF60; -fx-text-fill: white; -fx-border-radius: 5; -fx-background-radius: 5;");
+        });
+
+        actionButton.setOnMouseExited(e -> {
+            actionButton.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-border-radius: 5; -fx-background-radius: 5;");
+        });
+
         root.getChildren().add(actionButton);
     }
 
@@ -214,31 +320,25 @@ public class InteractiveObjectWindow implements UIWindow {
         return String.valueOf(code);
     }
 
-    @Override
-    public void show() {
-        uiManager.getOverlayPane().getChildren().add(root);
-
-        // Центрування вікна
-        javafx.application.Platform.runLater(() -> {
-            double centerX = (uiManager.getOverlayPane().getWidth() - root.getPrefWidth()) / 2;
-            double centerY = (uiManager.getOverlayPane().getHeight() - root.getPrefHeight()) / 2;
-            root.setLayoutX(centerX);
-            root.setLayoutY(centerY);
-            root.requestFocus();
-            System.out.println("Window positioned at: " + centerX + ", " + centerY);
-        });
-
-        System.out.println("Window shown: " + windowType);
-    }
-
-    @Override
-    public void hide() {
-        uiManager.getOverlayPane().getChildren().remove(root);
-        System.out.println("Window hidden: " + windowType);
-    }
-
-    @Override
-    public Node getRoot() {
+    public Node getUI() {
         return root;
+    }
+
+
+    // Метод для прямого закриття вікна
+    public void closeWindow() {
+
+        if (root.getParent() instanceof Pane) {
+            Pane parent = (Pane) root.getParent();
+
+            parent.getChildren().remove(root);
+
+            // Встановлюємо стан гри
+            GameManager.getInstance().setGameState(GameManager.GameState.PLAYING);
+
+        } else {
+            System.out.println("Cannot remove - parent is not a Pane: " +
+                    (root.getParent() != null ? root.getParent().getClass().getSimpleName() : "null"));
+        }
     }
 }

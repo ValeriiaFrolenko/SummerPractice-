@@ -1,11 +1,8 @@
 package main;
 
-import entities.Player;
 import javafx.scene.Group;
-import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
-import javafx.scene.input.KeyCode;
 import managers.*;
 import org.json.JSONObject;
 import utils.InputHandler;
@@ -67,7 +64,7 @@ public class GameWindow {
         scene = new Scene(root, 1280, 640);
         scene.setOnMouseMoved(e -> System.out.println("Mouse moved on scene: " + e.getX() + ", " + e.getY()));
         scene.setOnMouseClicked(e -> System.out.println("Mouse clicked on scene at (" + e.getX() + ", " + e.getY() + ")"));
-        root.setMouseTransparent(false); // Забезпечуємо інтерактивність кореневої панелі
+        root.setMouseTransparent(false);
         root.setFocusTraversable(true);
         root.requestFocus();
         primaryStage.setTitle("CatRobber");
@@ -77,7 +74,6 @@ public class GameWindow {
         inputHandler = new InputHandler(scene);
         inputHandler.setupKeyHandlers();
         inputHandler.setupMouseHandlers();
-        // Реєструємо колбек для взаємодії
         gameManager.registerInteractionCallback(inputHandler);
 
         canvas.widthProperty().bind(scene.widthProperty());
@@ -91,6 +87,12 @@ public class GameWindow {
         });
 
         handleWindowEvents();
+
+        // Початково приховуємо menuPane і overlayPane
+        uiManager.getMenuPane().setVisible(false);
+        uiManager.getMenuPane().setMouseTransparent(true);
+        uiManager.getOverlayPane().setVisible(false);
+        uiManager.getOverlayPane().setMouseTransparent(true);
 
         showMainMenu();
         gameManager.updateBackgroundScale(scene.getWidth(), scene.getHeight());
@@ -172,5 +174,9 @@ public class GameWindow {
 
     public Stage getPrimaryStage() {
         return primaryStage;
+    }
+
+    public Scene getScene() {
+        return scene;
     }
 }

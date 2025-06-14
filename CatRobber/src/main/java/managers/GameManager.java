@@ -12,6 +12,8 @@ import main.GameWindow;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import puzzles.Puzzle;
+import ui.ShopPane;
+import ui.ShopItem;
 import utils.GameLoader;
 import utils.InputHandler;
 import utils.Vector2D;
@@ -48,6 +50,7 @@ public class GameManager implements Savable {
     private int totalMoney; // Загальна кількість грошей
     private int currentLevelId; // Поточний рівень
     private GameLoader gameLoader = new GameLoader(); // Додано поле
+    private Map<ShopItem, Integer> inventory;
 
     public void setGameState(GameState gameState) {
         this.gameState = gameState;
@@ -113,8 +116,9 @@ public class GameManager implements Savable {
         completedLevels = new ArrayList<>();
         totalMoney = 0;
         currentLevelId = 1;
+        inventory = new HashMap<>();
         backgroundImage = null;
-        loadProgress(); // Завантажуємо прогрес
+        loadProgress();
     }
 
     // Повертає єдиний екземпляр GameManager (патерн Singleton)
@@ -129,8 +133,7 @@ public class GameManager implements Savable {
     public void registerInteractionCallback(InputHandler inputHandler) {
         inputHandler.registerCallback(KeyCode.E, () -> {
             UIManager uiManager = GameWindow.getInstance().getUIManager();
-            if (uiManager.getCurrentWindow() == null && closestInteractable != null && closestInteractable instanceof InteractiveObject interactiveObject) {
-                System.out.println("E pressed, interacting with: " + interactiveObject.getType());
+            if (closestInteractable != null && closestInteractable instanceof InteractiveObject interactiveObject) {
                 interactiveObject.interact(player);
             } else {
                 System.out.println("E pressed, blocked: window=" + uiManager.getCurrentWindow() + ", interactable=" + closestInteractable);
@@ -222,8 +225,10 @@ public class GameManager implements Savable {
         for (GameObject obj : objects) {
             if (obj instanceof Renderable) renderableObjects.add((Renderable) obj);
             if (obj instanceof Animatable) animatableObjects.add((Animatable) obj);
-            if (obj instanceof Player) player = (Player) obj;
-            if (obj instanceof Police) police.add((Police) obj);
+            if (obj instanceof Player) {
+                player = (Player) obj;
+                syncPlayerInventory(); // Синхронізуємо інвентар при ініціалізації гравця
+            }            if (obj instanceof Police) police.add((Police) obj);
             if (obj instanceof SecurityCamera) cameras.add((SecurityCamera) obj);
             if (obj instanceof Interactable) interactables.add((Interactable) obj);
             if (obj instanceof Door) door++;
@@ -232,7 +237,28 @@ public class GameManager implements Savable {
             System.out.println("НЕМАЄ ДВЕРЕЙ");
         }
     }
-    
+
+    private void syncPlayerInventory() {
+        if (player != null) {
+            for (Map.Entry<ShopItem, Integer> entry : inventory.entrySet()) {
+                ShopItem item = entry.getKey();
+                int quantity = entry.getValue();
+                for (int i = 0; i < quantity; i++) {
+                    player.buyItem(item);
+                }
+            }
+        }
+    }
+
+    private ShopItem findShopItemByName(String name) {
+        for (ShopItem item : ShopPane.getItems()) {
+            if (item.getName().equals(name)) {
+                return item;
+            }
+        }
+        return null;
+    }
+
     // Встановлює карту колізій на основі списку кімнат
     public void setCollisionMap(List<Room> rooms) {
         this.rooms.clear(); // Очищаємо список кімнат
@@ -243,12 +269,23 @@ public class GameManager implements Savable {
         }
     }
 
-    // Завантажує рівень, викликається з GameWindow
     public void loadLevel(int levelId, boolean isNewGame) {
-        gameState = GameState.PLAYING; // Встановлюємо стан гри PLAYING
-        levelManager.loadLevel(levelId, isNewGame); // Завантажуємо рівень через LevelManager
-        currentLevel = levelManager.getLevelData(); // Отримуємо JSON-дані рівня від LevelManager
-        loadBackgroundImage(); // Завантажуємо фонове зображення
+        UIManager.getInstance().hideMenu();
+        if (UIManager.getInstance().getCurrentWindow() != null) {
+            UIManager.getInstance().getCurrentWindow().hide();
+            UIManager.getInstance().setCurrentWindow(null);
+        }
+        UIManager.getInstance().hideCurrentWindowToGame();
+        UIManager.getInstance().getMenuPane().getChildren().clear();
+        UIManager.getInstance().getMenuPane().setVisible(false);
+        UIManager.getInstance().getMenuPane().setMouseTransparent(true);
+        UIManager.getInstance().getOverlayPane().getChildren().clear();
+        UIManager.getInstance().getOverlayPane().setVisible(false);
+        UIManager.getInstance().getOverlayPane().setMouseTransparent(true);
+        gameState = GameState.PLAYING;
+        levelManager.loadLevel(levelId, isNewGame);
+        currentLevel = levelManager.getLevelData();
+        loadBackgroundImage();
     }
 
     // Завантажує фонове зображення рівня
@@ -284,7 +321,6 @@ public class GameManager implements Savable {
 
     // Оновлює логіку гри, викликається з GameWindow.update()
     public void update(double deltaTime) {
-        System.out.println("Game state: " + gameState);
         if (gameState != GameState.PLAYING) {
             return;
         }
@@ -470,7 +506,6 @@ public class GameManager implements Savable {
                 closestInteractable = interactable;
                 // Показуємо підказку лише якщо немає відкритого вікна
                 //if (uiManager.getCurrentWindow() == null) {
-                    System.out.println("Game state: " + gameState);
                     uiManager.showInteractionPrompt(interactable.getInteractionPrompt());
                 //}
                 break;
@@ -483,6 +518,22 @@ public class GameManager implements Savable {
 
     public Interactable getClosestInteractable() {
         return closestInteractable;
+    }
+
+    public boolean buyItem(ShopItem item) {
+        if (totalMoney >= item.getPrice()) {
+            totalMoney -= item.getPrice();
+            inventory.put(item, inventory.getOrDefault(item, 0) + 1);
+            if (player != null) {
+                player.buyItem(item);
+            }
+            saveProgress();
+            saveGame();
+            return true;
+        } else {
+            System.out.println("Недостатньо грошей для покупки: " + item.getName());
+            return false;
+        }
     }
 
     // Завершує гру, змінюючи стан
@@ -561,7 +612,7 @@ public class GameManager implements Savable {
         backgroundImage = loader.loadImage(path);
     }
 
-    private void loadProgress() {
+    public void loadProgress() {
         JSONObject progressData = gameLoader.loadJSON("data/saves/game_progress.json");
         if (progressData != null) {
             totalMoney = progressData.optInt("totalMoney", 0);
@@ -575,7 +626,8 @@ public class GameManager implements Savable {
         }
     }
 
-    void saveProgress() {
+
+    public void saveProgress() {
         saveManager.saveGame(gameState);
     }
 

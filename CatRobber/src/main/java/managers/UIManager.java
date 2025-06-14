@@ -9,20 +9,23 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.control.Label;
 import javafx.scene.Node;
+import managers.FontManager;
+import managers.GameManager;
 import puzzles.Puzzle;
-import ui.UIWindow;
-import ui.InteractiveObjectWindow;
-import ui.Menu;
-import ui.Settings;
-import ui.Shop;
 import org.json.JSONObject;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.paint.Color;
 import main.GameWindow;
+import ui.InteractiveObjectWindow;
+import ui.Menu;
+import ui.ShopPane;
+import ui.UIWindow;
+
 import java.util.ArrayList;
 import java.util.List;
+
 public class UIManager implements Renderable {
     private static UIManager instance;
     private static Canvas canvas;
@@ -32,6 +35,8 @@ public class UIManager implements Renderable {
     private Label interactionLabel;
     private Pane menuPane;
     private Menu menu;
+    private boolean isPuzzleUIShown = false;
+    private boolean isInteractiveUIShown = false;
 
     public static UIManager getInstance() {
         if (instance == null) {
@@ -47,13 +52,13 @@ public class UIManager implements Renderable {
         this.overlayPane = new Pane();
         this.menuPane = new Pane();
 
-        // Налаштування overlayPane
+        // Налаштування overlayPane (для головоломок та інтерактивних об'єктів)
         this.overlayPane.setStyle("-fx-background-color: transparent;");
         this.overlayPane.setMouseTransparent(false);
         this.overlayPane.setFocusTraversable(true);
         this.overlayPane.setPickOnBounds(false);
 
-        // Налаштування menuPane
+        // Налаштування menuPane (для меню та магазину)
         this.menuPane.setStyle("-fx-background-color: transparent;");
         this.menuPane.setMouseTransparent(false);
         this.menuPane.setFocusTraversable(true);
@@ -63,214 +68,400 @@ public class UIManager implements Renderable {
         this.interactionLabel = new Label();
         this.interactionPrompts = new ArrayList<>();
 
-        // Встановлюємо обробник подій лише на menuPane
+        // Встановлюємо обробник подій на menuPane
         menuPane.setOnKeyPressed(this::handleInput);
 
         menuPane.setOnMouseClicked(e -> {
-            System.out.println("menuPane clicked at: " + e.getX() + ", " + e.getY());
             menuPane.requestFocus();
             e.consume();
         });
     }
 
     public UIWindow createWindow(WindowType type, JSONObject config) {
-        if (currentWindow != null) {
-            System.out.println("Window creation skipped: existing window = " +
-                    currentWindow.getClass().getSimpleName() + ", type = " + type);
+
+        // Тільки для меню та магазину - використовуємо стару логіку
+        if (type == WindowType.MENU || type == WindowType.SHOP) {
+            GameManager.getInstance().setGameState(GameManager.GameState.PAUSED);
+
+            switch (type) {
+                case MENU:
+                    if (menu == null) {
+                        menu = new Menu(config);
+                    }
+                    if (currentWindow != null) {
+                        currentWindow.hide();
+                        currentWindow = null;
+                    }
+                    menuPane.getChildren().clear();
+                    menuPane.getChildren().add(menu.getRoot());
+                    menu.show();
+                    GameManager.getInstance().setGameState(GameManager.GameState.MENU);
+                    menuPane.setMouseTransparent(false);
+                    menuPane.setFocusTraversable(true);
+                    menuPane.setVisible(true);
+                    javafx.application.Platform.runLater(() -> {
+                        menuPane.requestFocus();
+
+                    });
+                    return null;
+
+                case SHOP:
+                    if (currentWindow instanceof ShopPane) {
+                        hideCurrentWindowToMenu();
+                        return null;
+                    }
+                    if (currentWindow != null) {
+                        currentWindow.hide();
+                        currentWindow = null;
+                    }
+                    menuPane.getChildren().clear();
+                    currentWindow = new ShopPane();
+                    menuPane.getChildren().add(currentWindow.getRoot());
+                    currentWindow.show();
+                    menuPane.setMouseTransparent(false);
+                    menuPane.setFocusTraversable(true);
+                    menuPane.setVisible(true);
+                    javafx.application.Platform.runLater(() -> {
+                        menuPane.requestFocus();
+                    });
+                    break;
+            }
             return currentWindow;
         }
 
-        System.out.println("Creating window: " + type);
-        GameManager.getInstance().setGameState(GameManager.GameState.PAUSED);
-
-        switch (type) {
-            case MENU:
-                if (menu == null) {
-                    menu = new Menu(config);
-                }
-                menuPane.getChildren().clear();
-                menuPane.getChildren().add(menu.getRoot());
-                menu.show();
-                GameManager.getInstance().setGameState(GameManager.GameState.MENU);
-
-                // Налаштування фокусу для menuPane
-                menuPane.setMouseTransparent(false);
-                menuPane.setFocusTraversable(true);
-                javafx.application.Platform.runLater(() -> {
-                    menuPane.requestFocus();
-                    System.out.println("MenuPane focus requested in createWindow, has focus: " +
-                            menuPane.isFocused());
-                    // Додаємо слухач фокусу для дебагу
-                    menuPane.focusedProperty().addListener((obs, oldVal, newVal) ->
-                            System.out.println("menuPane focus changed: " + newVal));
-                });
-
-                System.out.println("Menu shown, menuPane children: " + menuPane.getChildren().size());
-                return null; // Меню не є currentWindow
-
-            case SETTINGS:
-                currentWindow = new Settings(config);
-                break;
-            case SHOP:
-                currentWindow = new Shop(GameManager.getInstance().getPlayer());
-                break;
-            case NOTE:
-            case PICTURE:
-            case COMPUTER:
-            case VICTORY:
-            case GAME_OVER:
-                currentWindow = new InteractiveObjectWindow(this, type, config);
-                break;
-            default:
-                currentWindow = null;
-                break;
+        // Для інтерактивних об'єктів - використовуємо нову логіку через overlayPane
+        else {
+            InteractiveObjectWindow interactiveWindow = new InteractiveObjectWindow(type, config);
+            showInteractiveObjectUI(interactiveWindow.getUI());
+            return null; // Не зберігаємо як currentWindow
         }
+    }
 
-        if (currentWindow != null) {
-            currentWindow.show();
-            overlayPane.setMouseTransparent(false);
-            overlayPane.requestFocus();
-            System.out.println("Window shown: " + type + ", overlayPane children: " +
-                    overlayPane.getChildren().size());
-        }
-        return currentWindow;
+    public void setCurrentWindow(UIWindow window) {
+        this.currentWindow = window;
     }
 
     public UIWindow getCurrentWindow() {
         return currentWindow;
     }
 
-    public void hideCurrentWindow() {
+    public void hideCurrentWindowToGame() {
+
+        // Ховаємо поточне вікно
         if (currentWindow != null) {
             currentWindow.hide();
-            overlayPane.getChildren().remove(currentWindow.getRoot());
             currentWindow = null;
-            GameManager.getInstance().setGameState(GameManager.GameState.PLAYING);
-
-            // Повертаємо фокус на основне вікно
-            if (GameWindow.getInstance().getPrimaryStage() != null) {
-                javafx.application.Platform.runLater(() -> {
-                    GameWindow.getInstance().getPrimaryStage().requestFocus();
-                });
-            }
-
-            System.out.println("Current window hidden, overlayPane children: " + overlayPane.getChildren().size());
         }
+
+        // Ховаємо меню якщо воно є
+        if (menu != null) {
+            menu.hide();
+        }
+
+        // Повністю очищаємо menuPane
+        menuPane.getChildren().clear();
+        menuPane.setVisible(false);
+        menuPane.setMouseTransparent(true);
+        menuPane.setFocusTraversable(false);
+
+        // Повністю очищаємо overlayPane
+        overlayPane.getChildren().clear();
+        overlayPane.setVisible(false);
+        overlayPane.setMouseTransparent(true);
+        overlayPane.setFocusTraversable(false);
+
+        // Скидаємо стани UI
+        isPuzzleUIShown = false;
+        isInteractiveUIShown = false;
+
+        // Встановлюємо стан гри
+        GameManager.getInstance().setGameState(GameManager.GameState.PLAYING);
+
+        // Запитуємо фокус для основного вікна
+        javafx.application.Platform.runLater(() -> {
+            if (GameWindow.getInstance().getPrimaryStage() != null) {
+                GameWindow.getInstance().getPrimaryStage().requestFocus();
+
+            }
+        });
+    }
+
+    public void hideCurrentWindowToMenu() {
+
+        if (currentWindow != null) {
+            currentWindow.hide();
+            currentWindow = null;
+        }
+
+        menuPane.getChildren().clear();
+        menuPane.setVisible(false);
+        menuPane.setMouseTransparent(true);
+
+        if (menu == null) {
+            menu = new Menu(new JSONObject());
+        }
+
+        menuPane.getChildren().add(menu.getRoot());
+        menu.showWithoutSplash();
+        GameManager.getInstance().setGameState(GameManager.GameState.MENU);
+        menuPane.setVisible(true);
+        menuPane.setMouseTransparent(false);
+
+        javafx.application.Platform.runLater(() -> {
+            menuPane.requestFocus();
+        });
     }
 
     public void hideMenu() {
         if (menu != null) {
             menu.hide();
             menuPane.getChildren().clear();
+            menuPane.setVisible(false);
+            menuPane.setMouseTransparent(true);
+            currentWindow = null;
             GameManager.getInstance().setGameState(GameManager.GameState.PLAYING);
 
-            // Повертаємо фокус на основне вікно
-            if (GameWindow.getInstance().getPrimaryStage() != null) {
-                javafx.application.Platform.runLater(() -> {
+            javafx.application.Platform.runLater(() -> {
+                if (GameWindow.getInstance().getPrimaryStage() != null) {
                     GameWindow.getInstance().getPrimaryStage().requestFocus();
-                    System.out.println("Primary stage focus requested after hiding menu");
-                });
-            }
-
-            System.out.println("Menu hidden, menuPane children: " + menuPane.getChildren().size());
+                }
+            });
         }
     }
+
     public Pane getMenuPane() {
         return menuPane;
     }
 
-    public void showPuzzleUI(Node uiNode) {
+    public void showInteractiveObjectUI(Node uiNode) {
+            hideInteractionPrompt();
         if (overlayPane != null && uiNode != null) {
+            isInteractiveUIShown = true;
             overlayPane.getChildren().clear();
-            overlayPane.getChildren().add(uiNode);
 
-            // Центрування UI елемента
+            if (menuPane.isVisible()) {
+                menuPane.setVisible(false);
+                menuPane.setMouseTransparent(true);
+            }
+
+            overlayPane.getChildren().add(uiNode);
+            isInteractiveUIShown = true;
+
+            if (uiNode instanceof Pane) {
+                Pane interactivePane = (Pane) uiNode;
+                double centerX = (canvas.getWidth() - interactivePane.getPrefWidth()) / 2;
+                double centerY = (canvas.getHeight() - interactivePane.getPrefHeight()) / 2;
+                uiNode.setLayoutX(centerX);
+                uiNode.setLayoutY(centerY);
+            }
+
+            overlayPane.setVisible(true);
+            overlayPane.setMouseTransparent(false);
+            overlayPane.setFocusTraversable(true);
+            uiNode.setMouseTransparent(false);
+            overlayPane.toFront();
+
+            javafx.application.Platform.runLater(() -> {
+                if (uiNode instanceof Pane) {
+                    Pane interactivePane = (Pane) uiNode;
+                    interactivePane.setFocusTraversable(true);
+                    interactivePane.requestFocus();
+                }
+                overlayPane.requestFocus();
+            });
+
+            GameManager.getInstance().setGameState(GameManager.GameState.PAUSED);
+        } else {
+            System.err.println("Failed to show interactive object UI - overlayPane or uiNode is null");
+        }
+    }
+
+    public void hideInteractiveObjectUI() {
+        if (overlayPane != null && isInteractiveUIShown) {
+
+            // Очищуємо дітей
+            overlayPane.getChildren().clear();
+
+            // Приховуємо панель
+            overlayPane.setVisible(false);
+
+            // Робимо прозорою для миші
+            overlayPane.setMouseTransparent(true);
+
+            // Змінюємо стан
+            isInteractiveUIShown = false;
+
+            // Змінюємо стан гри
+            GameManager.getInstance().setGameState(GameManager.GameState.PLAYING);
+
+            // Повертаємо фокус
+            if (GameWindow.getInstance().getPrimaryStage() != null) {
+                javafx.application.Platform.runLater(() -> {
+                    GameWindow.getInstance().getPrimaryStage().requestFocus();
+                });
+            } else {
+                System.out.println("Primary stage is null, cannot request focus");
+            }
+        } else {
+            System.out.println("Cannot hide UI - conditions not met:");
+            if (overlayPane == null) {
+                System.out.println("  - overlayPane is null");
+            }
+            if (!isInteractiveUIShown) {
+                System.out.println("  - isInteractiveUIShown is false");
+            }
+        }
+    }
+
+    // Додатковий метод для форсованого закриття
+    public void forceHideInteractiveObjectUI() {
+
+        if (overlayPane != null) {
+            overlayPane.getChildren().clear();
+            overlayPane.setVisible(false);
+            overlayPane.setMouseTransparent(true);
+        }
+
+        isInteractiveUIShown = false;
+        GameManager.getInstance().setGameState(GameManager.GameState.PLAYING);
+
+        if (GameWindow.getInstance().getPrimaryStage() != null) {
+            javafx.application.Platform.runLater(() -> {
+                GameWindow.getInstance().getPrimaryStage().requestFocus();
+            });
+        }
+
+    }
+    public void showPuzzleUI(Node uiNode) {
+        hideInteractionPrompt(); // Додайте цей рядок
+
+        if (overlayPane != null && uiNode != null) {
+
+            overlayPane.getChildren().clear();
+
+            if (menuPane.isVisible()) {
+                menuPane.setVisible(false);
+                menuPane.setMouseTransparent(true);
+            }
+
+            overlayPane.getChildren().add(uiNode);
+            isPuzzleUIShown = true;
+
             if (uiNode instanceof Pane) {
                 Pane puzzlePane = (Pane) uiNode;
                 double centerX = (canvas.getWidth() - puzzlePane.getPrefWidth()) / 2;
                 double centerY = (canvas.getHeight() - puzzlePane.getPrefHeight()) / 2;
                 uiNode.setLayoutX(centerX);
                 uiNode.setLayoutY(centerY);
+
             }
 
-            // Налаштування для puzzle UI
+            overlayPane.setVisible(true);
             overlayPane.setMouseTransparent(false);
+            overlayPane.setFocusTraversable(true);
             uiNode.setMouseTransparent(false);
+            overlayPane.toFront();
 
-            if (uiNode instanceof Pane) {
-                ((Pane) uiNode).setFocusTraversable(true);
-                javafx.application.Platform.runLater(() -> {
-                    ((Pane) uiNode).requestFocus();
-                });
-            }
+            javafx.application.Platform.runLater(() -> {
+                if (uiNode instanceof Pane) {
+                    Pane puzzlePane = (Pane) uiNode;
+                    puzzlePane.setFocusTraversable(true);
+                    puzzlePane.requestFocus();
+                }
+                overlayPane.requestFocus();
+            });
 
             GameManager.getInstance().setGameState(GameManager.GameState.PAUSED);
-            System.out.println("Puzzle UI shown, centered at: " + uiNode.getLayoutX() + ", " + uiNode.getLayoutY());
+        } else {
         }
     }
 
     public void hidePuzzleUI() {
-        if (overlayPane != null) {
+        if (overlayPane != null && isPuzzleUIShown) {
             overlayPane.getChildren().clear();
+            isPuzzleUIShown = false;
+
+            if (menu != null && !menuPane.getChildren().isEmpty()) {
+                menuPane.setVisible(true);
+                menuPane.setMouseTransparent(false);
+            }
+
             GameManager.getInstance().setGameState(GameManager.GameState.PLAYING);
 
-            // Повертаємо фокус на основне вікно
             if (GameWindow.getInstance().getPrimaryStage() != null) {
                 javafx.application.Platform.runLater(() -> {
                     GameWindow.getInstance().getPrimaryStage().requestFocus();
                 });
             }
 
-            System.out.println("Puzzle UI hidden");
         }
     }
 
     public void handleInput(KeyEvent event) {
-        System.out.println("UIManager handleInput: " + event.getCode() +
-                ", currentWindow: " +
-                (currentWindow != null ? currentWindow.getClass().getSimpleName() : "null") +
-                ", menuChildren: " + menuPane.getChildren().size());
 
-        // Передаємо подію до Menu, якщо воно активне
-        if (!menuPane.getChildren().isEmpty() && menu != null) {
-            System.out.println("Forwarding key event to Menu");
-            menu.handleInput(event);
-            return; // Виходимо, щоб уникнути подальшої обробки
+        // Якщо показана головоломка або інтерактивний об'єкт і натиснуто ESC
+        if ((isPuzzleUIShown || isInteractiveUIShown) && event.getCode() == KeyCode.ESCAPE) {
+            if (isPuzzleUIShown) {
+                hidePuzzleUI();
+            } else if (isInteractiveUIShown) {
+                hideInteractiveObjectUI();
+            }
+            event.consume();
+            return;
         }
 
-        // Обробка ESC для інших вікон або UI
+        if (currentWindow != null) {
+            return;
+        }
+
+        if (!menuPane.getChildren().isEmpty() && menu != null && menuPane.isVisible()) {
+            menu.handleInput(event);
+            return;
+        }
+
         if (event.getCode() == KeyCode.ESCAPE) {
-            if (currentWindow != null) {
-                System.out.println("Closing current window");
-                hideCurrentWindow();
-            } else if (!overlayPane.getChildren().isEmpty()) {
-                System.out.println("Hiding puzzle UI");
-                hidePuzzleUI();
-            } else if (!menuPane.getChildren().isEmpty()) {
-                System.out.println("Hiding menu");
+            if (!menuPane.getChildren().isEmpty() && menuPane.isVisible()) {
                 hideMenu();
             } else {
-                System.out.println("No UI to close");
             }
             event.consume();
         }
     }
 
     public void showInteractionPrompt(String prompt) {
-        if (overlayPane != null && interactionLabel != null && prompt != null && !prompt.isEmpty()) {
+        if (interactionLabel != null && prompt != null && !prompt.isEmpty()) {
             interactionLabel.setText(prompt);
+
+            interactionLabel.setFont(FontManager.getInstance().getFont("Hardpixel", 16));
+            interactionLabel.setStyle(
+                    "-fx-background-color: rgba(0, 0, 0, 0.8); " +
+                            "-fx-text-fill: white; " +
+                            "-fx-padding: 10px 20px; " +
+                            "-fx-background-radius: 5px; " +
+                            "-fx-border-color: #333333; " +
+                            "-fx-border-width: 2px; " +
+                            "-fx-border-radius: 5px;"
+            );
+
+            // Переконуємося що overlayPane налаштований правильно для показу підказки
+            if (!overlayPane.isVisible()) {
+                overlayPane.setVisible(true);
+            }
+
             if (!overlayPane.getChildren().contains(interactionLabel)) {
                 overlayPane.getChildren().add(interactionLabel);
             }
 
-            // Позиціонування внизу екрану
+            // Переносимо interactionLabel на передній план
+            interactionLabel.toFront();
+
             javafx.application.Platform.runLater(() -> {
                 double labelWidth = interactionLabel.prefWidth(-1);
+                double labelHeight = interactionLabel.prefHeight(-1);
                 interactionLabel.setLayoutX((canvas.getWidth() - labelWidth) / 2);
                 interactionLabel.setLayoutY(canvas.getHeight() - 50);
             });
 
-            System.out.println("Interaction prompt shown: " + prompt);
         } else {
             hideInteractionPrompt();
         }
@@ -279,7 +470,12 @@ public class UIManager implements Renderable {
     public void hideInteractionPrompt() {
         if (overlayPane != null && interactionLabel != null) {
             overlayPane.getChildren().remove(interactionLabel);
-            System.out.println("Interaction prompt hidden");
+
+            // Якщо в overlayPane немає інших дітей (крім підказки),
+            // ховаємо його повністю
+            if (overlayPane.getChildren().isEmpty() && !isPuzzleUIShown && !isInteractiveUIShown) {
+                overlayPane.setVisible(false);
+            }
         }
     }
 

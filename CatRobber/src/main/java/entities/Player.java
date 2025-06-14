@@ -40,7 +40,6 @@ public class Player implements Animatable, GameObject, Interactable {
     private String[] spritePaths;
     private boolean canMove;
     private int detectionCount;
-    private int money;
     private Map<ShopItem, Integer> inventory; // Інвентар: предмет -> кількість
     private Map<ShopItem, Boolean> itemUsage; // Стан використання: предмет -> чи використовується
     private JSONObject mapData; // Дані карти для синхронізації
@@ -66,7 +65,6 @@ public class Player implements Animatable, GameObject, Interactable {
         this.collX = jsonCollX;
         this.collY = jsonCollY;
         this.detectionCount = defaultData.optInt("detectionCount", 0);
-        this.money = defaultData.optInt("money", 0);
         this.inventory = new HashMap<>();
         this.itemUsage = new HashMap<>();
         this.mapData = defaultData; // Зберігаємо дані карти
@@ -129,34 +127,22 @@ public class Player implements Animatable, GameObject, Interactable {
 
     // --- Логіка покупок ---
 
-    // Купує предмет
     public boolean buyItem(ShopItem item) {
-        if (money >= item.getPrice()) {
-            money -= item.getPrice();
-            inventory.put(item, inventory.getOrDefault(item, 0) + 1);
-            itemUsage.putIfAbsent(item, false); // Предмет куплений, але не використовується
-            // Оновлення mapData
-            updateMapData(item);
-            System.out.println("Гравець купив: " + item.getName() + " за " + item.getPrice() + " монет");
-            System.out.println("Залишок грошей: " + money);
-            return true;
-        } else {
-            System.out.println("Недостатньо грошей для покупки: " + item.getName() + ". Потрібно: " + item.getPrice() + ", є: " + money);
-            return false;
-        }
+        inventory.put(item, inventory.getOrDefault(item, 0) + 1);
+        itemUsage.putIfAbsent(item, false);
+        updateMapData(item);
+        System.out.println("Гравець отримав: " + item.getName());
+        return true;
     }
 
-    // Оновлює mapData після покупки
     private void updateMapData(ShopItem item) {
         String mapKey = getMapKeyForItem(item);
         if (mapKey != null) {
             int currentQuantity = inventory.getOrDefault(item, 0);
             mapData.put(mapKey, currentQuantity);
         }
-        mapData.put("money", money);
     }
 
-    // Повертає ключ карти для предмета
     private String getMapKeyForItem(ShopItem item) {
         switch (item.getName()) {
             case "Невидимість": return "invisibility";
@@ -167,17 +153,6 @@ public class Player implements Animatable, GameObject, Interactable {
         }
     }
 
-    // Повертає кількість грошей
-    public int getMoney() {
-        return money;
-    }
-
-    // Додає гроші
-    public void addMoney(int amount) {
-        money += amount;
-        mapData.put("money", money);
-        System.out.println("Додано " + amount + " монет. Загалом: " + money);
-    }
 
     // Повертає інвентар
     public Map<ShopItem, Integer> getInventory() {
@@ -402,7 +377,6 @@ public class Player implements Animatable, GameObject, Interactable {
         data.put("currentAnimation", currentAnimation);
         data.put("canMove", canMove);
         data.put("detectionCount", detectionCount);
-        data.put("money", money);
         // Синхронізація інвентарю з mapData
         for (Map.Entry<ShopItem, Integer> entry : inventory.entrySet()) {
             String mapKey = getMapKeyForItem(entry.getKey());
@@ -437,7 +411,6 @@ public class Player implements Animatable, GameObject, Interactable {
         this.collHeight = data.optDouble("hightColl", collHeight);
         this.canMove = data.optBoolean("canMove", true);
         this.detectionCount = data.optInt("detectionCount", 0);
-        this.money = data.optInt("money", 0);
         this.mapData = data;
         // Оновлення інвентарю
         initializeInventory();

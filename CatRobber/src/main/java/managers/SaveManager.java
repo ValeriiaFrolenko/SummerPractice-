@@ -63,7 +63,6 @@ public class SaveManager {
         JSONObject data = new JSONObject();
         data.put("player_0", player.getSerializableData());
         saveJSON(data, saveDirectory + "player_current.json");
-        System.out.println("Гравця збережено" + data);
     }
 
     // Зберігає поліцейських
@@ -107,7 +106,6 @@ public class SaveManager {
 
     // Зберігає головоломки
     public void savePuzzles(List<Puzzle> puzzles) {
-        System.out.println("Збереження головоломок: " + puzzles.size());
         JSONObject data = new JSONObject();
         for (int i = 0; i < puzzles.size(); i++) {
             Puzzle puzzle = puzzles.get(i);
