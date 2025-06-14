@@ -1,0 +1,130 @@
+{
+  "police_76": {
+    "gid": 48,
+    "visible": true,
+    "rotation": 0,
+    "name": "",
+    "width": 101.948,
+    "x": 488.026,
+    "y": 587.526,
+    "id": 76,
+    "type": "Police",
+    "properties": [
+      {
+        "name": "animationFrame",
+        "type": "int",
+        "value": 0
+      },
+      {
+        "name": "animationTime",
+        "type": "int",
+        "value": 0
+      },
+      {
+        "name": "collX",
+        "type": "float",
+        "value": 514
+      },
+      {
+        "name": "collY",
+        "type": "float",
+        "value": 507
+      },
+      {
+        "name": "currentAnimation",
+        "type": "string",
+        "value": "idle"
+      },
+      {
+        "name": "detectionCount",
+        "type": "int",
+        "value": 0
+      },
+      {
+        "name": "direction",
+        "type": "string",
+        "value": "RIGHT"
+      },
+      {
+        "name": "hightColl",
+        "type": "float",
+        "value": 68
+      },
+      {
+        "name": "state",
+        "type": "string",
+        "value": "IDLE"
+      },
+      {
+        "name": "widthColl",
+        "type": "float",
+        "value": 43
+      }
+    ],
+    "height": 101.948
+  },
+  "police_83": {
+    "gid": 48,
+    "visible": true,
+    "rotation": 0,
+    "name": "",
+    "width": 101.948,
+    "x": 647.276,
+    "y": 139.526,
+    "id": 83,
+    "type": "Police",
+    "properties": [
+      {
+        "name": "animationFrame",
+        "type": "int",
+        "value": 0
+      },
+      {
+        "name": "animationTime",
+        "type": "int",
+        "value": 0
+      },
+      {
+        "name": "collX",
+        "type": "float",
+        "value": 675
+      },
+      {
+        "name": "collY",
+        "type": "float",
+        "value": 60
+      },
+      {
+        "name": "currentAnimation",
+        "type": "string",
+        "value": "idle"
+      },
+      {
+        "name": "detectionCount",
+        "type": "int",
+        "value": 0
+      },
+      {
+        "name": "direction",
+        "type": "string",
+        "value": "RIGHT"
+      },
+      {
+        "name": "hightColl",
+        "type": "float",
+        "value": 68
+      },
+      {
+        "name": "state",
+        "type": "string",
+        "value": "IDLE"
+      },
+      {
+        "name": "widthColl",
+        "type": "float",
+        "value": 43
+      }
+    ],
+    "height": 101.948
+  }
+}

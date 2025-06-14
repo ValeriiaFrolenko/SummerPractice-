@@ -1,0 +1,14 @@
+{ "columns":1,
+ "image":"..\/..\/..\/assets\/images\/interactiveObjects\/diamont.png",
+ "imageheight":272,
+ "imagewidth":322,
+ "margin":0,
+ "name":"diamont",
+ "spacing":0,
+ "tilecount":1,
+ "tiledversion":"1.11.2",
+ "tileheight":272,
+ "tilewidth":322,
+ "type":"tileset",
+ "version":"1.10"
+}

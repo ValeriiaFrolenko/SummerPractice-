@@ -1,12 +1,12 @@
-{"player_123": {
-  "gid": 3,
+{"player_74": {
+  "gid": 2147483688,
   "visible": true,
   "rotation": 0,
-  "name": "player",
+  "name": "",
   "width": 100,
-  "x": 33.5525357997892,
-  "y": 135.100775251752,
-  "id": 123,
+  "x": 969.333333333333,
+  "y": 366,
+  "id": 74,
   "type": "Player",
   "properties": [
     {
@@ -27,12 +27,12 @@
     {
       "name": "collX",
       "type": "float",
-      "value": 59.43
+      "value": 1004
     },
     {
       "name": "collY",
       "type": "float",
-      "value": 65.2
+      "value": 296
     },
     {
       "name": "currentAnimation",
@@ -47,7 +47,7 @@
     {
       "name": "direction",
       "type": "string",
-      "value": "RIGHT"
+      "value": "LEFT"
     },
     {
       "name": "gun",
@@ -57,7 +57,7 @@
     {
       "name": "hightColl",
       "type": "float",
-      "value": 57.15
+      "value": 57
     },
     {
       "name": "invisibility",
@@ -66,6 +66,11 @@
     },
     {
       "name": "key",
+      "type": "int",
+      "value": 0
+    },
+    {
+      "name": "money",
       "type": "int",
       "value": 0
     },

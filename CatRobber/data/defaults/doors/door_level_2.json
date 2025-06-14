@@ -1,0 +1,1622 @@
+{
+  "door_60": {
+    "gid": 35,
+    "visible": true,
+    "rotation": 0,
+    "name": "",
+    "width": 50,
+    "x": 1135,
+    "y": 114,
+    "id": 60,
+    "type": "Door",
+    "properties": [
+      {
+        "name": "direction",
+        "type": "string",
+        "value": "down"
+      },
+      {
+        "name": "isFloorLink",
+        "type": "bool",
+        "value": true
+      },
+      {
+        "name": "isLaser",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isLocked",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isOpen",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isRoomLink",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "lockType",
+        "type": "string",
+        "value": "NONE"
+      },
+      {
+        "name": "sharedId",
+        "type": "int",
+        "value": 10
+      }
+    ],
+    "height": 65
+  },
+  "door_63": {
+    "gid": 35,
+    "visible": true,
+    "rotation": 0,
+    "name": "",
+    "width": 50,
+    "x": 762.333333333333,
+    "y": 345.666666666667,
+    "id": 63,
+    "type": "Door",
+    "properties": [
+      {
+        "name": "direction",
+        "type": "string",
+        "value": "down"
+      },
+      {
+        "name": "isFloorLink",
+        "type": "bool",
+        "value": true
+      },
+      {
+        "name": "isLaser",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isLocked",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isOpen",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isRoomLink",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "lockType",
+        "type": "string",
+        "value": "NONE"
+      },
+      {
+        "name": "sharedId",
+        "type": "int",
+        "value": 13
+      }
+    ],
+    "height": 65
+  },
+  "door_42": {
+    "gid": 32,
+    "visible": true,
+    "rotation": 0,
+    "name": "",
+    "width": 21,
+    "x": 947.5,
+    "y": 137,
+    "id": 42,
+    "type": "Door",
+    "properties": [
+      {
+        "name": "direction",
+        "type": "string",
+        "value": "left"
+      },
+      {
+        "name": "isFloorLink",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isLaser",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isLocked",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isOpen",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isRoomLink",
+        "type": "bool",
+        "value": true
+      },
+      {
+        "name": "lockType",
+        "type": "string",
+        "value": "NONE"
+      },
+      {
+        "name": "sharedId",
+        "type": "int",
+        "value": 2
+      }
+    ],
+    "height": 96
+  },
+  "door_64": {
+    "gid": 35,
+    "visible": true,
+    "rotation": 0,
+    "name": "",
+    "width": 50,
+    "x": 1131,
+    "y": 451,
+    "id": 64,
+    "type": "Door",
+    "properties": [
+      {
+        "name": "direction",
+        "type": "string",
+        "value": "down"
+      },
+      {
+        "name": "isFloorLink",
+        "type": "bool",
+        "value": true
+      },
+      {
+        "name": "isLaser",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isLocked",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isOpen",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isRoomLink",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "lockType",
+        "type": "string",
+        "value": "NONE"
+      },
+      {
+        "name": "sharedId",
+        "type": "int",
+        "value": 14
+      }
+    ],
+    "height": 65
+  },
+  "door_61": {
+    "gid": 35,
+    "visible": true,
+    "rotation": 0,
+    "name": "",
+    "width": 50,
+    "x": 400.333333333333,
+    "y": 227.333333333333,
+    "id": 61,
+    "type": "Door",
+    "properties": [
+      {
+        "name": "direction",
+        "type": "string",
+        "value": "down"
+      },
+      {
+        "name": "isFloorLink",
+        "type": "bool",
+        "value": true
+      },
+      {
+        "name": "isLaser",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isLocked",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isOpen",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isRoomLink",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "lockType",
+        "type": "string",
+        "value": "NONE"
+      },
+      {
+        "name": "sharedId",
+        "type": "int",
+        "value": 11
+      }
+    ],
+    "height": 65
+  },
+  "door_62": {
+    "gid": 35,
+    "visible": true,
+    "rotation": 0,
+    "name": "",
+    "width": 50,
+    "x": 116.333333333333,
+    "y": 340.666666666667,
+    "id": 62,
+    "type": "Door",
+    "properties": [
+      {
+        "name": "direction",
+        "type": "string",
+        "value": "down"
+      },
+      {
+        "name": "isFloorLink",
+        "type": "bool",
+        "value": true
+      },
+      {
+        "name": "isLaser",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isLocked",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isOpen",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isRoomLink",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "lockType",
+        "type": "string",
+        "value": "NONE"
+      },
+      {
+        "name": "sharedId",
+        "type": "int",
+        "value": 12
+      }
+    ],
+    "height": 65
+  },
+  "door_45": {
+    "gid": 32,
+    "visible": true,
+    "rotation": 0,
+    "name": "",
+    "width": 21,
+    "x": 915.5,
+    "y": 475,
+    "id": 45,
+    "type": "Door",
+    "properties": [
+      {
+        "name": "direction",
+        "type": "string",
+        "value": "left"
+      },
+      {
+        "name": "isFloorLink",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isLaser",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isLocked",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isOpen",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isRoomLink",
+        "type": "bool",
+        "value": true
+      },
+      {
+        "name": "lockType",
+        "type": "string",
+        "value": "NONE"
+      },
+      {
+        "name": "sharedId",
+        "type": "int",
+        "value": 6
+      }
+    ],
+    "height": 96
+  },
+  "door_67": {
+    "gid": 35,
+    "visible": true,
+    "rotation": 0,
+    "name": "",
+    "width": 50,
+    "x": 113.333333333333,
+    "y": 451,
+    "id": 67,
+    "type": "Door",
+    "properties": [
+      {
+        "name": "direction",
+        "type": "string",
+        "value": "up"
+      },
+      {
+        "name": "isFloorLink",
+        "type": "bool",
+        "value": true
+      },
+      {
+        "name": "isLaser",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isLocked",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isOpen",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isRoomLink",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "lockType",
+        "type": "string",
+        "value": "NONE"
+      },
+      {
+        "name": "sharedId",
+        "type": "int",
+        "value": 12
+      }
+    ],
+    "height": 65
+  },
+  "door_46": {
+    "gid": 32,
+    "visible": true,
+    "rotation": 0,
+    "name": "",
+    "width": 21,
+    "x": 298.5,
+    "y": 476,
+    "id": 46,
+    "type": "Door",
+    "properties": [
+      {
+        "name": "direction",
+        "type": "string",
+        "value": "left"
+      },
+      {
+        "name": "isFloorLink",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isLaser",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isLocked",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isOpen",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isRoomLink",
+        "type": "bool",
+        "value": true
+      },
+      {
+        "name": "lockType",
+        "type": "string",
+        "value": "NONE"
+      },
+      {
+        "name": "sharedId",
+        "type": "int",
+        "value": 8
+      }
+    ],
+    "height": 96
+  },
+  "door_68": {
+    "gid": 35,
+    "visible": true,
+    "rotation": 0,
+    "name": "",
+    "width": 50,
+    "x": 402,
+    "y": 340.333333333333,
+    "id": 68,
+    "type": "Door",
+    "properties": [
+      {
+        "name": "direction",
+        "type": "string",
+        "value": "up"
+      },
+      {
+        "name": "isFloorLink",
+        "type": "bool",
+        "value": true
+      },
+      {
+        "name": "isLaser",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isLocked",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isOpen",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isRoomLink",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "lockType",
+        "type": "string",
+        "value": "NONE"
+      },
+      {
+        "name": "sharedId",
+        "type": "int",
+        "value": 11
+      }
+    ],
+    "height": 65
+  },
+  "door_43": {
+    "gid": 32,
+    "visible": true,
+    "rotation": 0,
+    "name": "",
+    "width": 21,
+    "x": 765.5,
+    "y": 249,
+    "id": 43,
+    "type": "Door",
+    "properties": [
+      {
+        "name": "direction",
+        "type": "string",
+        "value": "left"
+      },
+      {
+        "name": "isFloorLink",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isLaser",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isLocked",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isOpen",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isRoomLink",
+        "type": "bool",
+        "value": true
+      },
+      {
+        "name": "lockType",
+        "type": "string",
+        "value": "NONE"
+      },
+      {
+        "name": "sharedId",
+        "type": "int",
+        "value": 4
+      }
+    ],
+    "height": 96
+  },
+  "door_65": {
+    "gid": 35,
+    "visible": true,
+    "rotation": 0,
+    "name": "",
+    "width": 50,
+    "x": 1132.33333333333,
+    "y": 561.666666666667,
+    "id": 65,
+    "type": "Door",
+    "properties": [
+      {
+        "name": "direction",
+        "type": "string",
+        "value": "up"
+      },
+      {
+        "name": "isFloorLink",
+        "type": "bool",
+        "value": true
+      },
+      {
+        "name": "isLaser",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isLocked",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isOpen",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isRoomLink",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "lockType",
+        "type": "string",
+        "value": "NONE"
+      },
+      {
+        "name": "sharedId",
+        "type": "int",
+        "value": 14
+      }
+    ],
+    "height": 65
+  },
+  "door_44": {
+    "gid": 32,
+    "visible": true,
+    "rotation": 0,
+    "name": "",
+    "width": 21,
+    "x": 863.5,
+    "y": 364,
+    "id": 44,
+    "type": "Door",
+    "properties": [
+      {
+        "name": "direction",
+        "type": "string",
+        "value": "left"
+      },
+      {
+        "name": "isFloorLink",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isLaser",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isLocked",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isOpen",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isRoomLink",
+        "type": "bool",
+        "value": true
+      },
+      {
+        "name": "lockType",
+        "type": "string",
+        "value": "NONE"
+      },
+      {
+        "name": "sharedId",
+        "type": "int",
+        "value": 5
+      }
+    ],
+    "height": 96
+  },
+  "door_66": {
+    "gid": 35,
+    "visible": true,
+    "rotation": 0,
+    "name": "",
+    "width": 50,
+    "x": 762.666666666667,
+    "y": 453.666666666667,
+    "id": 66,
+    "type": "Door",
+    "properties": [
+      {
+        "name": "direction",
+        "type": "string",
+        "value": "up"
+      },
+      {
+        "name": "isFloorLink",
+        "type": "bool",
+        "value": true
+      },
+      {
+        "name": "isLaser",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isLocked",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isOpen",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isRoomLink",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "lockType",
+        "type": "string",
+        "value": "NONE"
+      },
+      {
+        "name": "sharedId",
+        "type": "int",
+        "value": 1
+      }
+    ],
+    "height": 65
+  },
+  "door_49": {
+    "gid": 33,
+    "visible": true,
+    "rotation": 0,
+    "name": "",
+    "width": 23,
+    "x": 984,
+    "y": 135.666666666667,
+    "id": 49,
+    "type": "Door",
+    "properties": [
+      {
+        "name": "direction",
+        "type": "string",
+        "value": "right"
+      },
+      {
+        "name": "isFloorLink",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isLaser",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isLocked",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isOpen",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isRoomLink",
+        "type": "bool",
+        "value": true
+      },
+      {
+        "name": "lockType",
+        "type": "string",
+        "value": "NONE"
+      },
+      {
+        "name": "sharedId",
+        "type": "int",
+        "value": 2
+      }
+    ],
+    "height": 94
+  },
+  "door_47": {
+    "gid": 32,
+    "visible": true,
+    "rotation": 0,
+    "name": "",
+    "width": 21,
+    "x": 859.5,
+    "y": 585,
+    "id": 47,
+    "type": "Door",
+    "properties": [
+      {
+        "name": "direction",
+        "type": "string",
+        "value": "left"
+      },
+      {
+        "name": "isFloorLink",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isLaser",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isLocked",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isOpen",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isRoomLink",
+        "type": "bool",
+        "value": true
+      },
+      {
+        "name": "lockType",
+        "type": "string",
+        "value": "NONE"
+      },
+      {
+        "name": "sharedId",
+        "type": "int",
+        "value": 9
+      }
+    ],
+    "height": 96
+  },
+  "door_69": {
+    "gid": 35,
+    "visible": true,
+    "rotation": 0,
+    "name": "",
+    "width": 50,
+    "x": 762.666666666667,
+    "y": 453.666666666667,
+    "id": 69,
+    "type": "Door",
+    "properties": [
+      {
+        "name": "direction",
+        "type": "string",
+        "value": "up"
+      },
+      {
+        "name": "isFloorLink",
+        "type": "bool",
+        "value": true
+      },
+      {
+        "name": "isLaser",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isLocked",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isOpen",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isRoomLink",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "lockType",
+        "type": "string",
+        "value": "NONE"
+      },
+      {
+        "name": "sharedId",
+        "type": "int",
+        "value": 13
+      }
+    ],
+    "height": 65
+  },
+  "door_48": {
+    "gid": 33,
+    "visible": true,
+    "rotation": 0,
+    "name": "",
+    "width": 23,
+    "x": 414,
+    "y": 137,
+    "id": 48,
+    "type": "Door",
+    "properties": [
+      {
+        "name": "direction",
+        "type": "string",
+        "value": "right"
+      },
+      {
+        "name": "isFloorLink",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isLaser",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isLocked",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isOpen",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isRoomLink",
+        "type": "bool",
+        "value": true
+      },
+      {
+        "name": "lockType",
+        "type": "string",
+        "value": "NONE"
+      },
+      {
+        "name": "sharedId",
+        "type": "int",
+        "value": 1
+      }
+    ],
+    "height": 94
+  },
+  "door_70": {
+    "gid": 35,
+    "visible": true,
+    "rotation": 0,
+    "name": "",
+    "width": 50,
+    "x": 1136,
+    "y": 227.666666666667,
+    "id": 70,
+    "type": "Door",
+    "properties": [
+      {
+        "name": "direction",
+        "type": "string",
+        "value": "up"
+      },
+      {
+        "name": "isFloorLink",
+        "type": "bool",
+        "value": true
+      },
+      {
+        "name": "isLaser",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isLocked",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isOpen",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isRoomLink",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "lockType",
+        "type": "string",
+        "value": "NONE"
+      },
+      {
+        "name": "sharedId",
+        "type": "int",
+        "value": 10
+      }
+    ],
+    "height": 65
+  },
+  "door_71": {
+    "gid": 2147483684,
+    "visible": true,
+    "rotation": 0,
+    "name": "",
+    "width": 21,
+    "x": 495.333333333333,
+    "y": 472,
+    "id": 71,
+    "type": "Door",
+    "properties": [
+      {
+        "name": "direction",
+        "type": "string",
+        "value": "right"
+      },
+      {
+        "name": "isFloorLink",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isLaser",
+        "type": "bool",
+        "value": true
+      },
+      {
+        "name": "isLocked",
+        "type": "bool",
+        "value": true
+      },
+      {
+        "name": "isOpen",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isRoomLink",
+        "type": "bool",
+        "value": true
+      },
+      {
+        "name": "lockType",
+        "type": "string",
+        "value": "LASER_LOCK"
+      },
+      {
+        "name": "sharedId",
+        "type": "int",
+        "value": 22
+      }
+    ],
+    "height": 95
+  },
+  "door_52": {
+    "gid": 33,
+    "visible": true,
+    "rotation": 0,
+    "name": "",
+    "width": 23,
+    "x": 953.333333333333,
+    "y": 474.333333333333,
+    "id": 52,
+    "type": "Door",
+    "properties": [
+      {
+        "name": "direction",
+        "type": "string",
+        "value": "right"
+      },
+      {
+        "name": "isFloorLink",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isLaser",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isLocked",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isOpen",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isRoomLink",
+        "type": "bool",
+        "value": true
+      },
+      {
+        "name": "lockType",
+        "type": "string",
+        "value": "NONE"
+      },
+      {
+        "name": "sharedId",
+        "type": "int",
+        "value": 6
+      }
+    ],
+    "height": 94
+  },
+  "door_53": {
+    "gid": 33,
+    "visible": true,
+    "rotation": 0,
+    "name": "",
+    "width": 23,
+    "x": 898,
+    "y": 584.333333333333,
+    "id": 53,
+    "type": "Door",
+    "properties": [
+      {
+        "name": "direction",
+        "type": "string",
+        "value": "right"
+      },
+      {
+        "name": "isFloorLink",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isLaser",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isLocked",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isOpen",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isRoomLink",
+        "type": "bool",
+        "value": true
+      },
+      {
+        "name": "lockType",
+        "type": "string",
+        "value": "NONE"
+      },
+      {
+        "name": "sharedId",
+        "type": "int",
+        "value": 9
+      }
+    ],
+    "height": 94
+  },
+  "door_50": {
+    "gid": 33,
+    "visible": true,
+    "rotation": 0,
+    "name": "",
+    "width": 23,
+    "x": 804.666666666667,
+    "y": 247.666666666667,
+    "id": 50,
+    "type": "Door",
+    "properties": [
+      {
+        "name": "direction",
+        "type": "string",
+        "value": "right"
+      },
+      {
+        "name": "isFloorLink",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isLaser",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isLocked",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isOpen",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isRoomLink",
+        "type": "bool",
+        "value": true
+      },
+      {
+        "name": "lockType",
+        "type": "string",
+        "value": "NONE"
+      },
+      {
+        "name": "sharedId",
+        "type": "int",
+        "value": 4
+      }
+    ],
+    "height": 94
+  },
+  "door_51": {
+    "gid": 33,
+    "visible": true,
+    "rotation": 0,
+    "name": "",
+    "width": 23,
+    "x": 900.666666666667,
+    "y": 361,
+    "id": 51,
+    "type": "Door",
+    "properties": [
+      {
+        "name": "direction",
+        "type": "string",
+        "value": "right"
+      },
+      {
+        "name": "isFloorLink",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isLaser",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isLocked",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isOpen",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isRoomLink",
+        "type": "bool",
+        "value": true
+      },
+      {
+        "name": "lockType",
+        "type": "string",
+        "value": "NONE"
+      },
+      {
+        "name": "sharedId",
+        "type": "int",
+        "value": 5
+      }
+    ],
+    "height": 94
+  },
+  "door_56": {
+    "gid": 33,
+    "visible": true,
+    "rotation": 0,
+    "name": "",
+    "width": 23,
+    "x": 287,
+    "y": 585.333333333333,
+    "id": 56,
+    "type": "Door",
+    "properties": [
+      {
+        "name": "direction",
+        "type": "string",
+        "value": "right"
+      },
+      {
+        "name": "isFloorLink",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isLaser",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isLocked",
+        "type": "bool",
+        "value": true
+      },
+      {
+        "name": "isOpen",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isRoomLink",
+        "type": "bool",
+        "value": true
+      },
+      {
+        "name": "lockType",
+        "type": "string",
+        "value": "NONE"
+      },
+      {
+        "name": "sharedId",
+        "type": "int",
+        "value": 7
+      }
+    ],
+    "height": 94
+  },
+  "door_54": {
+    "gid": 33,
+    "visible": true,
+    "rotation": 0,
+    "name": "",
+    "width": 23,
+    "x": 336.666666666667,
+    "y": 472.333333333333,
+    "id": 54,
+    "type": "Door",
+    "properties": [
+      {
+        "name": "direction",
+        "type": "string",
+        "value": "right"
+      },
+      {
+        "name": "isFloorLink",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isLaser",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isLocked",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isOpen",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isRoomLink",
+        "type": "bool",
+        "value": true
+      },
+      {
+        "name": "lockType",
+        "type": "string",
+        "value": "NONE"
+      },
+      {
+        "name": "sharedId",
+        "type": "int",
+        "value": 8
+      }
+    ],
+    "height": 94
+  },
+  "door_55": {
+    "gid": 33,
+    "visible": true,
+    "rotation": 0,
+    "name": "",
+    "width": 23,
+    "x": 330,
+    "y": 250.333333333333,
+    "id": 55,
+    "type": "Door",
+    "properties": [
+      {
+        "name": "direction",
+        "type": "string",
+        "value": "right"
+      },
+      {
+        "name": "isFloorLink",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isLaser",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isLocked",
+        "type": "bool",
+        "value": true
+      },
+      {
+        "name": "isOpen",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isRoomLink",
+        "type": "bool",
+        "value": true
+      },
+      {
+        "name": "lockType",
+        "type": "string",
+        "value": "NONE"
+      },
+      {
+        "name": "sharedId",
+        "type": "int",
+        "value": 3
+      }
+    ],
+    "height": 94
+  },
+  "door_39": {
+    "gid": 32,
+    "visible": true,
+    "rotation": 0,
+    "name": "",
+    "width": 21,
+    "x": 376.5,
+    "y": 139,
+    "id": 39,
+    "type": "Door",
+    "properties": [
+      {
+        "name": "direction",
+        "type": "string",
+        "value": "left"
+      },
+      {
+        "name": "isFloorLink",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isLaser",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isLocked",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isOpen",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isRoomLink",
+        "type": "bool",
+        "value": true
+      },
+      {
+        "name": "lockType",
+        "type": "string",
+        "value": "NONE"
+      },
+      {
+        "name": "sharedId",
+        "type": "int",
+        "value": 1
+      }
+    ],
+    "height": 96
+  },
+  "door_58": {
+    "gid": 34,
+    "visible": true,
+    "rotation": 0,
+    "name": "",
+    "width": 21,
+    "x": 289.333333333333,
+    "y": 250.666666666667,
+    "id": 58,
+    "type": "Door",
+    "properties": [
+      {
+        "name": "direction",
+        "type": "string",
+        "value": "left"
+      },
+      {
+        "name": "isFloorLink",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isLaser",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isLocked",
+        "type": "bool",
+        "value": true
+      },
+      {
+        "name": "isOpen",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isRoomLink",
+        "type": "bool",
+        "value": true
+      },
+      {
+        "name": "lockType",
+        "type": "string",
+        "value": "NONE"
+      },
+      {
+        "name": "sharedId",
+        "type": "int",
+        "value": 3
+      }
+    ],
+    "height": 96
+  },
+  "door_59": {
+    "gid": 34,
+    "visible": true,
+    "rotation": 0,
+    "name": "",
+    "width": 21,
+    "x": 248.833333333333,
+    "y": 587.166666666667,
+    "id": 59,
+    "type": "Door",
+    "properties": [
+      {
+        "name": "direction",
+        "type": "string",
+        "value": "left"
+      },
+      {
+        "name": "isFloorLink",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isLaser",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isLocked",
+        "type": "bool",
+        "value": true
+      },
+      {
+        "name": "isOpen",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "isRoomLink",
+        "type": "bool",
+        "value": true
+      },
+      {
+        "name": "lockType",
+        "type": "string",
+        "value": "NONE"
+      },
+      {
+        "name": "sharedId",
+        "type": "int",
+        "value": 7
+      }
+    ],
+    "height": 96
+  }
+}

@@ -234,18 +234,18 @@ public class Police implements Animatable, GameObject, Interactable {
                     direction = PoliceDirection.RIGHT;
                 }
                 // Рухаємося до гравця зі швидкістю переслідування
-                patrol(deltaTime, chaseSpeed);
+                patrol(deltaTime, chaseSpeed, rooms);
             } else {
                 // Якщо гравець не виявлений, патрулюємо
                 state = PoliceState.PATROL;
                 setAnimationState("patrol");
-                patrol(deltaTime, normalSpeed);
+                patrol(deltaTime, normalSpeed, rooms);
             }
         } else {
             // Якщо гравця немає в кімнаті, патрулюємо
             state = PoliceState.PATROL;
             setAnimationState("patrol");
-            patrol(deltaTime, normalSpeed);
+            patrol(deltaTime, normalSpeed, rooms);
         }
     }
 
@@ -255,20 +255,52 @@ public class Police implements Animatable, GameObject, Interactable {
      * @param deltaTime час, що пройшов з останнього оновлення
      * @param speed швидкість руху
      */
-    public void patrol(double deltaTime, double speed) {
+    public void patrol(double deltaTime, double speed, List<GameManager.Room> rooms) {
         setAnimationState("patrol");
         double movement = speed * deltaTime;
         double deltaX = 0;
         frameDuration = 0.2;
+
         if (direction == PoliceDirection.LEFT) {
             deltaX = -movement;
         } else if (direction == PoliceDirection.RIGHT) {
             deltaX = movement;
         }
-        collX += deltaX;
-        imageX += deltaX;
-    }
 
+        // Перевіряємо майбутню позицію ПЕРЕД рухом
+        double futureCollX = collX + deltaX;
+        double futureImageX = imageX + deltaX;
+
+        // Створюємо майбутні межі
+        Bounds futureBounds = new BoundingBox(futureCollX, collY, collWidth, collHeight);
+
+        // Перевіряємо, чи майбутня позиція буде в межах якоїсь кімнати
+        boolean willBeInRoom = false;
+        for (GameManager.Room room : rooms) {
+            Bounds roomBounds = room.getBounds();
+            if (futureBounds.getMinX() >= roomBounds.getMinX() &&
+                    futureBounds.getMinY() >= roomBounds.getMinY() &&
+                    futureBounds.getMaxX() <= roomBounds.getMaxX() &&
+                    futureBounds.getMaxY() <= roomBounds.getMaxY()) {
+                willBeInRoom = true;
+                break;
+            }
+        }
+
+        // Якщо майбутня позиція буде поза кімнатою, змінюємо напрямок
+        if (!willBeInRoom) {
+            if (direction == PoliceDirection.LEFT) {
+                direction = PoliceDirection.RIGHT;
+            } else {
+                direction = PoliceDirection.LEFT;
+            }
+            return; // Не рухаємось цього кадру
+        }
+
+        // Якщо все ОК, рухаємось
+        collX = futureCollX;
+        imageX = futureImageX;
+    }
     // Оновлює анімацію поліцейського
 
     /**

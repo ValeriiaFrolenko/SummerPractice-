@@ -22,7 +22,8 @@ public class GameApplication extends Application {
     // Ініціалізує гру, викликається JavaFX після запуску
     @Override
     public void start(Stage primaryStage) {
-        this.primaryStage = primaryStage; // Зберігаємо посилання на головне вікно
+        this.primaryStage = primaryStage; // Зберіг
+        // аємо посилання на головне вікно
         this.gameManager = GameManager.getInstance(); // Ініціалізуємо GameManager
         this.saveManager = new SaveManager(); // Ініціалізуємо SaveManager
         this.gameWindow = new GameWindow(primaryStage, gameManager, saveManager); // Передаємо менеджери в GameWindow

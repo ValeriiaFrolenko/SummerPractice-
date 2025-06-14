@@ -1,0 +1,170 @@
+{
+  "interactiveObjects_88": {
+    "gid": 62,
+    "visible": true,
+    "rotation": 0,
+    "name": "",
+    "width": 100,
+    "x": 119,
+    "y": 242.3335,
+    "id": 88,
+    "type": "InteractiveObject",
+    "properties": [
+      {
+        "name": "fileName",
+        "type": "string",
+        "value": "diamont.png"
+      },
+      {
+        "name": "typeObj",
+        "type": "string",
+        "value": "FINAL_PRIZE"
+      }
+    ],
+    "height": 80
+  },
+  "interactiveObjects_79": {
+    "gid": 61,
+    "visible": true,
+    "rotation": 0,
+    "name": "",
+    "width": 100,
+    "x": 129.333333333333,
+    "y": 585,
+    "id": 79,
+    "type": "InteractiveObject",
+    "properties": [
+      {
+        "name": "fileName",
+        "type": "string",
+        "value": "boxes.png"
+      },
+      {
+        "name": "typeObj",
+        "type": "string",
+        "value": "WITH_MONEY"
+      }
+    ],
+    "height": 70
+  },
+  "interactiveObjects_78": {
+    "gid": 60,
+    "visible": true,
+    "rotation": 0,
+    "name": "",
+    "width": 30,
+    "x": 82,
+    "y": 546.5,
+    "id": 78,
+    "type": "InteractiveObject",
+    "properties": [
+      {
+        "name": "fileName",
+        "type": "string",
+        "value": "electricalPanel.png"
+      },
+      {
+        "name": "typeObj",
+        "type": "string",
+        "value": "ELECTRICAL_PANEL"
+      }
+    ],
+    "height": 30
+  },
+  "interactiveObjects_89": {
+    "gid": 63,
+    "visible": true,
+    "rotation": 0,
+    "name": "",
+    "width": 50,
+    "x": 150.667,
+    "y": 105.6665,
+    "id": 89,
+    "type": "InteractiveObject",
+    "properties": [
+      {
+        "name": "fileName",
+        "type": "string",
+        "value": "picture.jpg"
+      },
+      {
+        "name": "typeObj",
+        "type": "string",
+        "value": "PICTURE"
+      }
+    ],
+    "height": 50
+  },
+  "interactiveObjects_91": {
+    "gid": 64,
+    "visible": true,
+    "rotation": 0,
+    "name": "",
+    "width": 50,
+    "x": 1077.66666666667,
+    "y": 128,
+    "id": 91,
+    "type": "InteractiveObject",
+    "properties": [
+      {
+        "name": "fileName",
+        "type": "string",
+        "value": "chest1.png"
+      },
+      {
+        "name": "typeObj",
+        "type": "string",
+        "value": "WITH_MONEY"
+      }
+    ],
+    "height": 40
+  },
+  "interactiveObjects_93": {
+    "gid": 66,
+    "visible": true,
+    "rotation": 0,
+    "name": "",
+    "width": 50,
+    "x": 173.5,
+    "y": 468.5,
+    "id": 93,
+    "type": "InteractiveObject",
+    "properties": [
+      {
+        "name": "fileName",
+        "type": "string",
+        "value": "chest3.png"
+      },
+      {
+        "name": "typeObj",
+        "type": "string",
+        "value": "WITH_MONEY"
+      }
+    ],
+    "height": 40
+  },
+  "interactiveObjects_92": {
+    "gid": 65,
+    "visible": true,
+    "rotation": 0,
+    "name": "",
+    "width": 50,
+    "x": 656,
+    "y": 243.666666666667,
+    "id": 92,
+    "type": "InteractiveObject",
+    "properties": [
+      {
+        "name": "fileName",
+        "type": "string",
+        "value": "chest2.png"
+      },
+      {
+        "name": "typeObj",
+        "type": "string",
+        "value": "WITH_MONEY"
+      }
+    ],
+    "height": 40
+  }
+}

@@ -1,81 +1,12 @@
 {
-  "puzzles_174": {
+  "puzzles_80": {
     "visible": true,
     "rotation": 0,
     "name": "puzzle",
     "width": 0,
-    "x": 976,
-    "y": 320,
-    "id": 174,
-    "type": "Puzzle",
-    "properties": [
-      {
-        "name": "puzzleType",
-        "type": "string",
-        "value": "CodeLockPuzzle"
-      },
-      {
-        "name": "state",
-        "type": "string",
-        "value": "UNSOLVED"
-      }
-    ],
-    "height": 13
-  },
-  "puzzles_175": {
-    "visible": true,
-    "rotation": 0,
-    "name": "puzzle",
-    "width": 0,
-    "x": 420,
-    "y": 442,
-    "id": 175,
-    "type": "Puzzle",
-    "properties": [
-      {
-        "name": "puzzleType",
-        "type": "string",
-        "value": "LockPickPuzzle"
-      },
-      {
-        "name": "state",
-        "type": "string",
-        "value": "UNSOLVED"
-      }
-    ],
-    "height": 0
-  },
-  "puzzles_172": {
-    "visible": true,
-    "rotation": 0,
-    "name": "puzzle",
-    "width": 0,
-    "x": 855,
-    "y": 437,
-    "id": 172,
-    "type": "Puzzle",
-    "properties": [
-      {
-        "name": "puzzleType",
-        "type": "string",
-        "value": "LockPickPuzzle"
-      },
-      {
-        "name": "state",
-        "type": "string",
-        "value": "UNSOLVED"
-      }
-    ],
-    "height": 0
-  },
-  "puzzles_171": {
-    "visible": true,
-    "rotation": 0,
-    "name": "puzzle",
-    "width": 0,
-    "x": 465,
-    "y": 207,
-    "id": 171,
+    "x": 210,
+    "y": 516,
+    "id": 80,
     "type": "Puzzle",
     "properties": [
       {
@@ -86,7 +17,53 @@
       {
         "name": "solution",
         "type": "int",
-        "value": 1
+        "value": 2
+      },
+      {
+        "name": "state",
+        "type": "string",
+        "value": "UNSOLVED"
+      }
+    ],
+    "height": 0
+  },
+  "puzzles_81": {
+    "visible": true,
+    "rotation": 0,
+    "name": "puzzle",
+    "width": 0,
+    "x": 276.5,
+    "y": 544.5,
+    "id": 81,
+    "type": "Puzzle",
+    "properties": [
+      {
+        "name": "puzzleType",
+        "type": "string",
+        "value": "LockPickPuzzle"
+      },
+      {
+        "name": "state",
+        "type": "string",
+        "value": "UNSOLVED"
+      }
+    ],
+    "height": 0
+  },
+  "puzzles_82": {
+    "visible": true,
+    "rotation": 0,
+    "name": "puzzle",
+    "width": 0,
+    "x": 321.333333333333,
+    "y": 217.333333333333,
+    "id": 82,
+    "type": "Puzzle",
+    "properties": [
+      {
+        "name": "puzzleType",
+        "type": "string",
+        "value": "LockPickPuzzle"
       },
       {
         "name": "state",

@@ -1,0 +1,14 @@
+{ "columns":1,
+ "image":"..\/..\/..\/assets\/images\/background\/doors\/closeLeft.png",
+ "imageheight":60,
+ "imagewidth":10,
+ "margin":0,
+ "name":"doorLeft",
+ "spacing":0,
+ "tilecount":1,
+ "tiledversion":"1.11.2",
+ "tileheight":60,
+ "tilewidth":10,
+ "type":"tileset",
+ "version":"1.10"
+}

@@ -1,0 +1,14 @@
+{ "columns":1,
+ "image":"..\/..\/..\/..\/..\/level2\/level2.png",
+ "imageheight":640,
+ "imagewidth":1280,
+ "margin":0,
+ "name":"rooms",
+ "spacing":0,
+ "tilecount":1,
+ "tiledversion":"1.11.2",
+ "tileheight":640,
+ "tilewidth":1280,
+ "type":"tileset",
+ "version":"1.10"
+}

@@ -3,6 +3,11 @@ package main;
 import javafx.scene.Group;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
+import javafx.scene.shape.Line;
+import javafx.scene.Cursor;
+import javafx.stage.StageStyle;
 import managers.*;
 import org.json.JSONObject;
 import utils.InputHandler;
@@ -28,12 +33,23 @@ public class GameWindow {
     private boolean isRunning;
     private long lastFrameTime;
 
+    // Нові поля для власного заголовка
+    private Rectangle titleBar;
+    private Rectangle closeButton;
+    private Line closeLine1, closeLine2;
+    private double xOffset = 0;
+    private double yOffset = 0;
+
     // Конструктор
     public GameWindow(Stage primaryStage, GameManager gameManager, SaveManager saveManager) {
         this.primaryStage = primaryStage;
         this.gameManager = gameManager;
         this.saveManager = saveManager;
         primaryStage.setResizable(false);
+
+        // Прибираємо системний заголовок
+        primaryStage.initStyle(StageStyle.UNDECORATED);
+
         instance = this; // Зберігаємо екземпляр
     }
 
@@ -45,9 +61,70 @@ public class GameWindow {
         return instance;
     }
 
+    // Створює власний заголовок з кнопкою закриття
+    private void createCustomTitleBar(Group root) {
+        // Заголовок
+        titleBar = new Rectangle(1280, 30);
+        titleBar.setFill(Color.rgb(101, 67, 33)); // Темно-коричневий
+        titleBar.setStroke(Color.rgb(139, 90, 43));
+
+        // Кнопка закриття
+        closeButton = new Rectangle(1250, 5, 20, 20);
+        closeButton.setFill(Color.rgb(139, 69, 19));
+        closeButton.setStroke(Color.RED);
+        closeButton.setStrokeWidth(1);
+
+        // Хрестик
+        closeLine1 = new Line(1255, 10, 1265, 20);
+        closeLine1.setStroke(Color.RED);
+        closeLine1.setStrokeWidth(2);
+
+        closeLine2 = new Line(1265, 10, 1255, 20);
+        closeLine2.setStroke(Color.RED);
+        closeLine2.setStrokeWidth(2);
+
+        // Ефекти наведення
+        closeButton.setOnMouseEntered(e -> {
+            closeButton.setFill(Color.rgb(160, 82, 45));
+            scene.setCursor(Cursor.HAND);
+        });
+
+        closeButton.setOnMouseExited(e -> {
+            closeButton.setFill(Color.rgb(139, 69, 19));
+            scene.setCursor(Cursor.DEFAULT);
+        });
+
+        // Обробка кліка по кнопці закриття
+        closeButton.setOnMouseClicked(e -> {
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Вийти з гри?");
+            if (alert.showAndWait().get() == ButtonType.OK) {
+                cleanup();
+                primaryStage.close();
+            }
+        });
+
+        closeLine1.setOnMouseClicked(e -> closeButton.getOnMouseClicked().handle(e));
+        closeLine2.setOnMouseClicked(e -> closeButton.getOnMouseClicked().handle(e));
+
+        // Перетягування вікна
+        titleBar.setOnMousePressed(e -> {
+            xOffset = e.getSceneX();
+            yOffset = e.getSceneY();
+        });
+
+        titleBar.setOnMouseDragged(e -> {
+            primaryStage.setX(e.getScreenX() - xOffset);
+            primaryStage.setY(e.getScreenY() - yOffset);
+        });
+
+        // Додаємо до групи
+        root.getChildren().addAll(titleBar, closeButton, closeLine1, closeLine2);
+    }
+
     // Налаштовує вікно, сцену, canvas і менеджери
     public void initialize() {
-        canvas = new Canvas(1280, 640);
+        canvas = new Canvas(1280, 640); // Залишаємо оригінальний розмір для фонового зображення
+        canvas.setLayoutY(30); // Зміщуємо canvas вниз на 30px для заголовка
         graphicsContext = canvas.getGraphicsContext2D();
         graphicsContext.setImageSmoothing(false);
 
@@ -57,11 +134,21 @@ public class GameWindow {
         soundManager = new SoundManager();
 
         Group root = new Group();
+
+        // Створюємо коричневий фон під всім вікном
+        Rectangle background = new Rectangle(1280, 670); // 640 + 30 для заголовка
+        background.setFill(Color.rgb(139, 90, 43)); // Коричневий фон
+        root.getChildren().add(background);
+
         root.getChildren().add(canvas);
         root.getChildren().add(uiManager.getOverlayPane());
         root.getChildren().add(uiManager.getMenuPane());
 
-        scene = new Scene(root, 1280, 640);
+        // Створюємо власний заголовок
+        createCustomTitleBar(root);
+
+        scene = new Scene(root, 1280, 670); // Збільшуємо висоту сцени на 30px для заголовка
+        scene.setFill(Color.rgb(139, 90, 43)); // Коричневий фон сцени
         scene.setOnMouseMoved(e -> System.out.println("Mouse moved on scene: " + e.getX() + ", " + e.getY()));
         scene.setOnMouseClicked(e -> System.out.println("Mouse clicked on scene at (" + e.getX() + ", " + e.getY() + ")"));
         root.setMouseTransparent(false);
@@ -77,13 +164,22 @@ public class GameWindow {
         gameManager.registerInteractionCallback(inputHandler);
 
         canvas.widthProperty().bind(scene.widthProperty());
-        canvas.heightProperty().bind(scene.heightProperty());
+        canvas.heightProperty().bind(scene.heightProperty().subtract(30)); // Віднімаємо висоту заголовка, але canvas залишається 640px для зображення
 
         scene.widthProperty().addListener((obs, oldVal, newVal) -> {
-            gameManager.updateBackgroundScale(newVal.doubleValue(), scene.getHeight());
+            gameManager.updateBackgroundScale(newVal.doubleValue(), 640); // Передаємо оригінальну висоту зображення
+            // Оновлюємо позицію кнопки закриття
+            closeButton.setX(newVal.doubleValue() - 30);
+            closeLine1.setStartX(newVal.doubleValue() - 25);
+            closeLine1.setEndX(newVal.doubleValue() - 15);
+            closeLine2.setStartX(newVal.doubleValue() - 15);
+            closeLine2.setEndX(newVal.doubleValue() - 25);
+            titleBar.setWidth(newVal.doubleValue());
+            background.setWidth(newVal.doubleValue());
         });
         scene.heightProperty().addListener((obs, oldVal, newVal) -> {
-            gameManager.updateBackgroundScale(scene.getWidth(), newVal.doubleValue());
+            gameManager.updateBackgroundScale(scene.getWidth(), 640); // Передаємо оригінальну висоту зображення
+            background.setHeight(newVal.doubleValue());
         });
 
         handleWindowEvents();
@@ -95,7 +191,7 @@ public class GameWindow {
         uiManager.getOverlayPane().setMouseTransparent(true);
 
         showMainMenu();
-        gameManager.updateBackgroundScale(scene.getWidth(), scene.getHeight());
+        gameManager.updateBackgroundScale(scene.getWidth(), 640); // Передаємо оригінальну висоту зображення
     }
 
     // Повертає UIManager
@@ -133,14 +229,7 @@ public class GameWindow {
     }
 
     public void handleWindowEvents() {
-        primaryStage.setOnCloseRequest(event -> {
-            Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Вийти з гри?");
-            if (alert.showAndWait().get() != ButtonType.OK) {
-                event.consume();
-            } else {
-                cleanup();
-            }
-        });
+        // Видаляємо стандартний обробник закриття, тепер він в кнопці
     }
 
     public void cleanup() {

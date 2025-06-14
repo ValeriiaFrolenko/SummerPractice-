@@ -347,7 +347,7 @@ public class GameManager implements Savable {
         }
         for (Police police : police) {
             police.update(deltaTime, rooms, player);
-            checkPoliceCollisions();
+            checkPoliceCollisions(police);
         }
         for (SecurityCamera camera : cameras) {
             camera.detectPlayer(player, police);
@@ -391,7 +391,6 @@ public class GameManager implements Savable {
     // Перевіряє колізії гравця з кімнатами
     public void checkCollisions() {
         checkPlayerCollisions();
-        checkPoliceCollisions();
         // checkPlayerCollisionsWithLaserDoor();
     }
 
@@ -413,11 +412,10 @@ public class GameManager implements Savable {
         }
     }
 
-    private void checkPoliceCollisions() {
-        if (police == null || police.isEmpty()) return;
+    private void checkPoliceCollisions(Police police) {
+        if (this.police == null || this.police.isEmpty()) return;
 
-        for (Police police1 : police) {
-            Bounds policeBounds = police1.getBounds(); // Отримуємо межі гравця
+            Bounds policeBounds = police.getBounds(); // Отримуємо межі гравця
             double policeX = policeBounds.getMinX();
             double policeY = policeBounds.getMinY();
             double policeWidth = policeBounds.getWidth();
@@ -444,13 +442,13 @@ public class GameManager implements Savable {
             }
 
             if (!fullyInside) {
-                if (police1.getDirection().equals(Police.PoliceDirection.LEFT)) {
-                    police1.setDirection(Police.PoliceDirection.RIGHT);
-                } else if (police1.getDirection().equals(Police.PoliceDirection.RIGHT)) {
-                    police1.setDirection(Police.PoliceDirection.LEFT);
+                if (police.getDirection().equals(Police.PoliceDirection.LEFT)) {
+                    police.setDirection(Police.PoliceDirection.RIGHT);
+                } else if (police.getDirection().equals(Police.PoliceDirection.RIGHT)) {
+                    police.setDirection(Police.PoliceDirection.LEFT);
                 }
             }
-        }
+
     }
 
     private void checkPlayerCollisions() {

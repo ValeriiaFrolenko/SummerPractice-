@@ -1,0 +1,14 @@
+{ "columns":1,
+ "image":"..\/..\/..\/assets\/images\/interactiveObjects\/chest2.png",
+ "imageheight":189,
+ "imagewidth":244,
+ "margin":0,
+ "name":"chest2",
+ "spacing":0,
+ "tilecount":1,
+ "tiledversion":"1.11.2",
+ "tileheight":189,
+ "tilewidth":244,
+ "type":"tileset",
+ "version":"1.10"
+}

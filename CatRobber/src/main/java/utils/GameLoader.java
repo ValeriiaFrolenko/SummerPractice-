@@ -208,7 +208,6 @@ public class GameLoader {
             case "Police":
                 return new Police(new Vector2D(x, y), properties);
             case "Door":
-                System.out.println("двері створено gameloader");
                 return new Door(new Vector2D(x, y), properties);
             case "Camera":
                 return new SecurityCamera(new Vector2D(x, y), properties);

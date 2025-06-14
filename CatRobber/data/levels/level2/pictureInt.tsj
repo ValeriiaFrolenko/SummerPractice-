@@ -1,0 +1,14 @@
+{ "columns":1,
+ "image":"..\/..\/..\/assets\/images\/interactiveObjects\/picture.jpg",
+ "imageheight":440,
+ "imagewidth":456,
+ "margin":0,
+ "name":"pictureInt",
+ "spacing":0,
+ "tilecount":1,
+ "tiledversion":"1.11.2",
+ "tileheight":440,
+ "tilewidth":456,
+ "type":"tileset",
+ "version":"1.10"
+}
