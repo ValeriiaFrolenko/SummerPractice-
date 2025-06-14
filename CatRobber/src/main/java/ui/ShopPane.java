@@ -1,6 +1,5 @@
 package ui;
 
-import entities.Player;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -11,54 +10,53 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
-import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.LinearGradient;
 import javafx.scene.paint.Stop;
 import javafx.scene.effect.DropShadow;
 import managers.FontManager;
 import managers.GameManager;
+import managers.UIManager;
+import utils.GameLoader;
 
 import java.util.ArrayList;
 import java.util.List;
 
-// Магазин для купів предметів, розширює UIWindow
-public class Shop implements UIWindow {
-    // Поля
-    private List<ShopItem> items;
-    private int playerMoney;
+public class ShopPane implements UIWindow {
+    private StackPane rootPane;
     private GridPane shopPane;
+    private static List<ShopItem> items;
+    private int playerMoney;
     private Button[] itemButtons;
     private Label moneyLabel;
     private Button backButton;
-    private Player player;
+    private GameLoader gameLoader;
 
-    // Конструктор
-    public Shop(Player player) {
-        this.player = player;
-        this.playerMoney = player.getMoney();
+    public ShopPane() {
+        gameLoader = new GameLoader();
+        this.playerMoney = GameManager.getInstance().getTotalMoney();
         initializeItems();
         createShopUI();
+        createRootPane();
     }
 
-    // Ініціалізація предметів магазину
+    public static List<ShopItem> getItems() {
+        if (items == null) {
+            ShopPane shop = new ShopPane();
+            shop.initializeItems();
+        }
+        return new ArrayList<>(items);
+    }
+
     private void initializeItems() {
         items = new ArrayList<>();
-        items.add(new ShopItem("Невидимість", 100, "Стаєш невидимим на 10 секунд", ShopItem.ItemType.BONUS, "UI/invisibility.png"));
-        items.add(new ShopItem("Буст швидкості", 80, "Збільшує швидкість на 50% на 15 секунд", ShopItem.ItemType.BONUS, "UI/speedBoost.png"));
+        items.add(new ShopItem("Невидимість", 100, "Стаєш невидимим на 10 секунд", ShopItem.ItemType.INVISIBILITY, "UI/invisibility.png"));
+        items.add(new ShopItem("Буст швидкості", 80, "Збільшує швидкість на 50% на 15 секунд", ShopItem.ItemType.SPEED_BOOST, "UI/speedBoost.png"));
         items.add(new ShopItem("Універсальний ключ", 120, "Відчиняє будь-які двері", ShopItem.ItemType.KEY, "UI/key.png"));
-        items.add(new ShopItem("Пістолет", 150, "Дозволяє стріляти по ворогах", ShopItem.ItemType.TOOL, "UI/gun.png"));
+        items.add(new ShopItem("Пістолет", 150, "Дозволяє стріляти по ворогах", ShopItem.ItemType.GUN, "UI/gun.png"));
     }
 
-    // Повертає предмети магазину (статичний метод)
-    public List<ShopItem> getShopItems() {
-        List<ShopItem> shopItems = new ArrayList<>();
-        shopItems = items;
-        return shopItems;
-    }
-
-    // Створює UI магазину
-    public void createShopUI() {
+    private void createShopUI() {
         shopPane = new GridPane();
         shopPane.setAlignment(Pos.CENTER);
         shopPane.setHgap(20);
@@ -66,7 +64,6 @@ public class Shop implements UIWindow {
         shopPane.setPadding(new Insets(20));
         shopPane.setPrefSize(1280, 640);
 
-        // Зістарений фон
         Stop[] stops = {
                 new Stop(0, Color.web("#3C2F2F")),
                 new Stop(0.5, Color.web("#2A2525")),
@@ -76,7 +73,6 @@ public class Shop implements UIWindow {
         Background bg = new Background(new BackgroundFill(gradient, null, null));
         shopPane.setBackground(bg);
 
-        // Заголовок магазину
         Label shopTitle = new Label("КРАМНИЦЯ КОТОГРАБІЖНИКА");
         shopTitle.setFont(FontManager.getInstance().getFont("Hardpixel", 42));
         shopTitle.setTextFill(Color.web("#EAD9C2"));
@@ -87,29 +83,24 @@ public class Shop implements UIWindow {
         titleShadow.setRadius(6);
         shopTitle.setEffect(titleShadow);
 
-        // Гроші гравця
         moneyLabel = new Label("Гроші: " + playerMoney + " монет");
         moneyLabel.setFont(FontManager.getInstance().getFont("Hardpixel", 24));
         moneyLabel.setTextFill(Color.web("#D4A76A"));
 
-        // Кнопка "Назад"
         backButton = createCuteButton("ПОВЕРНУТИСЯ ДО МЕНЮ", Color.web("#7B3F3F"));
 
-        // Контейнер для заголовка та грошей
         VBox topContainer = new VBox(10, shopTitle, moneyLabel);
         topContainer.setAlignment(Pos.CENTER);
         GridPane.setMargin(topContainer, new Insets(0, 0, 30, 0));
         shopPane.add(topContainer, 0, 0, 2, 1);
 
-        // Кнопки для предметів
         itemButtons = new Button[items.size()];
         for (int i = 0; i < items.size(); i++) {
             ShopItem item = items.get(i);
             Button button = createCuteButton("Купити за " + item.getPrice() + " монет", Color.web("#4A7043"));
             button.setUserData(item);
 
-            // Зображення предмета
-            ImageView imageView = new ImageView(new Image(item.getSpritePath()));
+            ImageView imageView = new ImageView(gameLoader.loadImage(item.getSpritePath()));
             imageView.setFitWidth(100);
             imageView.setFitHeight(100);
             DropShadow imageShadow = new DropShadow();
@@ -117,7 +108,6 @@ public class Shop implements UIWindow {
             imageShadow.setRadius(5);
             imageView.setEffect(imageShadow);
 
-            // Опис предмета
             Label description = new Label(item.getName() + ": " + item.getDescription());
             description.setFont(FontManager.getInstance().getFont("Hardpixel", 16));
             description.setTextFill(Color.web("#EAD9C2"));
@@ -131,18 +121,27 @@ public class Shop implements UIWindow {
             button.setOnAction(e -> buyItem((ShopItem) button.getUserData()));
         }
 
-        // Вирівнювання кнопки "Назад" через HBox
         HBox backButtonContainer = new HBox();
         backButtonContainer.setAlignment(Pos.CENTER);
         backButtonContainer.getChildren().add(backButton);
         GridPane.setMargin(backButtonContainer, new Insets(20, 0, 0, 0));
         shopPane.add(backButtonContainer, 0, 3, 2, 1);
 
-        // Налаштування дії для кнопки "Назад"
-        backButton.setOnAction(e -> hide());
+        backButton.setOnAction(e -> {
+            hide();
+            UIManager.getInstance().setCurrentWindow(null); // Явно очищаємо currentWindow
+            UIManager.getInstance().hideCurrentWindowToMenu();
+        });
     }
 
-    // Створює стилізовану кнопку
+    private void createRootPane() {
+        rootPane = new StackPane();
+        rootPane.setPrefSize(1280, 640);
+        rootPane.getChildren().add(shopPane);
+        rootPane.setFocusTraversable(true);
+        rootPane.setOnKeyPressed(this::handleInput);
+    }
+
     private Button createCuteButton(String text, Color color) {
         Button button = new Button(text);
         button.setFont(FontManager.getInstance().getFont("Hardpixel", 22));
@@ -178,7 +177,7 @@ public class Shop implements UIWindow {
         button.setStyle(baseStyle);
 
         DropShadow buttonShadow = new DropShadow();
-        buttonShadow.setColor(Color.web("#8B5A2A2B"));
+        buttonShadow.setColor(Color.web("#8B5A2B"));
         buttonShadow.setOffsetX(2);
         buttonShadow.setOffsetY(2);
         buttonShadow.setRadius(5);
@@ -202,49 +201,46 @@ public class Shop implements UIWindow {
         return button;
     }
 
-    // Обробляє ввід
-    public void handleInput(KeyEvent event) {
+    private void handleInput(KeyEvent event) {
         if (event.getCode() == KeyCode.ESCAPE) {
-            hide();
+            UIManager.getInstance().hideCurrentWindowToMenu();
+            event.consume();
         }
     }
 
-    // Купує предмет
-    public void buyItem(ShopItem item) {
-        if (player.buyItem(item)) {
-            updateMoney(player.getMoney());
+    private void buyItem(ShopItem item) {
+        if (GameManager.getInstance().buyItem(item)) {
+            updateMoney(GameManager.getInstance().getTotalMoney());
         }
     }
 
-    // Оновлює відображення грошей
-    public void updateMoney(int newAmount) {
+    private void updateMoney(int newAmount) {
         playerMoney = newAmount;
         moneyLabel.setText("Гроші: " + playerMoney + " монет");
     }
 
     @Override
     public void show() {
-        if (shopPane != null) {
-            shopPane.setVisible(true);
-            shopPane.setFocusTraversable(true);
-            shopPane.requestFocus();
-            shopPane.setOnKeyPressed(this::handleInput);
-            GameManager.getInstance().setGameState(GameManager.GameState.PAUSED);
-            updateMoney(player.getMoney());
-        }
-    }
+        rootPane.setVisible(true);
+        rootPane.setFocusTraversable(true);
+        updateMoney(GameManager.getInstance().getTotalMoney());
 
+        javafx.application.Platform.runLater(() -> {
+            rootPane.requestFocus();
+        });
+    }
     @Override
     public void hide() {
-        if (shopPane != null) {
-            shopPane.setVisible(false);
-        }
-        GameManager.getInstance().setGameState(GameManager.GameState.MENU);
+        rootPane.setVisible(false);
+        rootPane.setMouseTransparent(true);
+        rootPane.setOnKeyPressed(null);
+        rootPane.getChildren().clear();
+        shopPane.getChildren().clear();
     }
 
     @Override
     public Node getRoot() {
-        return shopPane;
+        return rootPane;
     }
 
     private String toHexString(Color color) {
@@ -253,6 +249,6 @@ public class Shop implements UIWindow {
                 (int) (color.getRed() * 255),
                 (int) (color.getGreen() * 255),
                 (int) (color.getBlue() * 255)
-            );
+        );
     }
 }

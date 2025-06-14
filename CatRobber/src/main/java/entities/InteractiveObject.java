@@ -11,6 +11,7 @@ import managers.GameManager;
 import managers.UIManager;
 import org.json.JSONObject;
 import puzzles.LaserLockPuzzle;
+import ui.InteractiveObjectWindow;
 import utils.GameLoader;
 import utils.Vector2D;
 
@@ -58,16 +59,19 @@ public class InteractiveObject implements GameObject, Interactable {
         }
         switch (type) {
             case NOTE:
-                uiManager.createWindow(UIManager.WindowType.NOTE, properties);
+                InteractiveObjectWindow noteWindow = new InteractiveObjectWindow(UIManager.WindowType.NOTE, properties);
+                uiManager.showInteractiveObjectUI(noteWindow.getUI());
                 break;
             case PICTURE:
-                uiManager.createWindow(UIManager.WindowType.PICTURE, properties);
+                InteractiveObjectWindow pictureWindow = new InteractiveObjectWindow(UIManager.WindowType.PICTURE, properties);
+                uiManager.showInteractiveObjectUI(pictureWindow.getUI());
                 break;
             case COMPUTER:
-                uiManager.createWindow(UIManager.WindowType.COMPUTER, properties);
+                InteractiveObjectWindow computerWindow = new InteractiveObjectWindow(UIManager.WindowType.COMPUTER, properties);
+                uiManager.showInteractiveObjectUI(computerWindow.getUI());
                 break;
             case ELECTRICAL_PANEL:
-                // Знаходимо лазерні двері серед інтерактивних об’єктів
+                // Знаходимо лазерні двері серед інтерактивних об'єктів
                 Door laserDoor = null;
                 for (Interactable obj : GameManager.getInstance().getInteractables()) {
                     if (obj instanceof Door && ((Door) obj).isLaser()) {
@@ -84,17 +88,17 @@ public class InteractiveObject implements GameObject, Interactable {
                         }
                     });
                     uiManager.showPuzzleUI(puzzle.getUI());
-                    System.out.println("LaserLockPuzzle opened for door: " + laserDoor.getSharedId());
                 } else {
                     System.err.println("No laser door found among interactables");
                 }
                 break;
             case WITH_MONEY:
-                player.addMoney(100);
+                GameManager.getInstance().addMoney(100);
                 break;
             case FINAL_PRIZE:
-                player.addMoney(500);
-                uiManager.createWindow(UIManager.WindowType.VICTORY, properties);
+                GameManager.getInstance().addMoney(500);
+                InteractiveObjectWindow victoryWindow = new InteractiveObjectWindow(UIManager.WindowType.VICTORY, properties);
+                uiManager.showInteractiveObjectUI(victoryWindow.getUI());
                 break;
         }
     }

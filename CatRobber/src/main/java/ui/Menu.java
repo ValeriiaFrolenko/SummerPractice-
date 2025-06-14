@@ -280,11 +280,8 @@ public class Menu implements UIWindow {
         transition.setOnFinished(e -> {
             splashPane.setVisible(false);
             menuVisible = true;
-
-            // ВАЖЛИВО: Після переходу запитуємо фокус знову
             javafx.application.Platform.runLater(() -> {
                 rootPane.requestFocus();
-                System.out.println("Focus requested after transition to menu");
             });
         });
         transition.play();
@@ -302,7 +299,6 @@ public class Menu implements UIWindow {
         levelFadeIn.setOnFinished(e -> {
             javafx.application.Platform.runLater(() -> {
                 rootPane.requestFocus();
-                System.out.println("Focus requested after showing level select");
             });
         });
         levelFadeIn.play();
@@ -320,7 +316,6 @@ public class Menu implements UIWindow {
         menuFadeIn.setOnFinished(e -> {
             javafx.application.Platform.runLater(() -> {
                 rootPane.requestFocus();
-                System.out.println("Focus requested after showing main menu");
             });
         });
         menuFadeIn.play();
@@ -386,18 +381,46 @@ public class Menu implements UIWindow {
     private void continueGame() {
         JSONObject progress = gameLoader.loadJSON("data/saves/game_progress.json");
         int currentLevel = progress != null ? progress.optInt("currentLevelId", 1) : 1;
-        GameManager.getInstance().loadLevel(currentLevel, false);
+
+        // Спочатку ховаємо поточне меню
         hide();
+
+        // Очищаємо UI Manager
+        UIManager.getInstance().hideMenu();
+        if (UIManager.getInstance().getCurrentWindow() != null) {
+            UIManager.getInstance().getCurrentWindow().hide();
+            UIManager.getInstance().setCurrentWindow(null);
+        }
+
+        // Повністю очищаємо всі UI панелі
+        UIManager.getInstance().hideCurrentWindowToGame();
+
+        // Завантажуємо рівень
+        GameManager.getInstance().loadLevel(currentLevel, false);
     }
 
     private void startLevel(int levelId) {
-        GameManager.getInstance().loadLevel(levelId, true);
+        // Спочатку ховаємо поточне меню
         hide();
+
+        // Очищаємо UI Manager
+        UIManager.getInstance().hideMenu();
+        if (UIManager.getInstance().getCurrentWindow() != null) {
+            UIManager.getInstance().getCurrentWindow().hide();
+            UIManager.getInstance().setCurrentWindow(null);
+        }
+
+        // Повністю очищаємо всі UI панелі
+        UIManager.getInstance().hideCurrentWindowToGame();
+
+        // Завантажуємо рівень
+        GameManager.getInstance().loadLevel(levelId, true);
+
     }
 
+
     private void openShop() {
-        JSONObject progress = gameLoader.loadJSON("data/saves/game_progress.json");
-        int totalMoney = progress != null ? progress.optInt("totalMoney", 0) : 0;
+        GameManager.getInstance().loadProgress();
         uiManager.createWindow(UIManager.WindowType.SHOP, new JSONObject());
         hide();
     }
@@ -417,37 +440,69 @@ public class Menu implements UIWindow {
                 (int) (color.getBlue() * 255));
     }
 
-    @Override
-    public void show() {
+    // In Menu.java
+    public void showWithoutSplash() {
+        showingSplash = false;
+        splashPane.setVisible(false);
+        menuPane.setVisible(true);
+        menuVisible = true;
+        levelSelectPane.setVisible(false);
+        levelSelectionVisible = false;
+
         if (!uiManager.getMenuPane().getChildren().contains(rootPane)) {
             uiManager.getMenuPane().getChildren().add(rootPane);
-            System.out.println("Menu shown, menuPane children: " + uiManager.getMenuPane().getChildren().size());
         }
         rootPane.setVisible(true);
         rootPane.setFocusTraversable(true);
 
-        // Встановлюємо обробник подій лише на rootPane
         rootPane.setOnKeyPressed(this::handleInput);
 
-        // Додаємо дебагування фокусу
         javafx.application.Platform.runLater(() -> {
             rootPane.requestFocus();
-            System.out.println("Menu: rootPane focus requested, has focus: " + rootPane.isFocused());
-            rootPane.focusedProperty().addListener((obs, oldVal, newVal) ->
-                    System.out.println("Menu: rootPane focus changed: " + newVal));
+        });
+    }
+
+    @Override
+    public void show() {
+        if (!uiManager.getMenuPane().getChildren().contains(rootPane)) {
+            uiManager.getMenuPane().getChildren().add(rootPane);
+        }
+        rootPane.setVisible(true);
+        rootPane.setFocusTraversable(true);
+
+        rootPane.setOnKeyPressed(this::handleInput);
+
+        javafx.application.Platform.runLater(() -> {
+            rootPane.requestFocus();
         });
 
         if (showingSplash) {
             splashPane.setVisible(true);
             menuPane.setVisible(false);
             levelSelectPane.setVisible(false);
+        } else {
+            splashPane.setVisible(false);
+            menuPane.setVisible(true);
+            menuVisible = true;
+            levelSelectPane.setVisible(false);
         }
     }
 
     @Override
     public void hide() {
+
+        // Ховаємо rootPane
         rootPane.setVisible(false);
-        System.out.println("Menu hidden, menuPane children: " + uiManager.getMenuPane().getChildren().size());
+        rootPane.setMouseTransparent(true);
+
+        // Очищаємо обробники подій
+        rootPane.setOnKeyPressed(null);
+
+        // Скидаємо стани
+        showingSplash = false;
+        menuVisible = false;
+        levelSelectionVisible = false;
+
     }
 
     @Override
@@ -455,10 +510,6 @@ public class Menu implements UIWindow {
         return rootPane;
     }
     public void handleInput(KeyEvent event) {
-        System.out.println("Key pressed: " + event.getCode() +
-                ", showingSplash: " + showingSplash +
-                ", levelSelectionVisible: " + levelSelectionVisible +
-                ", menuVisible: " + menuVisible);
 
         if (showingSplash) {
             transitionToMenu();

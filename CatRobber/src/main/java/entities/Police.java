@@ -149,7 +149,6 @@ public class Police implements Animatable, GameObject, Interactable {
      * @param player об'єкт гравця
      */
     public void update(double deltaTime, List<GameManager.Room> rooms, Player player) {
-        System.out.println(state);
         // Оновлення стану оглушення
         if (state == PoliceState.STUNNED) {
             stunDuration -= deltaTime;
@@ -279,7 +278,6 @@ public class Police implements Animatable, GameObject, Interactable {
      */
     @Override
     public void updateAnimation(double deltaTime) {
-        System.out.println(frameDuration);
 
         animationTime += deltaTime;
         Image[] frames = animations.getOrDefault(currentAnimation, animations.get("idle"));

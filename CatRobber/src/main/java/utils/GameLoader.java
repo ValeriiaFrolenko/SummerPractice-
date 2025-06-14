@@ -248,13 +248,10 @@ public class GameLoader {
         puzzleData.put("type", "Puzzle");
         switch (puzzleType) {
             case "CodeLockPuzzle":
-                System.out.println("Створено головоломку");
                 return new CodeLockPuzzle(puzzleData);
             case "LockPickPuzzle":
-                System.out.println("Створено головоломку");
                 return new LockPickPuzzle(puzzleData);
             case "LaserLockPuzzle":
-                System.out.println("Створено головоломку");
                 return new LaserLockPuzzle(puzzleData);
             default:
                 System.err.println("Невідомий тип головоломки: " + puzzleType);

@@ -67,7 +67,6 @@ public class LevelManager {
         File file = new File(saveFile);
         if (file.exists()) {
             saveManager.loadGame(saveFile);
-            System.out.println("game loaded");
         } else {
             loadFromDefaults();
         }
@@ -93,7 +92,6 @@ public class LevelManager {
         JSONObject doorData = gameLoader.loadJSON("data/defaults/doors/door_level_" + currentLevelId + ".json");
         if (doorData != null) {
             objects.addAll(gameLoader.parseTiledJSON(doorData));
-            System.out.println("двері створено LEVEL MANAGER");
 
         }
         // Інтерактивні об’єкти
@@ -103,11 +101,7 @@ public class LevelManager {
         }
         // Головоломки
         JSONObject puzzleData = gameLoader.loadJSON("data/defaults/puzzles/puzzles_level_" + currentLevelId + ".json");
-        System.out.println("Файл головоломок існує: " + (puzzleData != null));
         if (puzzleData != null) {
-            System.out.println("Кількість ключів у файлі: " + puzzleData.keySet().size());
-            System.out.println("Ключі: " + puzzleData.keySet());
-            // решта коду
         }
         if (puzzleData != null) {
             for (String key : puzzleData.keySet()) {
