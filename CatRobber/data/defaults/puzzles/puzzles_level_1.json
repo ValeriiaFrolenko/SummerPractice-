@@ -84,6 +84,11 @@
         "value": "LaserLockPuzzle"
       },
       {
+        "name": "solution",
+        "type": "int",
+        "value": 2
+      },
+      {
         "name": "state",
         "type": "string",
         "value": "UNSOLVED"

@@ -11,6 +11,7 @@ import managers.GameManager;
 import managers.UIManager;
 import org.json.JSONObject;
 import puzzles.LaserLockPuzzle;
+import puzzles.Puzzle;
 import utils.GameLoader;
 import utils.Vector2D;
 
@@ -76,15 +77,22 @@ public class InteractiveObject implements GameObject, Interactable {
                     }
                 }
                 if (laserDoor != null) {
-                    LaserLockPuzzle puzzle = new LaserLockPuzzle(new JSONObject().put("solution", "laser"));
-                    puzzle.setLinkedDoor(laserDoor, (solved, door) -> {
-                        if (solved) {
-                            door.unlock();
-                            uiManager.hidePuzzleUI(); // Закриваємо UI головоломки
+                    Puzzle puzzle = null;
+                    for(Puzzle puzzleLock : GameManager.getInstance().getPuzzles()){
+                        if(puzzleLock instanceof LaserLockPuzzle){
+                            puzzle = puzzleLock;
                         }
-                    });
-                    uiManager.showPuzzleUI(puzzle.getUI());
-                    System.out.println("LaserLockPuzzle opened for door: " + laserDoor.getSharedId());
+                    }
+                    if(puzzle != null) {
+                        puzzle.setLinkedDoor(laserDoor, (solved, door) -> {
+                            if (solved) {
+                                door.unlock();
+                                uiManager.hidePuzzleUI(); // Закриваємо UI головоломки
+                            }
+                        });
+                        uiManager.showPuzzleUI(puzzle.getUI());
+                        System.out.println("LaserLockPuzzle opened for door: " + laserDoor.getSharedId());
+                    }
                 } else {
                     System.err.println("No laser door found among interactables");
                 }

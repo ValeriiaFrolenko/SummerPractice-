@@ -245,6 +245,7 @@ public class GameLoader {
         puzzleData.put("state", properties.optString("state", "UNSOLVED"));
         puzzleData.put("x", properties.optFloat("x", 0.0f));
         puzzleData.put("y", properties.optFloat("y", 0.0f));
+        puzzleData.put("solution", properties.optInt("solution"));
         puzzleData.put("type", "Puzzle");
         switch (puzzleType) {
             case "CodeLockPuzzle":
