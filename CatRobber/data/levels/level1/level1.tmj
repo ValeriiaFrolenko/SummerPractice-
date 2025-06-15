@@ -1557,7 +1557,7 @@
                 }, 
                 {
                  "gid":3,
-                 "height":100,
+                 "height":100.948246196698,
                  "id":123,
                  "name":"player",
                  "properties":[
@@ -1579,12 +1579,12 @@
                         {
                          "name":"collX",
                          "type":"float",
-                         "value":241
+                         "value":59.43
                         }, 
                         {
                          "name":"collY",
                          "type":"float",
-                         "value":306
+                         "value":65.2
                         }, 
                         {
                          "name":"currentAnimation",
@@ -1622,6 +1622,11 @@
                          "value":0
                         }, 
                         {
+                         "name":"money",
+                         "type":"int",
+                         "value":0
+                        }, 
+                        {
                          "name":"speedBoost",
                          "type":"int",
                          "value":0
@@ -1639,9 +1644,9 @@
                  "rotation":0,
                  "type":"Player",
                  "visible":true,
-                 "width":100,
-                 "x":216.219202466456,
-                 "y":375.767441918419
+                 "width":100.948246196698,
+                 "x":33.5525357997892,
+                 "y":135.100775251752
                 }, 
                 {
                  "gid":13,
@@ -1768,8 +1773,8 @@
                  "type":"PlayerCOLISSION",
                  "visible":true,
                  "width":40.7406431019961,
-                 "x":241,
-                 "y":306
+                 "x":59.4257263314337,
+                 "y":65.204420482757
                 }, 
                 {
                  "height":68,
@@ -1971,11 +1976,6 @@
                          "name":"puzzleType",
                          "type":"string",
                          "value":"LaserLockPuzzle"
-                        }, 
-                        {
-                         "name":"solution",
-                         "type":"int",
-                         "value":2
                         }, 
                         {
                          "name":"state",

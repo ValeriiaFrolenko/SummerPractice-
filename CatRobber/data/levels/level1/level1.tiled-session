@@ -25,14 +25,11 @@
             "scaleInEditor": 1
         },
         "C:/Users/valer/SummerPractice-/CatRobber/data/levels/level2/level2.tmj": {
-            "expandedObjectLayers": [
-                4
-            ],
-            "scale": 1,
-            "selectedLayer": 3,
+            "scale": 0.75,
+            "selectedLayer": 2,
             "viewCenter": {
-                "x": 646.5,
-                "y": 280.5
+                "x": 563.3333333333333,
+                "y": 455.33333333333337
             }
         },
         "C:/Users/valer/SummerPractice-/CatRobber/data/levels/level2/pictureInt.tsj": {
@@ -266,8 +263,8 @@
             "scale": 0.75,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 3.3333333333333712,
-                "y": 544.6666666666667
+                "x": 435.3333333333333,
+                "y": 406
             }
         },
         "note.tsx": {
