@@ -1,0 +1,94 @@
+{"player_72": {
+  "gid": 2147483676,
+  "visible": true,
+  "rotation": 0,
+  "name": "",
+  "width": 100,
+  "x": 660,
+  "y": 478.333333333333,
+  "id": 72,
+  "type": "Player",
+  "properties": [
+    {
+      "name": "animationFrame",
+      "type": "int",
+      "value": 0
+    },
+    {
+      "name": "animationTime",
+      "type": "int",
+      "value": 0
+    },
+    {
+      "name": "canMove",
+      "type": "bool",
+      "value": true
+    },
+    {
+      "name": "collX",
+      "type": "float",
+      "value": 695
+    },
+    {
+      "name": "collY",
+      "type": "float",
+      "value": 410
+    },
+    {
+      "name": "currentAnimation",
+      "type": "string",
+      "value": "idle"
+    },
+    {
+      "name": "detectionCount",
+      "type": "int",
+      "value": 0
+    },
+    {
+      "name": "direction",
+      "type": "string",
+      "value": "LEFT"
+    },
+    {
+      "name": "gun",
+      "type": "int",
+      "value": 0
+    },
+    {
+      "name": "hightColl",
+      "type": "float",
+      "value": 57
+    },
+    {
+      "name": "invisibility",
+      "type": "int",
+      "value": 0
+    },
+    {
+      "name": "key",
+      "type": "int",
+      "value": 0
+    },
+    {
+      "name": "money",
+      "type": "int",
+      "value": 0
+    },
+    {
+      "name": "speedBoost",
+      "type": "int",
+      "value": 0
+    },
+    {
+      "name": "state",
+      "type": "string",
+      "value": "IDLE"
+    },
+    {
+      "name": "widthColl",
+      "type": "float",
+      "value": 40.74
+    }
+  ],
+  "height": 100
+}}

@@ -1,0 +1,99 @@
+{
+  "puzzles_105": {
+    "visible": true,
+    "rotation": 0,
+    "name": "puzzle",
+    "width": 0,
+    "x": 467,
+    "y": 82,
+    "id": 105,
+    "type": "Puzzle",
+    "properties": [
+      {
+        "name": "puzzleType",
+        "type": "string",
+        "value": "CodeLockPuzzle"
+      },
+      {
+        "name": "state",
+        "type": "string",
+        "value": "UNSOLVED"
+      }
+    ],
+    "height": 0
+  },
+  "puzzles_103": {
+    "visible": true,
+    "rotation": 0,
+    "name": "puzzle",
+    "width": 0,
+    "x": 402,
+    "y": 319,
+    "id": 103,
+    "type": "Puzzle",
+    "properties": [
+      {
+        "name": "puzzleType",
+        "type": "string",
+        "value": "LockPickPuzzle"
+      },
+      {
+        "name": "state",
+        "type": "string",
+        "value": "UNSOLVED"
+      }
+    ],
+    "height": 0
+  },
+  "puzzles_104": {
+    "visible": true,
+    "rotation": 0,
+    "name": "puzzle",
+    "width": 0,
+    "x": 469,
+    "y": 433,
+    "id": 104,
+    "type": "Puzzle",
+    "properties": [
+      {
+        "name": "puzzleType",
+        "type": "string",
+        "value": "LockPickPuzzle"
+      },
+      {
+        "name": "state",
+        "type": "string",
+        "value": "UNSOLVED"
+      }
+    ],
+    "height": 0
+  },
+  "puzzles_102": {
+    "visible": true,
+    "rotation": 0,
+    "name": "puzzle",
+    "width": 0,
+    "x": 527,
+    "y": 294,
+    "id": 102,
+    "type": "Puzzle",
+    "properties": [
+      {
+        "name": "puzzleType",
+        "type": "string",
+        "value": "LaserLockPuzzle"
+      },
+      {
+        "name": "solution",
+        "type": "int",
+        "value": 1
+      },
+      {
+        "name": "state",
+        "type": "string",
+        "value": "UNSOLVED"
+      }
+    ],
+    "height": 0
+  }
+}

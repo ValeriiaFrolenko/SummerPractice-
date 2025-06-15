@@ -1,0 +1,146 @@
+{
+  "interactiveObjects_88": {
+    "gid": 54,
+    "visible": true,
+    "rotation": 0,
+    "name": "",
+    "width": 40,
+    "x": 144,
+    "y": 317.333333333333,
+    "id": 88,
+    "type": "InteractiveObject",
+    "properties": [
+      {
+        "name": "fileName",
+        "type": "string",
+        "value": "computer.png"
+      },
+      {
+        "name": "typeObj",
+        "type": "string",
+        "value": "COMPUTER"
+      }
+    ],
+    "height": 40
+  },
+  "interactiveObjects_87": {
+    "gid": 53,
+    "visible": true,
+    "rotation": 0,
+    "name": "",
+    "width": 120,
+    "x": 718.666666666667,
+    "y": 138.333333333333,
+    "id": 87,
+    "type": "InteractiveObject",
+    "properties": [
+      {
+        "name": "fileName",
+        "type": "string",
+        "value": "bankDoor.png"
+      },
+      {
+        "name": "typeObj",
+        "type": "string",
+        "value": "FINAL_PRIZE"
+      }
+    ],
+    "height": 100
+  },
+  "interactiveObjects_79": {
+    "gid": 51,
+    "visible": true,
+    "rotation": 0,
+    "name": "",
+    "width": 30,
+    "x": 474,
+    "y": 316,
+    "id": 79,
+    "type": "InteractiveObject",
+    "properties": [
+      {
+        "name": "fileName",
+        "type": "string",
+        "value": "electricalPanel.png"
+      },
+      {
+        "name": "typeObj",
+        "type": "string",
+        "value": "ELECTRICAL_PANEL"
+      }
+    ],
+    "height": 30
+  },
+  "interactiveObjects_84": {
+    "gid": 13,
+    "visible": true,
+    "rotation": 0,
+    "name": "",
+    "width": 60,
+    "x": 602.833333333333,
+    "y": 240,
+    "id": 84,
+    "type": "InteractiveObject",
+    "properties": [
+      {
+        "name": "fileName",
+        "type": "string",
+        "value": "machine.png"
+      },
+      {
+        "name": "typeObj",
+        "type": "string",
+        "value": "WITH_MONEY"
+      }
+    ],
+    "height": 80
+  },
+  "interactiveObjects_86": {
+    "gid": 15,
+    "visible": true,
+    "rotation": 0,
+    "name": "",
+    "width": 80,
+    "x": 292,
+    "y": 127,
+    "id": 86,
+    "type": "InteractiveObject",
+    "properties": [
+      {
+        "name": "fileName",
+        "type": "string",
+        "value": "drawer.png"
+      },
+      {
+        "name": "typeObj",
+        "type": "string",
+        "value": "WITH_MONEY"
+      }
+    ],
+    "height": 70
+  },
+  "interactiveObjects_82": {
+    "gid": 5,
+    "visible": true,
+    "rotation": 0,
+    "name": "",
+    "width": 55,
+    "x": 565.5,
+    "y": 576,
+    "id": 82,
+    "type": "InteractiveObject",
+    "properties": [
+      {
+        "name": "fileName",
+        "type": "string",
+        "value": "atm.png"
+      },
+      {
+        "name": "typeObj",
+        "type": "string",
+        "value": "WITH_MONEY"
+      }
+    ],
+    "height": 80
+  }
+}

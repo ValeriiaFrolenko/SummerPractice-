@@ -1,0 +1,54 @@
+{"camera_77": {
+  "gid": 50,
+  "visible": true,
+  "rotation": 0,
+  "name": "",
+  "width": 67,
+  "x": 404.5,
+  "y": 520.833333333333,
+  "id": 77,
+  "type": "Camera",
+  "properties": [
+    {
+      "name": "animationFrame",
+      "type": "int",
+      "value": 0
+    },
+    {
+      "name": "animationTime",
+      "type": "int",
+      "value": 0
+    },
+    {
+      "name": "currentAnimation",
+      "type": "string",
+      "value": "normal"
+    },
+    {
+      "name": "direction",
+      "type": "string",
+      "value": "LEFT"
+    },
+    {
+      "name": "floorPointY",
+      "type": "float",
+      "value": 584
+    },
+    {
+      "name": "hightColl",
+      "type": "int",
+      "value": 13
+    },
+    {
+      "name": "isAlert",
+      "type": "bool",
+      "value": false
+    },
+    {
+      "name": "widthColl",
+      "type": "int",
+      "value": 14
+    }
+  ],
+  "height": 33
+}}
