@@ -2257,7 +2257,7 @@
                         {
                          "name":"solution",
                          "type":"int",
-                         "value":1
+                         "value":3
                         }, 
                         {
                          "name":"state",
