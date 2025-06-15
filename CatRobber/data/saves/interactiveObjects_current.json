@@ -41,10 +41,11 @@
   },
   "interactiveObjects_3": {
     "fileName": "picture.jpg",
+    "code": "8399",
     "isPictureMoved": true,
-    "x": 150.66700744628906,
+    "x": 100.66700744628906,
     "width": 50,
-    "y": 150.66700744628906,
+    "y": 105.66649627685547,
     "typeObj": "PICTURE",
     "type": "InteractiveObject",
     "height": 50

@@ -4,8 +4,8 @@
   "rotation": 0,
   "name": "player",
   "width": 100,
-  "x": 33.5525357997892,
-  "y": 135.100775251752,
+  "x": 216.219202466456,
+  "y": 375.767441918419,
   "id": 123,
   "type": "Player",
   "properties": [
@@ -27,12 +27,12 @@
     {
       "name": "collX",
       "type": "float",
-      "value": 59.43
+      "value": 241
     },
     {
       "name": "collY",
       "type": "float",
-      "value": 65.2
+      "value": 306
     },
     {
       "name": "currentAnimation",

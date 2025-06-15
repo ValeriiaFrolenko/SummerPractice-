@@ -433,6 +433,18 @@
                  "width":50,
                  "x":486.666666666667,
                  "y":240.333333333333
+                }, 
+                {
+                 "gid":67,
+                 "height":30,
+                 "id":112,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":30,
+                 "x":161.666666666667,
+                 "y":96
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -2847,7 +2859,7 @@
          "y":0
         }],
  "nextlayerid":7,
- "nextobjectid":110,
+ "nextobjectid":113,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.2",
@@ -3037,6 +3049,10 @@
         {
          "firstgid":66,
          "source":"chest3.tsj"
+        }, 
+        {
+         "firstgid":67,
+         "source":"NOTE.tsj"
         }],
  "tilewidth":32,
  "type":"map",

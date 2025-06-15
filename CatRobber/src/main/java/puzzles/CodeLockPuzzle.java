@@ -29,7 +29,7 @@ public class CodeLockPuzzle extends Puzzle {
 
     public CodeLockPuzzle(JSONObject defaultData) {
         super(defaultData);
-        String code = GameManager.getInstance().getNoteCode();
+        String code = GameManager.getInstance().getCode();
         this.solution = (code != null) ? code : String.valueOf(0000);
         this.enteredCode = new StringBuilder();
     }

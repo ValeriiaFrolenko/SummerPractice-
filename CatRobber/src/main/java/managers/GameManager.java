@@ -25,7 +25,7 @@ public class GameManager implements Savable {
     // Поля
     private static GameManager instance; // Singleton-екземпляр GameManager
     private final LevelManager levelManager; // Менеджер рівнів (завантаження даних рівня)
-    private String noteCode;
+    private String code;
     private SaveManager saveManager; // Менеджер збереження гри, пов’язаний із SaveManager
     private JSONObject currentLevel; // Дані поточного рівня у форматі JSON, отримані від LevelManager
     private List<GameObject> gameObjects; // Список усіх ігрових об’єктів (Player, Police тощо)
@@ -88,17 +88,17 @@ public class GameManager implements Savable {
         }
     }
 
-    public void setNoteCode(String code) {
-        noteCode  = code;
+    public void setCode(String code) {
+        this.code = code;
     }
 
-    public String getNoteCode() {
-        return noteCode;
+    public String getCode() {
+        return code;
     }
 
     // Конструктор, ініціалізує менеджери та списки
     public GameManager() {
-        noteCode = "0000";
+        code = "0000";
         gameObjects = new ArrayList<>();
         renderableObjects = new ArrayList<>();
         animatableObjects = new ArrayList<>();
@@ -548,7 +548,7 @@ public class GameManager implements Savable {
         JSONObject data = new JSONObject();
         data.put("gameState", gameState.toString());
         data.put("currentLevelId", currentLevelId);
-        data.put("noteCode", noteCode);
+        data.put("code", code);
         data.put("completedLevels", completedLevels);
         data.put("totalMoney", totalMoney);
         return data;
@@ -558,7 +558,7 @@ public class GameManager implements Savable {
     public void setFromData(JSONObject data) {
         gameState = GameState.valueOf(data.getString("gameState"));
         currentLevelId = data.getInt("currentLevelId");
-        noteCode = data.getString("noteCode");
+        code = data.getString("code");
         completedLevels = new ArrayList<>();
         for (Object level : data.getJSONArray("completedLevels")) {
             completedLevels.add((Integer) level);

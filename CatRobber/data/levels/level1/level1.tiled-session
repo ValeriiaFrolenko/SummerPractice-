@@ -9,30 +9,34 @@
     "file.lastUsedOpenFilter": "Всі файли (*)",
     "fileStates": {
         "C:/Users/valer/SummerPractice-/CatRobber/data/levels/level2/chest1.tsj": {
+            "scaleInDock": 1,
             "scaleInEditor": 1
         },
         "C:/Users/valer/SummerPractice-/CatRobber/data/levels/level2/chest2.tsj": {
+            "scaleInDock": 1,
             "scaleInEditor": 1
         },
         "C:/Users/valer/SummerPractice-/CatRobber/data/levels/level2/chest3.tsj": {
+            "scaleInDock": 1,
             "scaleInEditor": 1
         },
         "C:/Users/valer/SummerPractice-/CatRobber/data/levels/level2/diamont.tsj": {
+            "scaleInDock": 1,
             "scaleInEditor": 1
         },
         "C:/Users/valer/SummerPractice-/CatRobber/data/levels/level2/level2.tmj": {
             "expandedObjectLayers": [
-                3,
                 4
             ],
             "scale": 1,
             "selectedLayer": 3,
             "viewCenter": {
-                "x": 538.5,
+                "x": 646.5,
                 "y": 280.5
             }
         },
         "C:/Users/valer/SummerPractice-/CatRobber/data/levels/level2/pictureInt.tsj": {
+            "scaleInDock": 1,
             "scaleInEditor": 1
         },
         "C:/Users/valer/SummerPractice-/CatRobber/data/levels/level3/level3.tmj": {
@@ -42,59 +46,169 @@
             "scale": 1,
             "selectedLayer": 3,
             "viewCenter": {
-                "x": 591.5,
-                "y": 335.5
+                "x": 575.5,
+                "y": 280.5
             }
         },
+        "C:/Users/valer/level2/2b4e64686da65cbb2689b9d5e87a928a-removebg-preview.tsj": {
+            "scaleInDock": 1
+        },
+        "C:/Users/valer/level2/789d230cad4a7f2b57c9d1d7d52771b4-removebg-preview.tsj": {
+            "scaleInDock": 1
+        },
+        "C:/Users/valer/level2/82665727f77d2721e4b919f34d2676ae-removebg-preview.tsj": {
+            "scaleInDock": 1
+        },
+        "C:/Users/valer/level2/ChatGPT Image 14 черв. 2025 р., 13_28_53 (2).tsj": {
+            "scaleInDock": 1
+        },
+        "C:/Users/valer/level2/ChatGPT Image 14 черв. 2025 р., 13_46_33 (1).tsj": {
+            "scaleInDock": 1
+        },
+        "C:/Users/valer/level2/ChatGPT Image 14 черв. 2025 р., 13_46_33 (2).tsj": {
+            "scaleInDock": 1
+        },
+        "C:/Users/valer/level2/ChatGPT_Image_14_черв._2025_р.__14_01_33__1_-removebg-preview (1).tsj": {
+            "scaleInDock": 1
+        },
+        "C:/Users/valer/level2/ChatGPT_Image_14_черв._2025_р.__14_01_33__2_-removebg-preview.tsj": {
+            "scaleInDock": 1
+        },
+        "C:/Users/valer/level2/ChatGPT_Image_14_черв._2025_р.__14_03_49__1_-removebg-preview.tsj": {
+            "scaleInDock": 1
+        },
+        "C:/Users/valer/level2/ChatGPT_Image_14_черв._2025_р.__14_03_49__2_-removebg-preview.tsj": {
+            "scaleInDock": 1
+        },
+        "C:/Users/valer/level2/da5f3b2effd89e26881eac11df04f03c-removebg-preview.tsj": {
+            "scaleInDock": 1
+        },
+        "C:/Users/valer/level2/f2a83817aa31c7fd2b643bba2c66673d-removebg-preview.tsj": {
+            "scaleInDock": 1
+        },
+        "C:/Users/valer/level2/file_0000000076e861f4b30ed9290d2149dc-removebg-preview.tsj": {
+            "scaleInDock": 1
+        },
+        "C:/Users/valer/level2/file_0000000076e861f4b30ed9290d2149dc__1_-removebg-preview.tsj": {
+            "scaleInDock": 1
+        },
+        "C:/Users/valer/level2/file_000000008f1c624696890347fb82f177 (1).tsj": {
+            "scaleInDock": 1
+        },
+        "C:/Users/valer/level2/file_000000008f1c624696890347fb82f177.tsj": {
+            "scaleInDock": 1
+        },
+        "C:/Users/valer/level2/file_0000000094ec61f785168cf6c95f72d0 (2).tsj": {
+            "scaleInDock": 1
+        },
+        "C:/Users/valer/level2/file_00000000abb861f780f4029676708981-removebg-preview.tsj": {
+            "scaleInDock": 1
+        },
+        "C:/Users/valer/level2/file_00000000abb861f780f4029676708981__1_-removebg-preview.tsj": {
+            "scaleInDock": 1
+        },
+        "C:/Users/valer/level2/file_00000000abb861f780f4029676708981__2_-removebg-preview.tsj": {
+            "scaleInDock": 1
+        },
+        "C:/Users/valer/level2/file_00000000efc86243a2a1254b127e9b9f-removebg-preview.tsj": {
+            "scaleInDock": 1
+        },
+        "C:/Users/valer/level2/file_00000000efc86243a2a1254b127e9b9f__1_-removebg-preview.tsj": {
+            "scaleInDock": 1
+        },
+        "C:/Users/valer/level2/file_00000000efc86243a2a1254b127e9b9f__2_-removebg-preview.tsj": {
+            "scaleInDock": 1
+        },
+        "C:/Users/valer/level2/file_00000000f4906243956e39db120fab56.tsj": {
+            "scaleInDock": 1
+        },
+        "C:/Users/valer/level2/file_00000000f4906243956e39db120fab56__2_-removebg-preview.tsj": {
+            "scaleInDock": 1
+        },
+        "C:/Users/valer/level2/file_00000000f4906243956e39db120fab56__3_-removebg-preview.tsj": {
+            "scaleInDock": 1
+        },
+        "C:/Users/valer/level2/picture.tsj": {
+            "scaleInDock": 1
+        },
+        "C:/Users/valer/level2/rooms.tsj": {
+            "scaleInDock": 1
+        },
+        "C:/Users/valer/level2/table.tsj": {
+            "scaleInDock": 1
+        },
+        "C:/Users/valer/level2/лавка.tsj": {
+            "scaleInDock": 1
+        },
+        "C:/Users/valer/level2/лента.tsj": {
+            "scaleInDock": 1
+        },
         "C:/Users/valer/level3/ChatGPT Image 15 черв. 2025 р., 03_57_34 (1).tsj": {
+            "scaleInDock": 1,
             "scaleInEditor": 1
         },
         "C:/Users/valer/level3/ChatGPT Image 15 черв. 2025 р., 03_57_34 (4).tsj": {
+            "scaleInDock": 1,
             "scaleInEditor": 1
         },
         "C:/Users/valer/level3/ChatGPT Image 15 черв. 2025 р., 03_57_39.tsj": {
+            "scaleInDock": 1,
             "scaleInEditor": 1
         },
         "C:/Users/valer/level3/ChatGPT Image 15 черв. 2025 р., 03_57_42 (1).tsj": {
+            "scaleInDock": 1,
             "scaleInEditor": 1
         },
         "C:/Users/valer/level3/ChatGPT Image 15 черв. 2025 р., 03_57_42 (2).tsj": {
+            "scaleInDock": 1,
             "scaleInEditor": 1
         },
         "C:/Users/valer/level3/ChatGPT Image 15 черв. 2025 р., 03_57_42 (3).tsj": {
+            "scaleInDock": 1,
             "scaleInEditor": 1
         },
         "C:/Users/valer/level3/ChatGPT Image 15 черв. 2025 р., 03_57_42 (4).tsj": {
+            "scaleInDock": 1,
             "scaleInEditor": 1
         },
         "C:/Users/valer/level3/ChatGPT Image 15 черв. 2025 р., ТБТБ04_16_09 (1).tsj": {
+            "scaleInDock": 1,
             "scaleInEditor": 1
         },
         "C:/Users/valer/level3/ChatGPT_Image_15_черв._2025_р.__03_24_40__2_-removebg-preview.tsj": {
+            "scaleInDock": 1,
             "scaleInEditor": 1
         },
         "C:/Users/valer/level3/ChatGPT_Image_15_черв._2025_р.__03_24_40__4_-removebg-preview.tsj": {
+            "scaleInDock": 1,
             "scaleInEditor": 1
         },
         "C:/Users/valer/level3/ChatGPT_Image_15_черв._2025_р.__03_24_40__5_-removebg-preview.tsj": {
+            "scaleInDock": 1,
             "scaleInEditor": 1
         },
         "C:/Users/valer/level3/ChatGPT_Image_15_черв._2025_р.__03_24_40__6_-removebg-preview.tsj": {
+            "scaleInDock": 1,
             "scaleInEditor": 1
         },
         "C:/Users/valer/level3/ChatGPT_Image_15_черв._2025_р.__03_58_04__1_-removebg-preview.tsj": {
+            "scaleInDock": 1,
             "scaleInEditor": 1
         },
         "C:/Users/valer/level3/ChatGPT_Image_15_черв._2025_р.__03_58_04__2_-removebg-preview.tsj": {
+            "scaleInDock": 1,
             "scaleInEditor": 1
         },
         "C:/Users/valer/level3/ChatGPT_Image_15_черв._2025_р.__03_58_20__1_-removebg-preview.tsj": {
+            "scaleInDock": 1,
             "scaleInEditor": 1
         },
         "C:/Users/valer/level3/ChatGPT_Image_15_черв._2025_р.__03_58_20__2_-removebg-preview.tsj": {
+            "scaleInDock": 1,
             "scaleInEditor": 1
         },
         "C:/Users/valer/level3/atm.tsj": {
+            "scaleInDock": 1,
             "scaleInEditor": 1
         },
         "C:/Users/valer/level3/level3.tmj": {
@@ -110,18 +224,23 @@
             }
         },
         "C:/Users/valer/level3/mouse.tsj": {
+            "scaleInDock": 1,
             "scaleInEditor": 1
         },
         "C:/Users/valer/level3/office.tsj": {
+            "scaleInDock": 1,
             "scaleInEditor": 1
         },
         "C:/Users/valer/level3/register.tsj": {
+            "scaleInDock": 1,
             "scaleInEditor": 1
         },
         "C:/Users/valer/level3/rooms.tsj": {
+            "scaleInDock": 1,
             "scaleInEditor": 1
         },
         "C:/Users/valer/level3/ЬТЬ-removebg-preview.tsj": {
+            "scaleInDock": 1,
             "scaleInEditor": 1
         },
         "bars.tsj": {
@@ -144,11 +263,11 @@
             "expandedObjectLayers": [
                 3
             ],
-            "scale": 1.5,
+            "scale": 0.75,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 560.3333333333333,
-                "y": 527
+                "x": 3.3333333333333712,
+                "y": 544.6666666666667
             }
         },
         "note.tsx": {
@@ -190,7 +309,7 @@
             "scaleInEditor": 1
         }
     },
-    "last.imagePath": "C:/Users/valer/level3",
+    "last.imagePath": "C:/Users/valer/SummerPractice-/CatRobber/assets/images/UI",
     "map.height": 20,
     "map.lastUsedFormat": "json",
     "map.tileHeight": 32,
@@ -204,6 +323,7 @@
     "project": "level1.tiled-project",
     "property.type": "int",
     "recentFiles": [
+        "C:/Users/valer/SummerPractice-/CatRobber/data/levels/level2/pictureInt.tsj",
         "C:/Users/valer/level3/ChatGPT Image 15 черв. 2025 р., 03_57_39.tsj",
         "C:/Users/valer/level3/rooms.tsj",
         "C:/Users/valer/level3/ЬТЬ-removebg-preview.tsj",
@@ -214,13 +334,12 @@
         "C:/Users/valer/level3/ChatGPT_Image_15_черв._2025_р.__03_24_40__4_-removebg-preview.tsj",
         "C:/Users/valer/level3/ChatGPT_Image_15_черв._2025_р.__03_58_04__2_-removebg-preview.tsj",
         "C:/Users/valer/level3/ChatGPT_Image_15_черв._2025_р.__03_24_40__6_-removebg-preview.tsj",
-        "C:/Users/valer/level3/ChatGPT_Image_15_черв._2025_р.__03_58_20__1_-removebg-preview.tsj",
-        "C:/Users/valer/level3/ChatGPT_Image_15_черв._2025_р.__03_58_20__2_-removebg-preview.tsj"
+        "C:/Users/valer/level3/ChatGPT_Image_15_черв._2025_р.__03_58_20__1_-removebg-preview.tsj"
     ],
     "tileset.lastUsedFormat": "json",
     "tileset.tileSize": {
-        "height": 1024,
-        "width": 1024
+        "height": 499,
+        "width": 499
     },
     "tileset.type": 0
 }

@@ -45,10 +45,10 @@ public class InteractiveObject implements GameObject, Interactable {
         this.sprite = loader.loadImage(spritePath);
 
         // Генеруємо код для нотатки при створенні об'єкта
-        if (type == Type.NOTE && !properties.has("noteCode")) {
-            String noteCode = generateRandomCode();
-            properties.put("noteCode", noteCode);
-            GameManager.getInstance().setNoteCode(noteCode); // Зберігаємо в GameManager
+        if ((type == Type.NOTE||type == Type.PICTURE||type == Type.COMPUTER) && !properties.has("code")) {
+            String code = generateRandomCode();
+            properties.put("code", code);
+            GameManager.getInstance().setCode(code); // Зберігаємо в GameManager
         }
     }
 
@@ -148,8 +148,8 @@ public class InteractiveObject implements GameObject, Interactable {
         data.put("fileName", properties.getString("fileName"));
         data.put("type", "InteractiveObject");
         data.put("isPictureMoved", isPictureMoved);
-        if (type == Type.NOTE && properties.has("noteCode")) {
-            data.put("noteCode", properties.getString("noteCode")); // Зберігаємо код нотатки
+        if ((type == Type.NOTE||type == Type.PICTURE||type == Type.COMPUTER) && properties.has("code")) {
+            data.put("code", properties.getString("code")); // Зберігаємо код нотатки
         }
         return data;
     }
@@ -176,9 +176,9 @@ public class InteractiveObject implements GameObject, Interactable {
         GameLoader loader = new GameLoader();
         this.sprite = loader.loadImage(spritePath);
         // Відновлюємо код нотатки
-        if (data.has("noteCode")) {
-            properties.put("noteCode", data.getString("noteCode"));
-            GameManager.getInstance().setNoteCode(data.getString("noteCode"));
+        if (data.has("code")) {
+            properties.put("code", data.getString("code"));
+            GameManager.getInstance().setCode(data.getString("code"));
         }
     }
 

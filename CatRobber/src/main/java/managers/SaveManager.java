@@ -43,7 +43,7 @@ public class SaveManager {
         saveData.put("currentLevelId", GameManager.getInstance().getCurrentLevelId());
         saveData.put("totalMoney", GameManager.getInstance().getTotalMoney());
         saveData.put("gameState", gameState.toString());
-        saveData.put("noteCode", GameManager.getInstance().getNoteCode());
+        saveData.put("code", GameManager.getInstance().getCode());
 
         // Збереження об'єктів гри
         savePlayer(GameManager.getInstance().getPlayer());
