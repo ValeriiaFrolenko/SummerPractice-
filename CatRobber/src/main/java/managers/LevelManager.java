@@ -26,6 +26,7 @@ public class LevelManager {
         gameLoader = new GameLoader();
         saveManager = new SaveManager();
         collisionMap = new ArrayList<>();
+        currentLevelId = 1;
     }
 
     // --- Завантаження ---

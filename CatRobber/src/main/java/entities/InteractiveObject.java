@@ -22,7 +22,7 @@ public class InteractiveObject implements GameObject, Interactable {
     private String spritePath; //шлях до файлу із зображенням
     private Type type; //тип інтерективного об'єкта
     private JSONObject properties; //додаткові властивості об’єкта у форматі JSON
-
+    private boolean isMoneyGiven = false;
     /** Перелік можливих типів інтерактивних об'єктів **/
 
     public enum Type { NOTE, PICTURE, COMPUTER, ELECTRICAL_PANEL, WITH_MONEY, FINAL_PRIZE}
@@ -98,10 +98,16 @@ public class InteractiveObject implements GameObject, Interactable {
                 }
                 break;
             case WITH_MONEY:
-                GameManager.getInstance().addMoney(100);
+                if (!isMoneyGiven) {
+                    GameManager.getInstance().addMoney(100);
+                    isMoneyGiven = true;
+                }
                 break;
             case FINAL_PRIZE:
-                GameManager.getInstance().addMoney(500);
+                if (!isMoneyGiven) {
+                    GameManager.getInstance().addMoney(200);
+                    isMoneyGiven = true;
+                }
                 uiManager.createWindow(UIManager.WindowType.VICTORY, properties);
                 break;
         }
@@ -173,7 +179,7 @@ public class InteractiveObject implements GameObject, Interactable {
         data.put("width", imageWidth);
         data.put("height", imageHeight);
         data.put("fileName", properties.getString("fileName"));
-        data.put("type", "interactiveObject");
+        data.put("type","InteractiveObject");
 
         return data;
     }
@@ -288,7 +294,7 @@ public class InteractiveObject implements GameObject, Interactable {
      */
     @Override
     public int getRenderLayer() {
-        return 1;
+        return 0;
     }
 
     /**

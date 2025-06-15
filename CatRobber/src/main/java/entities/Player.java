@@ -261,7 +261,7 @@ public class Player implements Animatable, GameObject, Interactable {
         System.out.println("Teleported to room: x=" + getPosition().x + ", y=" + getPosition().y);
     }
 
-    public void teleportToFloor(Door door) {
+    public void teleportToFloor(Door door, int levelId) {
         String doorDirection = door.direction;
         Direction teleportDirection;
         if (doorDirection.equals("up")) {
@@ -273,7 +273,11 @@ public class Player implements Animatable, GameObject, Interactable {
         }
         stopMovement();
         setAnimationState("idle");
+        if (levelId==1){
         adjustPlayerPosition(120, teleportDirection);
+        } else {
+            adjustPlayerPosition(113, teleportDirection);
+        }
         System.out.println("Teleported to floor: x=" + getPosition().x + ", y=" + getPosition().y);
     }
 

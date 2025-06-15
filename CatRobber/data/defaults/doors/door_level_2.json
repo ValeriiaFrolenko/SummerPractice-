@@ -1339,7 +1339,7 @@
       {
         "name": "lockType",
         "type": "string",
-        "value": "NONE"
+        "value": "PICK_LOCK"
       },
       {
         "name": "sharedId",
@@ -1447,7 +1447,7 @@
       {
         "name": "lockType",
         "type": "string",
-        "value": "NONE"
+        "value": "CODE_LOCK"
       },
       {
         "name": "sharedId",
@@ -1555,7 +1555,7 @@
       {
         "name": "lockType",
         "type": "string",
-        "value": "NONE"
+        "value": "CODE_LOCK"
       },
       {
         "name": "sharedId",
@@ -1609,7 +1609,7 @@
       {
         "name": "lockType",
         "type": "string",
-        "value": "NONE"
+        "value": "PICK_LOCK"
       },
       {
         "name": "sharedId",

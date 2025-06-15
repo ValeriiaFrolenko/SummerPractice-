@@ -133,8 +133,12 @@ public class GameManager implements Savable {
     public void registerInteractionCallback(InputHandler inputHandler) {
         inputHandler.registerCallback(KeyCode.E, () -> {
             UIManager uiManager = GameWindow.getInstance().getUIManager();
-            if (closestInteractable != null && closestInteractable instanceof InteractiveObject interactiveObject) {
-                interactiveObject.interact(player);
+            if (closestInteractable != null) {
+                if (closestInteractable instanceof Door) {
+                    ((Door) closestInteractable).open();
+                } else if (closestInteractable instanceof InteractiveObject interactiveObject) {
+                    interactiveObject.interact(player);
+                }
             } else {
                 System.out.println("E pressed, blocked: window=" + uiManager.getCurrentWindow() + ", interactable=" + closestInteractable);
             }
@@ -147,7 +151,6 @@ public class GameManager implements Savable {
         checkInteractions(); // Перевіряємо взаємодії перед обробкою вводу
         managePlayerMoving(inputHandler, deltaTime);
         managePlayerHit(inputHandler, deltaTime);
-        managePlayerOpenDoor(inputHandler);
         checkCollisions();
     }
 
@@ -158,16 +161,6 @@ public class GameManager implements Savable {
                 if (interactable instanceof Police && interactable.canInteract(player)) {
                     interactable.interact(player);
                 }
-            }
-        }
-    }
-
-    // Відкриття дверей за допомогою кнопки Е
-    private void managePlayerOpenDoor(InputHandler inputHandler) {
-        if (inputHandler.isKeyPressed(KeyCode.E)) {
-            if (closestInteractable != null && closestInteractable instanceof Door) {
-                Door door = (Door) closestInteractable;
-                door.open();
             }
         }
     }
@@ -209,6 +202,7 @@ public class GameManager implements Savable {
             player.stopMovement();
         }
     }
+
 
     // Встановлює список ігрових об’єктів, сортує їх за типами
     public void setGameObjects(List<GameObject> objects) {

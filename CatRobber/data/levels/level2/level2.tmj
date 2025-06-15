@@ -908,7 +908,7 @@
                         {
                          "name":"lockType",
                          "type":"string",
-                         "value":"NONE"
+                         "value":"CODE_LOCK"
                         }, 
                         {
                          "name":"sharedId",
@@ -961,7 +961,7 @@
                         {
                          "name":"lockType",
                          "type":"string",
-                         "value":"NONE"
+                         "value":"PICK_LOCK"
                         }, 
                         {
                          "name":"sharedId",
@@ -1332,7 +1332,7 @@
                         {
                          "name":"lockType",
                          "type":"string",
-                         "value":"NONE"
+                         "value":"CODE_LOCK"
                         }, 
                         {
                          "name":"sharedId",
@@ -1385,7 +1385,7 @@
                         {
                          "name":"lockType",
                          "type":"string",
-                         "value":"NONE"
+                         "value":"PICK_LOCK"
                         }, 
                         {
                          "name":"sharedId",
@@ -2399,7 +2399,7 @@
                         {
                          "name":"solution",
                          "type":"int",
-                         "value":2
+                         "value":3
                         }, 
                         {
                          "name":"state",
@@ -2444,7 +2444,7 @@
                         {
                          "name":"puzzleType",
                          "type":"string",
-                         "value":"LockPickPuzzle"
+                         "value":"CodeLockPuzzle"
                         }, 
                         {
                          "name":"state",

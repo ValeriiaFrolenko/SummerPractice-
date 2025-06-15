@@ -86,38 +86,39 @@ public class Door implements GameObject, Interactable {
     @Override
     public void interact(Player player) {
         if (!isLocked && isOpen) {
-            Player.Direction direction = player.getDirection();
-            if ((direction.equals(Player.Direction.LEFT) || direction.equals(Player.Direction.RIGHT)) && isRoomLink) {
+            Player.Direction playerDirection = player.getDirection();
+            if (isRoomLink &&
+                    ((playerDirection == Player.Direction.LEFT && direction.equals("right")) ||
+                            (playerDirection == Player.Direction.RIGHT && direction.equals("left")))) {
                 player.teleportToRoom(this);
                 System.out.println("Teleporting to room: " + sharedId);
-            } else if (isFloorLink) {
-                player.teleportToFloor(this);
+            } else if (isFloorLink &&
+                    ((playerDirection == Player.Direction.UP && direction.equals("up")) ||
+                            (playerDirection == Player.Direction.DOWN && direction.equals("down")))) {
+                player.teleportToFloor(this, GameManager.getInstance().getCurrentLevelId());
                 System.out.println("Teleporting to floor: " + sharedId);
             }
         }
     }
+
 
     /**
      * Метод, що відкриває двері або запускає процес взаємодії (відображення підказки чи головоломки)
      * залежно від їхнього стану (заблоковані чи ні) та типу замка
      */
     public void open() {
-        //отримуємо UIManager, щоб показати/приховати підказки або головоломки
         UIManager uiManager = GameWindow.getInstance().getUIManager();
         if (uiManager == null) {
             System.err.println("UIManager не доступний");
             return;
         }
 
-        //якщо двері заблоковані
         if (isLocked) {
-            //якщо лазерні двері == true, то показує підказку
             if (isLaser) {
                 uiManager.showInteractionPrompt(getInteractionPrompt());
                 System.out.println("Laser door interaction: locked");
                 return;
             }
-            //для інших заблокованих дверей в залежності від типу замка створюється головоломка
             Puzzle puzzle = null;
             switch (lockType) {
                 case CODE_LOCK:
@@ -127,34 +128,26 @@ public class Door implements GameObject, Interactable {
                     puzzle = new LockPickPuzzle(new JSONObject().put("solution", "lockpick"));
                     break;
                 case LASER_LOCK:
-                    return; // Лазерні двері не викликають головоломку
+                    return;
                 case NONE:
                     return;
             }
-            //якщо головоломка створена, під'єднуємо двері до головоломки
             if (puzzle != null) {
                 puzzle.setLinkedDoor(this, (solved, door) -> {
-                    //якщо головоломка розв'язана
                     if (solved) {
-                        door.unlock(); // Розблоковуємо всі зв’язані двері
-                        uiManager.hidePuzzleUI(); // Головоломка зникне з екрану
+                        door.unlock();
+                        uiManager.hidePuzzleUI();
                         System.out.println("Puzzle solved, door unlocked: " + sharedId);
                     }
                 });
                 uiManager.showPuzzleUI(puzzle.getUI());
             }
         } else {
-            // Якщо двері не заблоковані, відкриваємо всі зв'язані двері
             openLinkedDoors();
             System.out.println("Door opened: " + sharedId);
         }
     }
 
-    /**
-     * Метод перебирає всі інтерактивні об'єкти гри, знаходить серед них двері,
-     * перевіряє, чи мають вони однаковий ідентифікатор sharedId,
-     * і відкриває (встановлює isOpen = true) всі такі зв'язані двері.
-     */
     public void openLinkedDoors() {
         for (Interactable interactable : GameManager.getInstance().getInteractables()) {
             if (interactable instanceof Door otherDoor && otherDoor.getSharedId() == this.sharedId) {
@@ -164,72 +157,29 @@ public class Door implements GameObject, Interactable {
         }
     }
 
-    /**
-     * Метод, що розблоковує та відкриває поточні двері, а також усі двері, які мають однаковий sharedId
-     */
     public void unlock() {
-        this.isLocked = false; //прапорець, що двері більше не заблоковані
-        this.isOpen = true; //прапорць, що двері відриті
-
-        // Розблоковуємо та відкриваємо всі двері, що зв’язані з поточними (мають однаковий sharedId)
+        this.isLocked = false;
+        this.isOpen = true;
         for (Interactable interactable : GameManager.getInstance().getInteractables()) {
             if (interactable instanceof Door otherDoor && otherDoor.getSharedId() == this.sharedId) {
-                otherDoor.isLocked = false; //знімаємо блокування з пов'язаних дверей
-                otherDoor.isOpen = true; //відриваємо пов'язані двері
+                otherDoor.isLocked = false;
+                otherDoor.isOpen = true;
                 System.out.println("Linked door unlocked: " + otherDoor.getSharedId());
             }
         }
     }
 
-    /**
-     * Метод, що перевіряє чи може гравець взаємодіяти з дверми
-     * @param player об'єкт гравця
-     * @return true - якщо гравець може взаємодіяти з дверми, false - якщо ні
-     */
     @Override
     public boolean canInteract(Player player) {
-        //отримуємо межі гравця та дверей
         Bounds playerBounds = player.getBounds();
         Bounds doorBounds = this.getBounds();
         double offset = 5;
-        //створюємо прямокутник bounds, який розташований по горизонталі на 5 пікселів ліворуч і праворуч від меж гравця
-        Bounds bounds = new BoundingBox(playerBounds.getMinX()-offset, playerBounds.getMinY(), playerBounds.getWidth() + offset*2, playerBounds.getHeight());
-        boolean hasOverlap = bounds.intersects(doorBounds); //перевіряємо чи перетинається гравець з дверми
-
-        //якщо немає перетину, повертаємо false, взаємодія неможлива
-        if (!hasOverlap) {
-            return false;
-        }
-
-        //отримуємо напрямок, у якому дивиться гравець і напрямок дверей
-        Player.Direction playerDirection = player.getDirection();
-        String doorDirection = this.direction;
-
-        //якщо двері лазерні, то перевіряємо, чи дивиться гравець вліво чи вправо
-        if (isLaser) {
-            if (playerDirection == Player.Direction.RIGHT || playerDirection == Player.Direction.LEFT) {
-                return true; // Лазерні двері дозволяють взаємодію для показу підказки
-            }
-        }
-
-        //якщо двері ведуть в іншу кімнату
-        if (isRoomLink) {
-            if ((playerDirection == Player.Direction.RIGHT && doorDirection.equals("left")) ||
-                    (playerDirection == Player.Direction.LEFT && doorDirection.equals("right"))) {
-                return true;
-            }
-        }
-
-        //якщо двері ведуть на інший поверх
-        if (isFloorLink) {
-            if ((playerDirection == Player.Direction.UP && doorDirection.equals("up")) ||
-                    (playerDirection == Player.Direction.DOWN && doorDirection.equals("down"))) {
-                return true;
-            }
-        }
-
-        return false;
+        Bounds bounds = new BoundingBox(playerBounds.getMinX() - offset, playerBounds.getMinY(),
+                playerBounds.getWidth() + offset * 2, playerBounds.getHeight());
+        boolean hasOverlap = bounds.intersects(doorBounds);
+        return hasOverlap;
     }
+
 
     /**
      * Метод, що повертає відстань, на якій гравець може взаємодіяти з дверми
@@ -247,6 +197,8 @@ public class Door implements GameObject, Interactable {
     @Override
     public void render(GraphicsContext gc) {
         Image sprite = null; //змінна в яку буде завантажено спрайт
+        boolean shouldMirror = false; //флаг для відзеркалювання
+
         if (isFloorLink) {
             if (isLocked) {
                 sprite = sprites.get("stairsLocked");
@@ -265,6 +217,8 @@ public class Door implements GameObject, Interactable {
             if (isLocked) {
                 if (isLaser) {
                     sprite = sprites.get("laserLocked");
+                    // Відзеркалюємо лазерні двері якщо вони направо
+                    shouldMirror = direction.equals("right");
                 } else {
                     if (direction.equals("left")) {
                         sprite = sprites.get("lockedLeft");
@@ -276,6 +230,8 @@ public class Door implements GameObject, Interactable {
                 if (isOpen) {
                     if (isLaser) {
                         sprite = sprites.get("laserUnlocked");
+                        // Відзеркалюємо лазерні двері якщо вони направо
+                        shouldMirror = direction.equals("right");
                     } else {
                         if (direction.equals("left")) {
                             sprite = sprites.get("openLeft");
@@ -286,6 +242,8 @@ public class Door implements GameObject, Interactable {
                 } else {
                     if (isLaser) {
                         sprite = sprites.get("laserUnlocked");
+                        // Відзеркалюємо лазерні двері якщо вони направо
+                        shouldMirror = direction.equals("right");
                     } else {
                         if (direction.equals("left")) {
                             sprite = sprites.get("closedLeft");
@@ -296,6 +254,7 @@ public class Door implements GameObject, Interactable {
                 }
             }
         }
+
         if (sprite != null) {
             gc.setImageSmoothing(false); //вимикаємо згладжування
             Bounds bounds = getImageBounds(); //отримаємо координати, де треба малювати
@@ -303,7 +262,26 @@ public class Door implements GameObject, Interactable {
             double renderY = bounds.getMinY();
             double renderWidth = imageWidth;
             double renderHeight = imageHeight;
-            gc.drawImage(sprite, renderX, renderY, renderWidth, renderHeight);
+
+            if (shouldMirror) {
+                // Зберігаємо поточний стан трансформації
+                gc.save();
+
+                // Переміщуємо початок координат до центру зображення
+                gc.translate(renderX + renderWidth / 2, renderY + renderHeight / 2);
+
+                // Відзеркалюємо по горизонталі
+                gc.scale(-1, 1);
+
+                // Малюємо зображення відносно нового центру
+                gc.drawImage(sprite, -renderWidth / 2, -renderHeight / 2, renderWidth, renderHeight);
+
+                // Відновлюємо стан трансформації
+                gc.restore();
+            } else {
+                // Звичайне малювання без відзеркалювання
+                gc.drawImage(sprite, renderX, renderY, renderWidth, renderHeight);
+            }
         }
     }
 

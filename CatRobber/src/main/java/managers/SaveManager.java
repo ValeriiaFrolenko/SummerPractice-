@@ -41,7 +41,7 @@ public class SaveManager {
         // Основні дані гри
         saveData.put("completedLevels", new ArrayList<Integer>());
         saveData.put("currentLevelId", GameManager.getInstance().getCurrentLevelId());
-        saveData.put("totalMoney", 0);
+        saveData.put("totalMoney", GameManager.getInstance().getTotalMoney());
         saveData.put("gameState", gameState.toString());
         saveData.put("noteCode", GameManager.getInstance().getNoteCode());
 

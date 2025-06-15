@@ -1,32 +1,15 @@
-{
-  "police_0": {
-    "currentAnimation": "patrol",
-    "collY": 507,
-    "collX": 814.376148000001,
-    "stunDuration": 0,
-    "type": "Police",
-    "widthColl": 43,
-    "x": 788.40213634375,
-    "width": 101.948,
-    "y": 587.5260009765625,
-    "hightColl": 68,
-    "state": "PATROL",
-    "height": 101.948,
-    "direction": "LEFT"
-  },
-  "police_1": {
-    "currentAnimation": "patrol",
-    "collY": 60,
-    "collX": 742.8481240000011,
-    "stunDuration": 0,
-    "type": "Police",
-    "widthColl": 43,
-    "x": 715.1241158339851,
-    "width": 101.948,
-    "y": 139.5260009765625,
-    "hightColl": 68,
-    "state": "PATROL",
-    "height": 101.948,
-    "direction": "LEFT"
-  }
-}
+{"police_0": {
+  "currentAnimation": "patrol",
+  "collY": 537.5,
+  "collX": 447.9493740000014,
+  "stunDuration": -0.008387999999999611,
+  "type": "Police",
+  "widthColl": 43,
+  "x": 419.3319576181651,
+  "width": 101.948246196698,
+  "y": 618.5289306640625,
+  "hightColl": 68,
+  "state": "PATROL",
+  "height": 101.948246196698,
+  "direction": "RIGHT"
+}}
