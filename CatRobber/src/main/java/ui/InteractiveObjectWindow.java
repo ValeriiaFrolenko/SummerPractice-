@@ -16,10 +16,12 @@ import org.json.JSONObject;
 import java.util.Random;
 
 public class InteractiveObjectWindow {
+    private JSONObject config;
     private Pane root;
     private UIManager.WindowType windowType;
 
     public InteractiveObjectWindow(UIManager.WindowType windowType, JSONObject config) {
+        this.config = config;
         this.windowType = windowType;
         this.root = new Pane();
         initializeUI(config);
@@ -180,24 +182,24 @@ public class InteractiveObjectWindow {
                 "-fx-border-radius: 5; " +
                 "-fx-background-radius: 5;");
 
-        String randomCode = generateRandomCode();
-        GameManager.getInstance().setNoteCode(randomCode);
-
+        // Отримуємо код із properties
+        String noteCode = config.optString("noteCode", "0000"); // Значення за замовчуванням, якщо код відсутній
+        GameManager.getInstance().setNoteCode(noteCode);
         Label codeLabel = new Label("Код:");
         codeLabel.setFont(FontManager.getInstance().getFont("EpsilonCTT", 18));
         codeLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #2C1810;");
         codeLabel.setLayoutX(20);
         codeLabel.setLayoutY(60);
-        codeLabel.setMouseTransparent(false); // ВИПРАВЛЕНО
+        codeLabel.setMouseTransparent(false);
         codeLabel.setDisable(false);
         root.getChildren().add(codeLabel);
 
-        Label noteContent = new Label(randomCode);
+        Label noteContent = new Label(noteCode);
         noteContent.setFont(FontManager.getInstance().getFont("EpsilonCTT", 36));
         noteContent.setStyle("-fx-font-weight: bold; -fx-text-fill: #2C1810;");
         noteContent.setLayoutX(125);
         noteContent.setLayoutY(132);
-        noteContent.setMouseTransparent(false); // ВИПРАВЛЕНО
+        noteContent.setMouseTransparent(false);
         noteContent.setDisable(false);
 
         noteContent.setOnMouseClicked(e -> {

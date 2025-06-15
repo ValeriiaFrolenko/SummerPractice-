@@ -98,7 +98,7 @@ public class GameManager implements Savable {
 
     // Конструктор, ініціалізує менеджери та списки
     public GameManager() {
-        noteCode = String.valueOf(0000);
+        noteCode = "0000";
         gameObjects = new ArrayList<>();
         renderableObjects = new ArrayList<>();
         animatableObjects = new ArrayList<>();
