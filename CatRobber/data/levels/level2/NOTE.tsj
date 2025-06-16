@@ -1,0 +1,14 @@
+{ "columns":1,
+ "image":"..\/..\/..\/assets\/images\/UI\/note.png",
+ "imageheight":499,
+ "imagewidth":499,
+ "margin":0,
+ "name":"NOTE",
+ "spacing":0,
+ "tilecount":1,
+ "tiledversion":"1.11.2",
+ "tileheight":499,
+ "tilewidth":499,
+ "type":"tileset",
+ "version":"1.10"
+}

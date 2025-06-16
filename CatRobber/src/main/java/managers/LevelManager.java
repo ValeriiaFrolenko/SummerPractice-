@@ -27,6 +27,7 @@ public class LevelManager {
         saveManager = new SaveManager();
         collisionMap = new ArrayList<>();
         currentLevelId = 1;
+
     }
 
     // --- Завантаження ---

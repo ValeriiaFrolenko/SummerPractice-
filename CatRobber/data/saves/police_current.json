@@ -1,15 +1,15 @@
 {"police_0": {
   "currentAnimation": "patrol",
-  "collY": 537.5,
-  "collX": 447.9493740000014,
-  "stunDuration": -0.008387999999999611,
+  "collY": 510,
+  "collX": 592.2809919999992,
+  "stunDuration": 0,
   "type": "Police",
   "widthColl": 43,
-  "x": 419.3319576181651,
-  "width": 101.948246196698,
-  "y": 618.5289306640625,
+  "x": 564.0153364824208,
+  "width": 101.948,
+  "y": 589.6926879882812,
   "hightColl": 68,
   "state": "PATROL",
-  "height": 101.948246196698,
-  "direction": "RIGHT"
+  "height": 101.948,
+  "direction": "LEFT"
 }}

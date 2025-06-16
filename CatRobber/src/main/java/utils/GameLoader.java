@@ -239,7 +239,7 @@ public class GameLoader {
         if (obj.has("height")) {
             properties.put("height", obj.getDouble("height"));
         }
-        String puzzleType = properties.optString("puzzleType", "CodeLockPuzzle");
+        String puzzleType = obj.optString("puzzleType", properties.optString("puzzleType", "CodeLockPuzzle"));
         JSONObject puzzleData = new JSONObject();
         puzzleData.put("state", properties.optString("state", "UNSOLVED"));
         puzzleData.put("x", properties.optFloat("x", 0.0f));

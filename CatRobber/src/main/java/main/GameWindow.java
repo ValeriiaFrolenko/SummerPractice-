@@ -10,6 +10,7 @@ import javafx.scene.Cursor;
 import javafx.stage.StageStyle;
 import managers.*;
 import org.json.JSONObject;
+import utils.GameLoader;
 import utils.InputHandler;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
@@ -37,6 +38,7 @@ public class GameWindow {
     private Rectangle titleBar;
     private Rectangle closeButton;
     private Line closeLine1, closeLine2;
+    private Group titleBarGroup; // Group for title bar elements
     private double xOffset = 0;
     private double yOffset = 0;
 
@@ -63,18 +65,16 @@ public class GameWindow {
 
     // Створює власний заголовок з кнопкою закриття
     private void createCustomTitleBar(Group root) {
-        // Заголовок
+        titleBarGroup = new Group(); // Окрема група для елементів заголовка
         titleBar = new Rectangle(1280, 30);
-        titleBar.setFill(Color.rgb(101, 67, 33)); // Темно-коричневий
+        titleBar.setFill(Color.rgb(101, 67, 33));
         titleBar.setStroke(Color.rgb(139, 90, 43));
 
-        // Кнопка закриття
         closeButton = new Rectangle(1250, 5, 20, 20);
         closeButton.setFill(Color.rgb(139, 69, 19));
         closeButton.setStroke(Color.RED);
         closeButton.setStrokeWidth(1);
 
-        // Хрестик
         closeLine1 = new Line(1255, 10, 1265, 20);
         closeLine1.setStroke(Color.RED);
         closeLine1.setStrokeWidth(2);
@@ -83,7 +83,6 @@ public class GameWindow {
         closeLine2.setStroke(Color.RED);
         closeLine2.setStrokeWidth(2);
 
-        // Ефекти наведення
         closeButton.setOnMouseEntered(e -> {
             closeButton.setFill(Color.rgb(160, 82, 45));
             scene.setCursor(Cursor.HAND);
@@ -94,19 +93,18 @@ public class GameWindow {
             scene.setCursor(Cursor.DEFAULT);
         });
 
-        // Обробка кліка по кнопці закриття
         closeButton.setOnMouseClicked(e -> {
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Вийти з гри?");
             if (alert.showAndWait().get() == ButtonType.OK) {
                 cleanup();
                 primaryStage.close();
             }
+            e.consume();
         });
 
         closeLine1.setOnMouseClicked(e -> closeButton.getOnMouseClicked().handle(e));
         closeLine2.setOnMouseClicked(e -> closeButton.getOnMouseClicked().handle(e));
 
-        // Перетягування вікна
         titleBar.setOnMousePressed(e -> {
             xOffset = e.getSceneX();
             yOffset = e.getSceneY();
@@ -117,8 +115,21 @@ public class GameWindow {
             primaryStage.setY(e.getScreenY() - yOffset);
         });
 
-        // Додаємо до групи
-        root.getChildren().addAll(titleBar, closeButton, closeLine1, closeLine2);
+        titleBarGroup.getChildren().addAll(titleBar, closeButton, closeLine1, closeLine2);
+        root.getChildren().add(titleBarGroup);
+    }
+
+
+    // Ховає заголовок
+    public void hideTitleBar() {
+        titleBarGroup.setVisible(false);
+        titleBarGroup.setMouseTransparent(true);
+    }
+
+    // Показує заголовок
+    public void showTitleBar() {
+        titleBarGroup.setVisible(true);
+        titleBarGroup.setMouseTransparent(false);
     }
 
     // Налаштовує вікно, сцену, canvas і менеджери
@@ -141,8 +152,12 @@ public class GameWindow {
         root.getChildren().add(background);
 
         root.getChildren().add(canvas);
+        createCustomTitleBar(root); // Додаємо заголовок після canvas
         root.getChildren().add(uiManager.getOverlayPane());
         root.getChildren().add(uiManager.getMenuPane());
+        root.getChildren().add(UIManager.getInstance().getMenuButtonPane());
+
+
 
         // Створюємо власний заголовок
         createCustomTitleBar(root);
@@ -199,6 +214,12 @@ public class GameWindow {
         return uiManager;
     }
 
+    public void showMenuButtonWhenGameStarts() {
+        // Викликайте це коли гра починається
+        if (gameManager.getGameState() == GameManager.GameState.PLAYING) {
+            uiManager.showMenuButton();
+        }
+    }
     // Запускає ігровий цикл
     public void startGameLoop() {
         isRunning = true;

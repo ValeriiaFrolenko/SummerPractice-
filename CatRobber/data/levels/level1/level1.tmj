@@ -1557,7 +1557,7 @@
                 }, 
                 {
                  "gid":3,
-                 "height":100,
+                 "height":100.948246196698,
                  "id":123,
                  "name":"player",
                  "properties":[
@@ -1622,6 +1622,11 @@
                          "value":0
                         }, 
                         {
+                         "name":"money",
+                         "type":"int",
+                         "value":0
+                        }, 
+                        {
                          "name":"speedBoost",
                          "type":"int",
                          "value":0
@@ -1639,7 +1644,7 @@
                  "rotation":0,
                  "type":"Player",
                  "visible":true,
-                 "width":100,
+                 "width":100.948246196698,
                  "x":33.5525357997892,
                  "y":135.100775251752
                 }, 

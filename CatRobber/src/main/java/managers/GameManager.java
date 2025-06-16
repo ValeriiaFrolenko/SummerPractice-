@@ -25,7 +25,7 @@ public class GameManager implements Savable {
     // Поля
     private static GameManager instance; // Singleton-екземпляр GameManager
     private final LevelManager levelManager; // Менеджер рівнів (завантаження даних рівня)
-    private String noteCode;
+    private String code;
     private SaveManager saveManager; // Менеджер збереження гри, пов’язаний із SaveManager
     private JSONObject currentLevel; // Дані поточного рівня у форматі JSON, отримані від LevelManager
     private List<GameObject> gameObjects; // Список усіх ігрових об’єктів (Player, Police тощо)
@@ -66,6 +66,10 @@ public class GameManager implements Savable {
         return doors;
     }
 
+    public GameState getGameState() {
+        return gameState;
+    }
+
     // Перелік станів гри
     public enum GameState {MENU, PLAYING, PAUSED, GAME_OVER}
 
@@ -88,17 +92,74 @@ public class GameManager implements Savable {
         }
     }
 
-    public void setNoteCode(String code) {
-        noteCode  = code;
+    // Переводить гру в меню, зберігаючи стан і призупиняючи гру
+    public void stopGame() {
+        // Зупиняємо рух гравця перед збереженням
+        if (player != null) {
+            player.stopMovement();
+        }
+
+        // Скидаємо глобальну тривогу
+        if (isGlobalAlert) {
+            isGlobalAlert = false;
+            globalAlertTimer = 0.0;
+            for (Police police1 : police) {
+                if (police1.getState() == Police.PoliceState.ALERT) {
+                    police1.setState(Police.PoliceState.PATROL);
+                    police1.setAnimationState("patrol");
+                }
+            }
+        }
+
+        // Зберігаємо прогрес
+        saveProgress();
+        saveGame();
+
+        // Очищаємо поточний стан гри
+        clearGameState();
+
+        // Налаштовуємо UI для меню
+        UIManager uiManager = GameWindow.getInstance().getUIManager();
+        if (uiManager != null) {
+            uiManager.hideInteractionPrompt();
+            uiManager.forceHideInteractiveObjectUI();
+            uiManager.hideMenuButton();
+            uiManager.clearSceneForMenu(); // Новий метод для очищення та підготовки сцени
+            uiManager.showMenu();
+            GameWindow.getInstance().hideTitleBar();
+        } else {
+            System.err.println("UIManager не доступний для переходу в меню");
+            return;
+        }
     }
 
-    public String getNoteCode() {
-        return noteCode;
+    public void clearGameState() {
+        // Очищаємо списки об'єктів
+        gameObjects.clear();
+        renderableObjects.clear();
+        animatableObjects.clear();
+        police.clear();
+        cameras.clear();
+        interactables.clear();
+        puzzles.clear();
+        collisionMap.clear();
+        rooms.clear();
+        player = null;
+        backgroundImage = null;
+    }
+
+
+    public void setCode(String code) {
+        this.code = code;
+    }
+
+    public String getCode() {
+        return code;
     }
 
     // Конструктор, ініціалізує менеджери та списки
     public GameManager() {
-        noteCode = String.valueOf(0000);
+        code = "0000";
         gameObjects = new ArrayList<>();
         renderableObjects = new ArrayList<>();
         animatableObjects = new ArrayList<>();
@@ -141,6 +202,12 @@ public class GameManager implements Savable {
                 }
             } else {
                 System.out.println("E pressed, blocked: window=" + uiManager.getCurrentWindow() + ", interactable=" + closestInteractable);
+            }
+        });
+
+        inputHandler.registerCallback(KeyCode.ESCAPE, () -> {
+            if (gameState == GameState.PLAYING) {
+                stopGame();
             }
         });
     }
@@ -264,22 +331,19 @@ public class GameManager implements Savable {
     }
 
     public void loadLevel(int levelId, boolean isNewGame) {
-        UIManager.getInstance().hideMenu();
-        if (UIManager.getInstance().getCurrentWindow() != null) {
-            UIManager.getInstance().getCurrentWindow().hide();
-            UIManager.getInstance().setCurrentWindow(null);
+        UIManager uiManager = UIManager.getInstance();
+        uiManager.clearSceneForMenu(); // Очищаємо сцену перед завантаженням
+        uiManager.hideMenu();
+        if (uiManager.getCurrentWindow() != null) {
+            uiManager.getCurrentWindow().hide();
+            uiManager.setCurrentWindow(null);
         }
-        UIManager.getInstance().hideCurrentWindowToGame();
-        UIManager.getInstance().getMenuPane().getChildren().clear();
-        UIManager.getInstance().getMenuPane().setVisible(false);
-        UIManager.getInstance().getMenuPane().setMouseTransparent(true);
-        UIManager.getInstance().getOverlayPane().getChildren().clear();
-        UIManager.getInstance().getOverlayPane().setVisible(false);
-        UIManager.getInstance().getOverlayPane().setMouseTransparent(true);
         gameState = GameState.PLAYING;
         levelManager.loadLevel(levelId, isNewGame);
         currentLevel = levelManager.getLevelData();
         loadBackgroundImage();
+        GameWindow.getInstance().showTitleBar();
+        uiManager.showMenuButton(); // Показуємо кнопку меню після завантаження рівня
     }
 
     // Завантажує фонове зображення рівня
@@ -352,11 +416,14 @@ public class GameManager implements Savable {
 
     // Рендерить гру, викликається з GameWindow.render()
     public void render(GraphicsContext gc) {
-        gc.setImageSmoothing(false); // Вимикаємо згладжування для піксельної графіки
-        renderBackground(gc); // Рендеримо фон
-        renderableObjects.sort(Comparator.comparingInt(Renderable::getRenderLayer)); // Сортуємо об’єкти за шаром рендерингу
+        if (gameState != GameState.PLAYING && gameState != GameState.PAUSED) {
+            return;
+        }
+        gc.setImageSmoothing(false);
+        renderBackground(gc);
+        renderableObjects.sort(Comparator.comparingInt(Renderable::getRenderLayer));
         for (Renderable renderable : renderableObjects) {
-            renderable.render(gc); // Рендеримо кожен об’єкт
+            renderable.render(gc);
         }
     }
 
@@ -548,7 +615,7 @@ public class GameManager implements Savable {
         JSONObject data = new JSONObject();
         data.put("gameState", gameState.toString());
         data.put("currentLevelId", currentLevelId);
-        data.put("noteCode", noteCode);
+        data.put("code", code);
         data.put("completedLevels", completedLevels);
         data.put("totalMoney", totalMoney);
         return data;
@@ -558,7 +625,7 @@ public class GameManager implements Savable {
     public void setFromData(JSONObject data) {
         gameState = GameState.valueOf(data.getString("gameState"));
         currentLevelId = data.getInt("currentLevelId");
-        noteCode = data.getString("noteCode");
+        code = data.getString("code");
         completedLevels = new ArrayList<>();
         for (Object level : data.getJSONArray("completedLevels")) {
             completedLevels.add((Integer) level);

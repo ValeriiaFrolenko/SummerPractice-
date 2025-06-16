@@ -379,6 +379,7 @@ public class Menu implements UIWindow {
     }
 
     private void continueGame() {
+        GameManager.getInstance().setGameState(GameManager.GameState.PLAYING);
         JSONObject progress = gameLoader.loadJSON("data/saves/game_progress.json");
         int currentLevel = progress != null ? progress.optInt("currentLevelId", 1) : 1;
 
@@ -400,6 +401,7 @@ public class Menu implements UIWindow {
     }
 
     private void startLevel(int levelId) {
+        GameManager.getInstance().setGameState(GameManager.GameState.PLAYING);
         // Спочатку ховаємо поточне меню
         hide();
 

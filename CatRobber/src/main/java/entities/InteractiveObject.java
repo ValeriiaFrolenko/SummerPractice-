@@ -1,11 +1,13 @@
 package entities;
 
 import interfaces.*;
+import javafx.animation.TranslateTransition;
 import javafx.geometry.Bounds;
 import javafx.geometry.BoundingBox;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
+import javafx.util.Duration;
 import main.GameWindow;
 import managers.GameManager;
 import managers.UIManager;
@@ -15,41 +17,47 @@ import puzzles.Puzzle;
 import utils.GameLoader;
 import utils.Vector2D;
 
+import java.util.Random;
+
 public class InteractiveObject implements GameObject, Interactable {
-    private final String path = "interactiveObjects/"; //базовий шлях до папки зі спрайтами
-    private double imageX, imageY, imageWidth, imageHeight; //координати, висота та ширина об'єктів
-    private Image sprite; //об'єкт зображення
-    private String spritePath; //шлях до файлу із зображенням
-    private Type type; //тип інтерективного об'єкта
-    private JSONObject properties; //додаткові властивості об’єкта у форматі JSON
+    private final String path = "interactiveObjects/";
+    private double imageX, imageY, imageWidth, imageHeight;
+    private Image sprite;
+    private String spritePath;
+    private Type type;
+    private JSONObject properties;
     private boolean isMoneyGiven = false;
-    /** Перелік можливих типів інтерактивних об'єктів **/
+    private boolean isPictureMoved = false;
+    private double targetImageX;
 
-    public enum Type { NOTE, PICTURE, COMPUTER, ELECTRICAL_PANEL, WITH_MONEY, FINAL_PRIZE}
+    public enum Type { NOTE, PICTURE, COMPUTER, ELECTRICAL_PANEL, WITH_MONEY, FINAL_PRIZE }
 
-    /**
-     * Конструктор, що створює новий інтерактивний об'єкт на основі заданої позиції та властивостей
-     * @param position початкова позиція об'єкта у вигляді вектора Vector2D
-     * @param properties об'єкт JSON, що містить властивості інтерактивного об'єкта
-     */
     public InteractiveObject(Vector2D position, JSONObject properties) {
         this.properties = properties;
         this.imageWidth = properties.optDouble("width", 32.0);
         this.imageHeight = properties.optDouble("height", 32.0);
         this.imageX = position.x;
         this.imageY = position.y - imageHeight;
+        this.targetImageX = imageY;
         this.type = Type.valueOf(properties.optString("typeObj", "NOTE"));
         this.spritePath = path + properties.getString("fileName");
-        this.imageWidth = properties.optDouble("width", 32.0);
-        this.imageHeight = properties.optDouble("height", 32.0);
         GameLoader loader = new GameLoader();
         this.sprite = loader.loadImage(spritePath);
+
+        // Генеруємо код для нотатки при створенні об'єкта
+        if ((type == Type.NOTE||type == Type.PICTURE||type == Type.COMPUTER) && !properties.has("code")) {
+            String code = generateRandomCode();
+            properties.put("code", code);
+            GameManager.getInstance().setCode(code); // Зберігаємо в GameManager
+        }
     }
 
-    /**
-     * Обробляє взаємодію гравця з інтерактивним об'єктом
-     * @param player гравець, який взаємодіє з об'єктом
-     */
+    private String generateRandomCode() {
+        Random random = new Random();
+        int code = random.nextInt(9000) + 1000;
+        return String.valueOf(code);
+    }
+
     @Override
     public void interact(Player player) {
         UIManager uiManager = GameWindow.getInstance().getUIManager();
@@ -57,18 +65,22 @@ public class InteractiveObject implements GameObject, Interactable {
             System.err.println("UIManager не доступний");
             return;
         }
+
         switch (type) {
             case NOTE:
                 uiManager.createWindow(UIManager.WindowType.NOTE, properties);
                 break;
             case PICTURE:
-                uiManager.createWindow(UIManager.WindowType.PICTURE, properties);
+                if (!isPictureMoved) {
+                    animatePicture(uiManager);
+                } else {
+                    uiManager.createWindow(UIManager.WindowType.PICTURE, properties);
+                }
                 break;
             case COMPUTER:
                 uiManager.createWindow(UIManager.WindowType.COMPUTER, properties);
                 break;
             case ELECTRICAL_PANEL:
-                // Знаходимо лазерні двері серед інтерактивних об’єктів
                 Door laserDoor = null;
                 for (Interactable obj : GameManager.getInstance().getInteractables()) {
                     if (obj instanceof Door && ((Door) obj).isLaser()) {
@@ -78,16 +90,16 @@ public class InteractiveObject implements GameObject, Interactable {
                 }
                 if (laserDoor != null) {
                     Puzzle puzzle = null;
-                    for(Puzzle puzzleLock : GameManager.getInstance().getPuzzles()){
-                        if(puzzleLock instanceof LaserLockPuzzle){
+                    for (Puzzle puzzleLock : GameManager.getInstance().getPuzzles()) {
+                        if (puzzleLock instanceof LaserLockPuzzle) {
                             puzzle = puzzleLock;
                         }
                     }
-                    if(puzzle != null) {
+                    if (puzzle != null) {
                         puzzle.setLinkedDoor(laserDoor, (solved, door) -> {
                             if (solved) {
                                 door.unlock();
-                                uiManager.hidePuzzleUI(); // Закриваємо UI головоломки
+                                uiManager.hidePuzzleUI();
                             }
                         });
                         uiManager.showPuzzleUI(puzzle.getUI());
@@ -112,36 +124,66 @@ public class InteractiveObject implements GameObject, Interactable {
                 break;
         }
     }
-
-    /**
-     * Перевіряє, чи може гравець взаємодіяти з об'єктом
-     * @param player гравець, для якого перевіряється можливість взаємодії
-     * @return true - якщо гравець знаходиться в зоні взаємодії з об'єктом, інакше - false
-     */
-    @Override
-    public boolean canInteract(Player player) {
-        Bounds playerBounds = player.getBounds();
-        Bounds objectBounds = this.getBounds();
-        double interactionRange = getInteractionRange();
-        Bounds extendedBounds = new BoundingBox(
-                playerBounds.getMinX(),
-                playerBounds.getMinY(),
-                playerBounds.getWidth(),
-                playerBounds.getHeight()
-        );
-        return extendedBounds.intersects(objectBounds);
+    private void animatePicture(UIManager uiManager) {
+        targetImageX = imageX - 50; // Цільова позиція X (зміщення вліво)
+        TranslateTransition transition = new TranslateTransition(Duration.millis(500));
+        transition.setFromX(0);
+        transition.setToX(targetImageX - imageX); // Відносне зміщення вліво
+        transition.setOnFinished(event -> {
+            imageX = targetImageX; // Оновлюємо позицію X після анімації
+            isPictureMoved = true;
+            uiManager.createWindow(UIManager.WindowType.PICTURE, properties);
+        });
+        transition.play();
     }
 
-    /**
-     * Метод, що відображає інтерактивний об'єкт на графічному контексті
-     * Малює спрайт об'єкта з заданими координатами та розмірами
-     * Якщо цей об'єкт є найближчим для взаємодії з гравцем,
-     * навколо нього додається додаткове виділення у вигляді білих "кутів"
-     * @param gc графічний контекст, на якому виконується малювання
-     */
+    @Override
+    public JSONObject getSerializableData() {
+        JSONObject data = new JSONObject();
+        data.put("typeObj", type.toString());
+        data.put("x", imageX);
+        data.put("y", imageY + imageHeight);
+        data.put("width", imageWidth);
+        data.put("height", imageHeight);
+        data.put("fileName", properties.getString("fileName"));
+        data.put("type", "InteractiveObject");
+        data.put("isPictureMoved", isPictureMoved);
+        if ((type == Type.NOTE||type == Type.PICTURE||type == Type.COMPUTER) && properties.has("code")) {
+            data.put("code", properties.getString("code")); // Зберігаємо код нотатки
+        }
+        return data;
+    }
+
+    @Override
+    public void setFromData(JSONObject data) {
+        this.imageX = data.optDouble("x", imageX);
+        this.imageY = data.optDouble("y", imageY) - imageHeight;
+        this.imageWidth = data.optDouble("width", imageWidth);
+        this.imageHeight = data.optDouble("height", imageHeight);
+        this.spritePath = data.optString("fileName", spritePath);
+        this.isPictureMoved = data.optBoolean("isPictureMoved", false);
+        if (isPictureMoved) {
+            this.targetImageX = imageY - 50;
+            this.imageY = targetImageX;
+        } else {
+            this.targetImageX = imageY;
+        }
+        try {
+            this.type = Type.valueOf(data.optString("typeObj", type.toString()));
+        } catch (IllegalArgumentException e) {
+            System.err.println("Невірне значення типу: " + data.optString("typeObj") + ". Залишаю поточний.");
+        }
+        GameLoader loader = new GameLoader();
+        this.sprite = loader.loadImage(spritePath);
+        // Відновлюємо код нотатки
+        if (data.has("code")) {
+            properties.put("code", data.getString("code"));
+            GameManager.getInstance().setCode(data.getString("code"));
+        }
+    }
+
     @Override
     public void render(GraphicsContext gc) {
-
         if (sprite != null) {
             gc.setImageSmoothing(false);
             gc.drawImage(sprite, imageX, imageY, imageWidth, imageHeight);
@@ -166,144 +208,76 @@ public class InteractiveObject implements GameObject, Interactable {
         }
     }
 
-    /**
-     * Повертає JSON-об’єкт, що містить серіалізовані дані інтерактивного об’єкта
-     * @return JSONObject, що містить серіалізовані поля об’єкта
-     */
     @Override
-    public JSONObject getSerializableData() {
-        JSONObject data = new JSONObject();
-        data.put("typeObj", type.toString());
-        data.put("x", imageX);
-        data.put("y", imageY+imageHeight);
-        data.put("width", imageWidth);
-        data.put("height", imageHeight);
-        data.put("fileName", properties.getString("fileName"));
-        data.put("type","InteractiveObject");
-
-        return data;
+    public boolean canInteract(Player player) {
+        Bounds playerBounds = player.getBounds();
+        Bounds objectBounds = this.getBounds();
+        double interactionRange = getInteractionRange();
+        Bounds extendedBounds = new BoundingBox(
+                playerBounds.getMinX(),
+                playerBounds.getMinY(),
+                playerBounds.getWidth(),
+                playerBounds.getHeight()
+        );
+        return extendedBounds.intersects(objectBounds);
     }
 
-    /**
-     * Відновлює стан інтерактивного об’єкта з JSON-даних
-     * @param data JSONObject, що містить серіалізовані поля об’єкта
-     */
-    @Override
-    public void setFromData(JSONObject data) {
-        this.imageX = data.optDouble("x", imageX);
-        this.imageY = data.optDouble("y", imageY) - imageHeight;
-        this.imageWidth = data.optDouble("width", imageWidth);
-        this.imageHeight = data.optDouble("height", imageHeight);
-        this.spritePath = data.optString("fileName", spritePath);
-        try {
-            this.type = Type.valueOf(data.optString("typeObj", type.toString()));
-        } catch (IllegalArgumentException e) {
-            System.err.println("Невірне значення типу: " + data.optString("typeObj") + ". Залишаю поточний.");
-        }
-        GameLoader loader = new GameLoader();
-        this.sprite = loader.loadImage(spritePath);
-    }
-
-    /**
-     * Повертає тип інтерактивного об'єкта у вигляді рядка
-     * @return рядок, що представляє тип об'єкта
-     */
     @Override
     public String getType() {
         return type.toString();
     }
 
-    /**
-     * Повертає позицію об'єкта у вигляді вектора
-     * @return позиція (x, y) об'єкта
-     */
     @Override
     public Vector2D getPosition() {
         return new Vector2D(imageX, imageY);
     }
 
-    /**
-     * Повертає позицію зображення об'єкта
-     * @return позиція (x, y) зображення об'єкта
-     */
     @Override
     public Vector2D getImagePosition() {
         return new Vector2D(imageX, imageY);
     }
 
-    /**
-     * Встановлює позицію об'єкта
-     * @param position нова позиція у вигляді вектора (x, y)
-     */
     @Override
     public void setPosition(Vector2D position) {
         this.imageX = position.x;
         this.imageY = position.y;
+        this.targetImageX = isPictureMoved ? imageY - 50 : imageY;
     }
 
-    /**
-     * Встановлює позицію зображення об'єкта
-     * @param position нова позиція зображення у вигляді вектора (x, y)
-     */
     @Override
     public void setImagePosition(Vector2D position) {
         this.imageX = position.x;
         this.imageY = position.y;
+        this.targetImageX = isPictureMoved ? imageY - 50 : imageY;
     }
 
-    /**
-     * Повертає межі об'єкта у вигляді BoundingBox
-     * @return об'єкт типу Bounds, що описує межі об'єкта
-     */
     @Override
     public Bounds getBounds() {
         return new BoundingBox(imageX, imageY, imageWidth, imageHeight);
     }
 
-    /**
-     * Повертає межі зображення об'єкта
-     * @return об'єкт типу Bounds, що описує межі зображення об'єкта
-     */
     @Override
     public Bounds getImageBounds() {
         return new BoundingBox(imageX, imageY, imageWidth, imageHeight);
     }
 
-    /**
-     * Повертає радіус взаємодії з об'єктом
-     * @return відстань (у пікселях) для взаємодії з об'єктом
-     */
     @Override
     public double getInteractionRange() {
         return 50.0;
     }
 
-    /**
-     * Повертає підказку, яка відображається гравцю для взаємодії з об'єктом
-     * @return текст підказки
-     */
     @Override
     public String getInteractionPrompt() {
         return "Press E to interact with object";
     }
 
-    /**
-     * Повертає рівень відмалювання (шар), на якому розташований об'єкт
-     * Визначає порядок відображення об'єктів
-     * @return 1 - номер шару відмалювання
-     */
     @Override
     public int getRenderLayer() {
         return 0;
     }
 
-    /**
-     * Визначає, чи є об'єкт видимим
-     * @return true, якщо об'єкт видно, інакше false
-     */
     @Override
     public boolean isVisible() {
         return true;
     }
-
 }
