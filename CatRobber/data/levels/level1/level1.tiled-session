@@ -28,11 +28,11 @@
             "expandedObjectLayers": [
                 4
             ],
-            "scale": 2,
+            "scale": 1,
             "selectedLayer": 3,
             "viewCenter": {
-                "x": 458.5,
-                "y": 336.75
+                "x": 653,
+                "y": 227.5
             }
         },
         "C:/Users/valer/SummerPractice-/CatRobber/data/levels/level2/pictureInt.tsj": {
@@ -43,11 +43,11 @@
             "expandedObjectLayers": [
                 6
             ],
-            "scale": 1,
+            "scale": 4,
             "selectedLayer": 3,
             "viewCenter": {
-                "x": 663,
-                "y": 353.5
+                "x": 687,
+                "y": 528.125
             }
         },
         "C:/Users/valer/level2/2b4e64686da65cbb2689b9d5e87a928a-removebg-preview.tsj": {
@@ -263,11 +263,11 @@
             "expandedObjectLayers": [
                 3
             ],
-            "scale": 3,
+            "scale": 1.5,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 141,
-                "y": 186.49999999999997
+                "x": 300.66666666666663,
+                "y": 232.33333333333337
             }
         },
         "note.tsx": {
@@ -309,7 +309,7 @@
             "scaleInEditor": 1
         }
     },
-    "last.imagePath": "C:/Users/valer/SummerPractice-/CatRobber/assets/images/UI",
+    "last.imagePath": "C:/Users/valer/SummerPractice-/CatRobber/assets/images/camera",
     "map.height": 20,
     "map.lastUsedFormat": "json",
     "map.tileHeight": 32,
@@ -321,7 +321,7 @@
         "stairsUp.tsj"
     ],
     "project": "level1.tiled-project",
-    "property.type": "int",
+    "property.type": "float",
     "recentFiles": [
         "C:/Users/valer/SummerPractice-/CatRobber/data/levels/level2/pictureInt.tsj",
         "C:/Users/valer/level3/ChatGPT Image 15 черв. 2025 р., 03_57_39.tsj",
@@ -338,8 +338,8 @@
     ],
     "tileset.lastUsedFormat": "json",
     "tileset.tileSize": {
-        "height": 499,
-        "width": 499
+        "height": 96,
+        "width": 21
     },
     "tileset.type": 0
 }

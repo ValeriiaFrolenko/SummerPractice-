@@ -1663,59 +1663,6 @@
                  "y":518
                 }, 
                 {
-                 "gid":50,
-                 "height":25,
-                 "id":77,
-                 "name":"",
-                 "properties":[
-                        {
-                         "name":"animationFrame",
-                         "type":"int",
-                         "value":0
-                        }, 
-                        {
-                         "name":"animationTime",
-                         "type":"int",
-                         "value":0
-                        }, 
-                        {
-                         "name":"currentAnimation",
-                         "type":"string",
-                         "value":"normal"
-                        }, 
-                        {
-                         "name":"direction",
-                         "type":"string",
-                         "value":"LEFT"
-                        }, 
-                        {
-                         "name":"floorPointY",
-                         "type":"float",
-                         "value":584
-                        }, 
-                        {
-                         "name":"hightColl",
-                         "type":"int",
-                         "value":13
-                        }, 
-                        {
-                         "name":"isAlert",
-                         "type":"bool",
-                         "value":false
-                        }, 
-                        {
-                         "name":"widthColl",
-                         "type":"int",
-                         "value":14
-                        }],
-                 "rotation":0,
-                 "type":"Camera",
-                 "visible":true,
-                 "width":55,
-                 "x":404.833333333333,
-                 "y":512.916666666666
-                }, 
-                {
                  "height":0,
                  "id":78,
                  "name":"",
@@ -2002,8 +1949,7 @@
                  "width":293.697666666667,
                  "x":920.151166666667,
                  "y":156
-                },
-            
+                }, 
                 {
                  "height":96,
                  "id":94,
@@ -2020,7 +1966,8 @@
                  "width":297.031,
                  "x":68.1511666666667,
                  "y":264
-                }, 
+                },
+            
                 {
                  "height":96,
                  "id":95,
@@ -2257,12 +2204,12 @@
                         {
                          "name":"collX",
                          "type":"float",
-                         "value":703
+                         "value":673
                         }, 
                         {
                          "name":"collY",
                          "type":"float",
-                         "value":413
+                         "value":417
                         }, 
                         {
                          "name":"currentAnimation",
@@ -2323,8 +2270,8 @@
                  "type":"Player",
                  "visible":true,
                  "width":95,
-                 "x":669.5,
-                 "y":476.5
+                 "x":639.5,
+                 "y":480.5
                 }, 
                 {
                  "height":50,
@@ -2334,8 +2281,168 @@
                  "type":"PlayerColl",
                  "visible":true,
                  "width":30,
-                 "x":703,
-                 "y":413
+                 "x":673,
+                 "y":417
+                }, 
+                {
+                 "gid":50,
+                 "height":25,
+                 "id":77,
+                 "name":"",
+                 "properties":[
+                        {
+                         "name":"animationFrame",
+                         "type":"int",
+                         "value":0
+                        }, 
+                        {
+                         "name":"animationTime",
+                         "type":"int",
+                         "value":0
+                        }, 
+                        {
+                         "name":"currentAnimation",
+                         "type":"string",
+                         "value":"normal"
+                        }, 
+                        {
+                         "name":"direction",
+                         "type":"string",
+                         "value":"LEFT"
+                        }, 
+                        {
+                         "name":"floorPointY",
+                         "type":"float",
+                         "value":584
+                        }, 
+                        {
+                         "name":"gratingHeight",
+                         "type":"float",
+                         "value":91
+                        }, 
+                        {
+                         "name":"gratingWidth",
+                         "type":"float",
+                         "value":25
+                        }, 
+                        {
+                         "name":"gratingX",
+                         "type":"float",
+                         "value":753
+                        }, 
+                        {
+                         "name":"gratingY",
+                         "type":"float",
+                         "value":583
+                        }, 
+                        {
+                         "name":"hasGrating",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"hightColl",
+                         "type":"int",
+                         "value":13
+                        }, 
+                        {
+                         "name":"isAlert",
+                         "type":"bool",
+                         "value":false
+                        }, 
+                        {
+                         "name":"widthColl",
+                         "type":"int",
+                         "value":14
+                        }],
+                 "rotation":0,
+                 "type":"Camera",
+                 "visible":true,
+                 "width":55,
+                 "x":404.833333333333,
+                 "y":512.916666666666
+                }, 
+                {
+                 "gid":56,
+                 "height":91,
+                 "id":112,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":25,
+                 "x":753,
+                 "y":583
+                }, 
+                {
+                 "gid":50,
+                 "height":25,
+                 "id":113,
+                 "name":"",
+                 "properties":[
+                        {
+                         "name":"animationFrame",
+                         "type":"int",
+                         "value":0
+                        }, 
+                        {
+                         "name":"animationTime",
+                         "type":"int",
+                         "value":0
+                        }, 
+                        {
+                         "name":"currentAnimation",
+                         "type":"string",
+                         "value":"normal"
+                        }, 
+                        {
+                         "name":"direction",
+                         "type":"string",
+                         "value":"LEFT"
+                        }, 
+                        {
+                         "name":"floorPointY",
+                         "type":"float",
+                         "value":250
+                        }, 
+                        {
+                         "name":"hasGrating",
+                         "type":"bool",
+                         "value":false
+                        }, 
+                        {
+                         "name":"hightColl",
+                         "type":"int",
+                         "value":13
+                        }, 
+                        {
+                         "name":"isAlert",
+                         "type":"bool",
+                         "value":false
+                        }, 
+                        {
+                         "name":"widthColl",
+                         "type":"int",
+                         "value":14
+                        }],
+                 "rotation":0,
+                 "type":"Camera",
+                 "visible":true,
+                 "width":55,
+                 "x":678.5,
+                 "y":179
+                }, 
+                {
+                 "height":0,
+                 "id":114,
+                 "name":"",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":600.5,
+                 "y":250
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -2344,7 +2451,7 @@
          "y":0
         }],
  "nextlayerid":8,
- "nextobjectid":110,
+ "nextobjectid":115,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.2",
@@ -2485,6 +2592,10 @@
         {
          "firstgid":54,
          "source":"..\/..\/..\/..\/..\/level3\/computer.tsj"
+        }, 
+        {
+         "firstgid":55,
+         "source":"gates.tsj"
         }],
  "tilewidth":32,
  "type":"map",

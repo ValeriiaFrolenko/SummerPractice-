@@ -1,63 +1,53 @@
 {
-  "interactiveObjects_5": {
-    "fileName": "atm.png",
-    "isPictureMoved": false,
-    "x": 565.5,
-    "width": 55,
-    "y": 576,
-    "typeObj": "WITH_MONEY",
-    "type": "InteractiveObject",
-    "height": 80
-  },
   "interactiveObjects_0": {
-    "fileName": "computer.png",
-    "code": "1994",
+    "fileName": "electricalPanel.png",
     "isPictureMoved": false,
-    "x": 144,
-    "width": 40,
-    "y": 317.3333435058594,
-    "typeObj": "COMPUTER",
+    "x": 402.4986267089844,
+    "width": 44,
+    "y": 219.95018005371094,
+    "typeObj": "ELECTRICAL_PANEL",
     "type": "InteractiveObject",
     "height": 40
   },
   "interactiveObjects_4": {
-    "fileName": "drawer.png",
+    "fileName": "note.png",
+    "code": "4267",
     "isPictureMoved": false,
-    "x": 292,
-    "width": 80,
-    "y": 127,
-    "typeObj": "WITH_MONEY",
+    "x": 173.90467834472656,
+    "width": 50,
+    "y": 320.8509216308594,
+    "typeObj": "NOTE",
     "type": "InteractiveObject",
-    "height": 70
+    "height": 50
   },
   "interactiveObjects_3": {
-    "fileName": "machine.png",
+    "fileName": "finalPrize.png",
     "isPictureMoved": false,
-    "x": 602.8333129882812,
-    "width": 60,
-    "y": 240,
-    "typeObj": "WITH_MONEY",
+    "x": 531.6666870117188,
+    "width": 80,
+    "y": 484.6666564941406,
+    "typeObj": "FINAL_PRIZE",
     "type": "InteractiveObject",
     "height": 80
   },
   "interactiveObjects_2": {
-    "fileName": "electricalPanel.png",
+    "fileName": "safe.png",
     "isPictureMoved": false,
-    "x": 474,
-    "width": 30,
-    "y": 316,
-    "typeObj": "ELECTRICAL_PANEL",
+    "x": 1180.8348388671875,
+    "width": 50,
+    "y": 362.11651611328125,
+    "typeObj": "WITH_MONEY",
     "type": "InteractiveObject",
-    "height": 30
+    "height": 40
   },
   "interactiveObjects_1": {
-    "fileName": "bankDoor.png",
+    "fileName": "boxes.png",
     "isPictureMoved": false,
-    "x": 718.6666870117188,
+    "x": 246.8011016845703,
     "width": 120,
-    "y": 138.3333282470703,
-    "typeObj": "FINAL_PRIZE",
+    "y": 250.36485290527344,
+    "typeObj": "WITH_MONEY",
     "type": "InteractiveObject",
-    "height": 100
+    "height": 80
   }
 }

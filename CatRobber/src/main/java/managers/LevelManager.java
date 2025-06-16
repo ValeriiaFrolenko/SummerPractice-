@@ -27,7 +27,6 @@ public class LevelManager {
         saveManager = new SaveManager();
         collisionMap = new ArrayList<>();
         currentLevelId = 1;
-
     }
 
     // --- Завантаження ---
@@ -51,6 +50,13 @@ public class LevelManager {
         if (isNewGame) {
             createDefaultFiles(levelData); // Генеруємо дефолтні файли
             loadFromDefaults();
+            String saveFile = "data/saves/game_progress.json";
+            File file = new File(saveFile);
+            if (file.exists()) {
+                JSONObject saveData = gameLoader.loadJSON(saveFile);
+                GameManager.getInstance().setFromData(saveData);
+                GameManager.getInstance().setCurrentLevelId(id);
+            }
         } else {
             loadFromSave();
         }
@@ -116,6 +122,7 @@ public class LevelManager {
         }
         GameManager.getInstance().setGameObjects(objects);
     }
+
 
     // --- Геттери ---
 

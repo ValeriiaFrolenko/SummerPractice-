@@ -339,6 +339,8 @@ public class UIManager implements Renderable {
                 System.out.println("Не вдалося активувати: " + itemToUse.getName() + ", немає в наявності.");
                 return;
             }
+            GameManager.getInstance().updateInventoryFromPlayer(); // Оновлюємо інвентар
+
         }
 
         updateAllBoostCounts();
