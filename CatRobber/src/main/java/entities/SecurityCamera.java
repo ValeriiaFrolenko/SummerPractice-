@@ -130,8 +130,9 @@ public class SecurityCamera implements GameObject, Animatable {
     // Перевіряє, чи гравець у полі зору камери
     public void detectPlayer(Player player, List<Police> police) {
         updateFieldOfView();
-        if (player == null) return;
-
+        if (player == null || player.isInvisible()) { // <--- Перевірка на невидимість
+            return;
+        }
         Bounds playerBounds = player.getBounds();
         boolean playerInFOV = false;
         double[] points = fieldOfView.getPoints().stream().mapToDouble(Double::doubleValue).toArray();

@@ -108,15 +108,17 @@ public class Door implements GameObject, Interactable {
      */
     public void open() {
         UIManager uiManager = GameWindow.getInstance().getUIManager();
-        if (uiManager == null) {
-            System.err.println("UIManager не доступний");
-            return;
-        }
+        if (uiManager == null) return;
+
+        Player player = GameManager.getInstance().getPlayer();
 
         if (isLocked) {
-            if (isLaser) {
-                uiManager.showInteractionPrompt(getInteractionPrompt());
-                System.out.println("Laser door interaction: locked");
+            // Перевіряємо, чи є ключ "в руках", але НЕ ВИТРАЧАЄМО його тут
+            if (lockType == LockType.PICK_LOCK && player != null && player.hasUniversalKey()) {
+                player.useUniversalKey(); // Цей метод тепер просто "скидає" ключ з рук (hasUniversalKey = false)
+                // Ми більше не викликаємо updateAllBoostCounts тут, бо лічильник вже оновився при активації
+                unlock(); // Відмикаємо двері
+                System.out.println("Двері відкрито за допомогою активованого ключа.");
                 return;
             }
             Puzzle puzzle = null;

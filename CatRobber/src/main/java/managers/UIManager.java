@@ -1,5 +1,6 @@
 package managers;
 
+import entities.Player;
 import interfaces.Renderable;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -39,7 +40,6 @@ public class UIManager implements Renderable {
     private boolean isBoostButtonVisible = false;
     private Pane boostPane;
     private boolean isBoostPaneVisible = false;
-    private int[] boostCounts = {5, 5, 5, 5}; // Початкова кількість для кожного покращення
     private GameLoader gameLoader;
 
     public static UIManager getInstance() {
@@ -246,7 +246,7 @@ public class UIManager implements Renderable {
         boostButtons.setLayoutY(8);
 
         List<ShopItem> shopItems = ShopPane.getItems();
-        System.out.println("Creating boost pane with " + shopItems.size() + " items");
+        Player player = GameManager.getInstance().getPlayer(); // Отримуємо гравця
 
         for (int i = 0; i < 4; i++) {
             VBox boostContainer = new VBox(3);
@@ -294,63 +294,105 @@ public class UIManager implements Renderable {
             });
 
             boostButton.setOnAction(e -> {
-                if (boostCounts[index] > 0) {
-                    boostCounts[index]--;
-                    updateBoostCountLabel(index);
-                    activateBoost(index);
-                    System.out.println("Activated boost " + item.getName() + ", remaining: " + boostCounts[index]);
-                }
+                // Тепер просто викликаємо activateBoost, логіка перевірки кількості буде там
+                activateBoost(index);
                 e.consume();
             });
 
-            Label countLabel = new Label(String.valueOf(boostCounts[index]));
+            boostButton.setFocusTraversable(false);
+
+            // Отримуємо початкову кількість з інвентарю гравця
+            int initialCount = (player != null) ? player.getInventory().getOrDefault(item, 0) : 0;
+            Label countLabel = new Label(String.valueOf(initialCount)); // Встановлюємо реальну кількість
             countLabel.setStyle("-fx-text-fill: white; -fx-font-size: 12px; -fx-font-weight: bold;");
             countLabel.setUserData(index);
 
             boostContainer.getChildren().addAll(boostButton, countLabel);
             boostButtons.getChildren().add(boostContainer);
-            System.out.println("Added boost button for " + item.getName());
         }
 
-        boostPane.getChildren().clear(); // Очищаємо перед додаванням
+        boostPane.getChildren().clear();
         boostPane.getChildren().add(boostButtons);
-        System.out.println("Boost pane created with size: " + boostPane.getPrefWidth() + "x" + boostPane.getPrefHeight());
     }
 
-    private void updateBoostCountLabel(int index) {
-        boostPane.getChildren().stream()
-                .filter(node -> node instanceof HBox)
-                .map(node -> (HBox) node)
-                .flatMap(hbox -> hbox.getChildren().stream())
-                .filter(node -> node instanceof VBox)
-                .map(node -> (VBox) node)
-                .filter(vbox -> {
-                    Label label = (Label) vbox.getChildren().get(1);
-                    return (Integer) label.getUserData() == index;
-                })
-                .findFirst()
-                .ifPresent(vbox -> {
-                    Label label = (Label) vbox.getChildren().get(1);
-                    label.setText(String.valueOf(boostCounts[index]));
-                });
-    }
+
+
 
     private void activateBoost(int index) {
-        // Додайте вашу логіку активації покращення
-        // Наприклад: GameManager.getInstance().applyBoost(index);
-        switch (index) {
-            case 0:
-                // Покращення 1
+        Player player = GameManager.getInstance().getPlayer();
+        if (player == null) return;
+
+        List<ShopItem> shopItems = ShopPane.getItems();
+        if (index >= shopItems.size()) return;
+
+        ShopItem itemToUse = shopItems.get(index);
+
+        // ЗМІНЮЄМО УМОВУ: ТЕПЕР КЛЮЧ ТАКОЖ ВИТРАЧАЄТЬСЯ ОДРАЗУ
+        if (itemToUse.getItemType() == ShopItem.ItemType.SPEED_BOOST ||
+                itemToUse.getItemType() == ShopItem.ItemType.INVISIBILITY ||
+                itemToUse.getItemType() == ShopItem.ItemType.KEY) { // <--- ДОДАЄМО КЛЮЧ ДО УМОВИ
+
+            if (!player.useItem(itemToUse)) {
+                System.out.println("Не вдалося активувати: " + itemToUse.getName() + ", немає в наявності.");
+                return;
+            }
+        }
+
+        updateAllBoostCounts();
+        System.out.println("Активовано покращення: " + itemToUse.getName());
+
+        switch (itemToUse.getItemType()) {
+            case INVISIBILITY:
+                player.applyInvisibility(10.0);
                 break;
-            case 1:
-                // Покращення 2
+            case SPEED_BOOST:
+                player.applySpeedBoost(8.0);
                 break;
-            case 2:
-                // Покращення 3
+            case KEY:
+                player.giveUniversalKey(); // Гравець "бере ключ в руки"
                 break;
-            case 3:
-                // Покращення 4
+            case GUN:
+                // Для пістолета нічого не робимо, він витрачається при пострілі
                 break;
+        }
+    }
+
+
+
+
+
+    public void updateAllBoostCounts() {
+        Player player = GameManager.getInstance().getPlayer();
+        if (player == null || boostPane == null) {
+            return;
+        }
+
+        List<ShopItem> shopItems = ShopPane.getItems();
+        if (shopItems.size() < 4) return;
+
+        for (int i = 0; i < 4; i++) {
+            ShopItem item = shopItems.get(i);
+            int quantity = player.getInventory().getOrDefault(item, 0);
+
+            final int index = i;
+            boostPane.getChildren().stream()
+                    .filter(node -> node instanceof HBox)
+                    .map(node -> (HBox) node)
+                    .flatMap(hbox -> hbox.getChildren().stream())
+                    .filter(node -> node instanceof VBox)
+                    .map(node -> (VBox) node)
+                    .filter(vbox -> {
+                        if (vbox.getChildren().size() > 1 && vbox.getChildren().get(1) instanceof Label) {
+                            Label label = (Label) vbox.getChildren().get(1);
+                            return label.getUserData() != null && (Integer) label.getUserData() == index;
+                        }
+                        return false;
+                    })
+                    .findFirst()
+                    .ifPresent(vbox -> {
+                        Label label = (Label) vbox.getChildren().get(1);
+                        label.setText(String.valueOf(quantity));
+                    });
         }
     }
 
@@ -424,7 +466,9 @@ public class UIManager implements Renderable {
             menuButtonPane.setVisible(true);
             menuButtonPane.setMouseTransparent(false);
 
-            javafx.application.Platform.runLater(() -> {
+            updateAllBoostCounts();
+
+              javafx.application.Platform.runLater(() -> {
                 menuButton.setLayoutX(canvas.getWidth() - 80);
                 menuButton.setLayoutY(40);
                 boostButton.setLayoutX(canvas.getWidth() - 120); // Поряд з menu кнопкою

@@ -51,6 +51,8 @@ public class GameManager implements Savable {
     private int currentLevelId; // Поточний рівень
     private GameLoader gameLoader = new GameLoader(); // Додано поле
     private Map<ShopItem, Integer> inventory;
+    private InputHandler inputHandler;
+
 
     public void setGameState(GameState gameState) {
         this.gameState = gameState;
@@ -257,10 +259,13 @@ public class GameManager implements Savable {
 
     // Обробляє ввід гравця, викликається з GameWindow.update()
     public void handleInput(InputHandler inputHandler, double deltaTime) {
+        this.inputHandler = inputHandler; // Зберігаємо посилання
         if (player == null) return;
-        checkInteractions(); // Перевіряємо взаємодії перед обробкою вводу
+
+        checkInteractions();
         managePlayerMoving(inputHandler, deltaTime);
         managePlayerHit(inputHandler, deltaTime);
+        managePlayerShooting(); // <--- Виклик нового методу
         checkCollisions();
     }
 
@@ -458,9 +463,15 @@ public class GameManager implements Savable {
         checkInteractions();
     }
 
+
     private void checkGameOver() {
+        // Додаємо перевірку: якщо гравця немає, то і гра не може бути завершена.
+        if (player == null) {
+            return;
+        }
+
         UIManager uiManager = GameWindow.getInstance().getUIManager();
-        if (player.getDetectionCount()>=3){
+        if (player.getDetectionCount() >= 3) {
             uiManager.createWindow(UIManager.WindowType.GAME_OVER, new JSONObject());
         }
     }
@@ -527,39 +538,39 @@ public class GameManager implements Savable {
     private void checkPoliceCollisions(Police police) {
         if (this.police == null || this.police.isEmpty()) return;
 
-            Bounds policeBounds = police.getBounds(); // Отримуємо межі гравця
-            double policeX = policeBounds.getMinX();
-            double policeY = policeBounds.getMinY();
-            double policeWidth = policeBounds.getWidth();
-            double policeHeight = policeBounds.getHeight();
+        Bounds policeBounds = police.getBounds(); // Отримуємо межі гравця
+        double policeX = policeBounds.getMinX();
+        double policeY = policeBounds.getMinY();
+        double policeWidth = policeBounds.getWidth();
+        double policeHeight = policeBounds.getHeight();
 
-            boolean fullyInside = false; // Прапорець, чи гравець повністю в межах кімнати
+        boolean fullyInside = false; // Прапорець, чи гравець повністю в межах кімнати
 
-            for (Room room : rooms) {
-                Bounds roomBounds = room.getBounds(); // Отримуємо межі кімнати
-                double roomX = roomBounds.getMinX();
-                double roomY = roomBounds.getMinY();
-                double roomWidth = roomBounds.getWidth();
-                double roomHeight = roomBounds.getHeight();
+        for (Room room : rooms) {
+            Bounds roomBounds = room.getBounds(); // Отримуємо межі кімнати
+            double roomX = roomBounds.getMinX();
+            double roomY = roomBounds.getMinY();
+            double roomWidth = roomBounds.getWidth();
+            double roomHeight = roomBounds.getHeight();
 
-                // Перевіряємо, чи гравець повністю в межах кімнати
-                fullyInside = policeX >= roomX &&
-                        policeY >= roomY &&
-                        (policeX + policeWidth) <= (roomX + roomWidth) &&
-                        (policeY + policeHeight) <= (roomY + roomHeight);
+            // Перевіряємо, чи гравець повністю в межах кімнати
+            fullyInside = policeX >= roomX &&
+                    policeY >= roomY &&
+                    (policeX + policeWidth) <= (roomX + roomWidth) &&
+                    (policeY + policeHeight) <= (roomY + roomHeight);
 
-                if (fullyInside) {
-                    break;
-                }
+            if (fullyInside) {
+                break;
             }
+        }
 
-            if (!fullyInside) {
-                if (police.getDirection().equals(Police.PoliceDirection.LEFT)) {
-                    police.setDirection(Police.PoliceDirection.RIGHT);
-                } else if (police.getDirection().equals(Police.PoliceDirection.RIGHT)) {
-                    police.setDirection(Police.PoliceDirection.LEFT);
-                }
+        if (!fullyInside) {
+            if (police.getDirection().equals(Police.PoliceDirection.LEFT)) {
+                police.setDirection(Police.PoliceDirection.RIGHT);
+            } else if (police.getDirection().equals(Police.PoliceDirection.RIGHT)) {
+                police.setDirection(Police.PoliceDirection.LEFT);
             }
+        }
 
     }
 
@@ -616,7 +627,7 @@ public class GameManager implements Savable {
                 closestInteractable = interactable;
                 // Показуємо підказку лише якщо немає відкритого вікна
                 //if (uiManager.getCurrentWindow() == null) {
-                    uiManager.showInteractionPrompt(interactable.getInteractionPrompt());
+                uiManager.showInteractionPrompt(interactable.getInteractionPrompt());
                 //}
                 break;
             }
@@ -691,7 +702,7 @@ public class GameManager implements Savable {
             currentLevelId = levelId + 1; // Наступний рівень
             saveManager.saveGame(gameState); // Зберігаємо стан гри
         }
-}
+    }
 
     public void addMoney(int amount) {
         totalMoney += amount;
@@ -782,5 +793,38 @@ public class GameManager implements Savable {
             }
         }
         return null; // Повертаємо null, якщо кімната не знайдена
+    }
+
+
+
+    private void managePlayerShooting() {
+        if (this.inputHandler == null || !inputHandler.isKeyPressed(KeyCode.F)) return;
+
+        if (player != null && player.hasGun() && !player.isAttacking()) {
+            ShopItem gunItem = player.getInventory().keySet().stream()
+                    .filter(item -> item.getItemType() == ShopItem.ItemType.GUN)
+                    .findFirst().orElse(null);
+
+            if (gunItem != null && player.useItem(gunItem)) {
+                UIManager.getInstance().updateAllBoostCounts(); // <--- ДОДАЙТЕ ЦЕЙ РЯДОК
+                player.attack(true);
+                Police target = findTargetPolice();
+                if (target != null) {
+                    target.takeHit(true);
+                }
+            }
+        }
+    }
+
+    private Police findTargetPolice() {
+        GameManager.Room playerRoom = getRoomForPosition(player.getPosition());
+        if (playerRoom == null) return null;
+
+        return police.stream()
+                .filter(p -> playerRoom.equals(getRoomForPosition(p.getPosition())))
+                .filter(p -> (player.getDirection() == Player.Direction.RIGHT && p.getPosition().getX() > player.getPosition().getX()) ||
+                        (player.getDirection() == Player.Direction.LEFT && p.getPosition().getX() < player.getPosition().getX()))
+                .min(Comparator.comparingDouble(p -> player.getPosition().distance(p.getPosition())))
+                .orElse(null);
     }
 }
