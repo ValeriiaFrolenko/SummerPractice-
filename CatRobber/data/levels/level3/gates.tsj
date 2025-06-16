@@ -1,0 +1,14 @@
+{ "columns":2,
+ "image":"..\/..\/..\/assets\/images\/camera\/gates.png",
+ "imageheight":96,
+ "imagewidth":42,
+ "margin":0,
+ "name":"gates",
+ "spacing":0,
+ "tilecount":2,
+ "tiledversion":"1.11.2",
+ "tileheight":96,
+ "tilewidth":21,
+ "type":"tileset",
+ "version":"1.10"
+}

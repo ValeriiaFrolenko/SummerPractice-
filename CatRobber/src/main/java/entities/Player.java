@@ -6,6 +6,7 @@ import javafx.geometry.BoundingBox;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
+import managers.GameManager;
 import org.json.JSONObject;
 import ui.ShopItem;
 import utils.GameLoader;
@@ -205,8 +206,19 @@ public class Player implements Animatable, GameObject, Interactable {
 
     // Повертає інвентар
     public Map<ShopItem, Integer> getInventory() {
-        return inventory;
+        return new HashMap<>(inventory); // Повертаємо копію інвентаря
     }
+
+
+    public void clearInventory() {
+        inventory.clear();
+        itemUsage.clear();
+        hasUniversalKey = false;
+        isInvisible = false;
+        isSpeedBoosted = false;
+        speed = baseSpeed;
+    }
+
 
     // Встановлює стан використання предмета
     public void setItemUsage(ShopItem item, boolean isUsed) {
@@ -458,7 +470,7 @@ public class Player implements Animatable, GameObject, Interactable {
         data.put("currentAnimation", currentAnimation);
         data.put("canMove", canMove);
         data.put("detectionCount", detectionCount);
-        // Синхронізація інвентарю з mapData
+        // Серіалізація інвентаря
         for (Map.Entry<ShopItem, Integer> entry : inventory.entrySet()) {
             String mapKey = getMapKeyForItem(entry.getKey());
             if (mapKey != null) {
@@ -471,7 +483,6 @@ public class Player implements Animatable, GameObject, Interactable {
             usageData.put(entry.getKey().getName(), entry.getValue());
         }
         data.put("itemUsage", usageData);
-        data.put("type", "Player");
         data.put("type", "Player");
         return data;
     }
@@ -493,8 +504,6 @@ public class Player implements Animatable, GameObject, Interactable {
         this.canMove = data.optBoolean("canMove", true);
         this.detectionCount = data.optInt("detectionCount", 0);
         this.mapData = data;
-        // Оновлення інвентарю
-        initializeInventory();
         // Відновлення itemUsage
         JSONObject usageData = data.optJSONObject("itemUsage");
         if (usageData != null) {
@@ -595,20 +604,23 @@ public class Player implements Animatable, GameObject, Interactable {
      * @param item Предмет для використання.
      * @return true, якщо предмет був успішно використаний, інакше false.
      */
+
     public boolean useItem(ShopItem item) {
         int currentQuantity = inventory.getOrDefault(item, 0);
         if (currentQuantity > 0) {
             inventory.put(item, currentQuantity - 1);
-            updateMapData(item); // Оновлюємо дані для збереження
+            if (inventory.get(item) == 0) {
+                inventory.remove(item);
+                itemUsage.remove(item);
+            }
+            updateMapData(item);
+            GameManager.getInstance().updateInventoryFromPlayer(); // Оновлюємо інвентар у GameManager
             System.out.println("Використано предмет: " + item.getName() + ", залишилось: " + (currentQuantity - 1));
             return true;
         }
         System.out.println("Неможливо використати предмет: " + item.getName() + ", немає в наявності.");
         return false;
     }
-
-
-
 
     /**
      * Активує тимчасове прискорення для гравця.

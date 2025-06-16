@@ -69,6 +69,10 @@ public class Door implements GameObject, Interactable {
         sprites.put("laserUnlocked", loader.loadImage(spritePaths[11]));
     }
 
+    public String getDirection() {
+        return direction;
+    }
+
     /**
      * Перелік типів замків
      * CODE_LOCK - кодовий замок

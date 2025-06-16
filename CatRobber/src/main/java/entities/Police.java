@@ -39,7 +39,7 @@ public class Police implements Animatable, GameObject, Interactable {
     private double normalSpeed = 40.0; // Швидкість патрулювання
     private double chaseSpeed = 70.0; // Швидкість переслідування
     private double stunDuration = 0.0; // Тривалість стану STUNNED
-    private static final double MAX_STUN_DURATION = 3.0; // Максимальна тривалість оглушення (в секундах)
+    private static final double MAX_STUN_DURATION = 15.0; // Максимальна тривалість оглушення (в секундах)
     private boolean canSeePlayer;
     private boolean inSameRoom;
     private boolean wasPlayerDetectedLastFrame = false; // Нове поле для відстеження попереднього стану
@@ -218,6 +218,7 @@ public class Police implements Animatable, GameObject, Interactable {
 
                 // Якщо гравець перетинається більш ніж на 80% своєї ширини
                 if (overlapWidth >= playerWidth * 0.8) {
+                    GameManager.getInstance().setTemporaryMoney(0);
                     uiManager.createWindow(UIManager.WindowType.GAME_OVER, new JSONObject());
                     return;
                 }
@@ -355,7 +356,7 @@ public class Police implements Animatable, GameObject, Interactable {
      * Активує стан тривоги для поліцейського, змінює стан на ALERT
      */
     public void alert() {
-        if (state != PoliceState.ALERT) { // Активуємо лише якщо не в ALERT
+        if (state != PoliceState.ALERT && state != PoliceState.STUNNED) { // Активуємо лише якщо не в ALERT
             state = PoliceState.ALERT;
             setAnimationState("alarm");
             alarmDuration = 3.0;

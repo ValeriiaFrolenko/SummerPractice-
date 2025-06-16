@@ -52,7 +52,7 @@ public class GameManager implements Savable {
     private GameLoader gameLoader = new GameLoader(); // Додано поле
     private Map<ShopItem, Integer> inventory;
     private InputHandler inputHandler;
-
+    private int temporaryMoney;
 
     public void setGameState(GameState gameState) {
         this.gameState = gameState;
@@ -74,6 +74,10 @@ public class GameManager implements Savable {
 
     public void restartCurrentLevel() {
         loadLevel(currentLevelId, true);
+    }
+
+    public Map<ShopItem, Integer> getInventory() {
+        return inventory;
     }
 
     // Перелік станів гри
@@ -118,6 +122,7 @@ public class GameManager implements Savable {
         }
 
         // Зберігаємо прогрес
+        addMoney(getTemporaryMoney());
         saveProgress();
         saveGame();
 
@@ -191,6 +196,7 @@ public class GameManager implements Savable {
         rooms.clear();
         player = null;
         backgroundImage = null;
+        temporaryMoney = 0;
     }
 
 
@@ -220,7 +226,6 @@ public class GameManager implements Savable {
         isGlobalAlert = false;
         globalAlertTimer = 0.0;
         completedLevels = new ArrayList<>();
-        totalMoney = 0;
         currentLevelId = 1;
         inventory = new HashMap<>();
         backgroundImage = null;
@@ -349,6 +354,7 @@ public class GameManager implements Savable {
 
     private void syncPlayerInventory() {
         if (player != null) {
+            player.clearInventory(); // Очищаємо інвентар гравця
             for (Map.Entry<ShopItem, Integer> entry : inventory.entrySet()) {
                 ShopItem item = entry.getKey();
                 int quantity = entry.getValue();
@@ -427,6 +433,7 @@ public class GameManager implements Savable {
 
     // Оновлює логіку гри, викликається з GameWindow.update()
     public void update(double deltaTime) {
+        System.out.println(temporaryMoney);
         if (gameState != GameState.PLAYING) {
             return;
         }
@@ -457,6 +464,7 @@ public class GameManager implements Savable {
         }
         for (SecurityCamera camera : cameras) {
             camera.detectPlayer(player, police);
+
         }
         checkGameOver();
         checkCollisions();
@@ -472,6 +480,7 @@ public class GameManager implements Savable {
 
         UIManager uiManager = GameWindow.getInstance().getUIManager();
         if (player.getDetectionCount() >= 3) {
+            setTemporaryMoney(0);
             uiManager.createWindow(UIManager.WindowType.GAME_OVER, new JSONObject());
         }
     }
@@ -514,7 +523,15 @@ public class GameManager implements Savable {
     // Перевіряє колізії гравця з кімнатами
     public void checkCollisions() {
         checkPlayerCollisions();
-        // checkPlayerCollisionsWithLaserDoor();
+        checkPlayerCollisionsWithLaserDoor();
+        checkPlayerCollisionsWithGrating();
+    }
+
+    private void checkPlayerCollisionsWithGrating() {
+            if (player == null) return;
+            for (SecurityCamera camera : cameras) {
+                camera.checkPlayerGateCollisions(player);
+            }
     }
 
     private void checkPlayerCollisionsWithLaserDoor() {
@@ -530,7 +547,11 @@ public class GameManager implements Savable {
 
         if (laserBounds != null && player.getBounds().intersects(laserBounds)) {
             if (door.isLocked()) {
-                player.adjustPlayerPosition(1, Player.Direction.LEFT);
+                if (player.getDirection().equals(Player.Direction.RIGHT)) {
+                    player.adjustPlayerPosition(1, Player.Direction.LEFT);
+                } else {
+                    player.adjustPlayerPosition(1, Player.Direction.RIGHT);
+                }
             }
         }
     }
@@ -644,16 +665,26 @@ public class GameManager implements Savable {
     public boolean buyItem(ShopItem item) {
         if (totalMoney >= item.getPrice()) {
             totalMoney -= item.getPrice();
+            temporaryMoney = totalMoney; // Синхронізуємо temporaryMoney
             inventory.put(item, inventory.getOrDefault(item, 0) + 1);
             if (player != null) {
                 player.buyItem(item);
             }
-            saveProgress();
-            saveGame();
             return true;
         } else {
             System.out.println("Недостатньо грошей для покупки: " + item.getName());
             return false;
+        }
+    }
+
+    public void updateInventoryFromPlayer() {
+        if (player != null) {
+            inventory.clear(); // Очищаємо старий інвентар
+            Map<ShopItem, Integer> playerInventory = player.getInventory();
+            for (Map.Entry<ShopItem, Integer> entry : playerInventory.entrySet()) {
+                inventory.put(entry.getKey(), entry.getValue());
+            }
+            saveProgress(); // Зберігаємо оновлений інвентар
         }
     }
 
@@ -669,9 +700,6 @@ public class GameManager implements Savable {
     }
 
 
-
-    // Реалізує інтерфейс Savable: повертає дані для збереження
-
     @Override
     public JSONObject getSerializableData() {
         JSONObject data = new JSONObject();
@@ -680,6 +708,7 @@ public class GameManager implements Savable {
         data.put("code", code);
         data.put("completedLevels", completedLevels);
         data.put("totalMoney", totalMoney);
+        data.put("temporaryMoney", temporaryMoney);
         return data;
     }
 
@@ -693,8 +722,9 @@ public class GameManager implements Savable {
             completedLevels.add((Integer) level);
         }
         totalMoney = data.getInt("totalMoney");
-        saveManager.saveGame(gameState);
-    }
+        temporaryMoney = data.optInt("temporaryMoney", totalMoney);
+          }
+
 
     public void completeLevel(int levelId) {
         if (!completedLevels.contains(levelId)) {
@@ -705,13 +735,25 @@ public class GameManager implements Savable {
     }
 
     public void addMoney(int amount) {
-        totalMoney += amount;
-        saveProgress();
-        saveGame(); // Зберігаємо стан гри
+        totalMoney = temporaryMoney;
     }
 
     public int getTotalMoney() {
         return totalMoney;
+    }
+
+    public void addTemporaryMoney(int amount) {
+        temporaryMoney += amount;
+        saveProgress();
+        saveGame(); // Зберігаємо стан гри
+    }
+
+    public int getTemporaryMoney() {
+        return totalMoney;
+    }
+
+    public void setTemporaryMoney(int i){
+        temporaryMoney = i;
     }
 
     public List<Integer> getCompletedLevels() {
@@ -736,14 +778,8 @@ public class GameManager implements Savable {
     public void loadProgress() {
         JSONObject progressData = gameLoader.loadJSON("data/saves/game_progress.json");
         if (progressData != null) {
-            totalMoney = progressData.optInt("totalMoney", 0);
-            currentLevelId = progressData.optInt("currentLevelId", 1);
-            JSONArray completed = progressData.optJSONArray("completedLevels");
-            if (completed != null) {
-                for (int i = 0; i < completed.length(); i++) {
-                    completedLevels.add(completed.getInt(i));
-                }
-            }
+            setFromData(progressData);
+            syncPlayerInventory(); // Синхронізуємо інвентар після завантаження
         }
     }
 
@@ -751,6 +787,7 @@ public class GameManager implements Savable {
     public void saveProgress() {
         saveManager.saveGame(gameState);
     }
+
 
 
 
