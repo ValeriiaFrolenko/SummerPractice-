@@ -1579,12 +1579,12 @@
                         {
                          "name":"collX",
                          "type":"float",
-                         "value":482
+                         "value":83
                         }, 
                         {
                          "name":"collY",
                          "type":"float",
-                         "value":426
+                         "value":69
                         }, 
                         {
                          "name":"currentAnimation",
@@ -1645,8 +1645,8 @@
                  "type":"Player",
                  "visible":true,
                  "width":100.948246196698,
-                 "x":448.885869133123,
-                 "y":495.100775251752
+                 "x":49.8858691331226,
+                 "y":136.100775251752
                 }, 
                 {
                  "gid":13,
@@ -1773,8 +1773,8 @@
                  "type":"PlayerCOLISSION",
                  "visible":true,
                  "width":32,
-                 "x":482,
-                 "y":426
+                 "x":83,
+                 "y":69
                 }, 
                 {
                  "height":68,

@@ -2257,12 +2257,12 @@
                         {
                          "name":"collX",
                          "type":"float",
-                         "value":642
+                         "value":703
                         }, 
                         {
                          "name":"collY",
                          "type":"float",
-                         "value":80
+                         "value":413
                         }, 
                         {
                          "name":"currentAnimation",
@@ -2323,8 +2323,8 @@
                  "type":"Player",
                  "visible":true,
                  "width":95,
-                 "x":608.5,
-                 "y":144.5
+                 "x":669.5,
+                 "y":476.5
                 }, 
                 {
                  "height":50,
@@ -2334,8 +2334,8 @@
                  "type":"PlayerColl",
                  "visible":true,
                  "width":30,
-                 "x":642,
-                 "y":80
+                 "x":703,
+                 "y":413
                 }],
          "opacity":1,
          "type":"objectgroup",
