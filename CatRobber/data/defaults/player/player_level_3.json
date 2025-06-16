@@ -1,12 +1,12 @@
-{"player_72": {
+{"player_108": {
   "gid": 2147483676,
   "visible": true,
   "rotation": 0,
   "name": "",
-  "width": 100,
-  "x": 660,
-  "y": 478.333333333333,
-  "id": 72,
+  "width": 95,
+  "x": 608.5,
+  "y": 144.5,
+  "id": 108,
   "type": "Player",
   "properties": [
     {
@@ -27,12 +27,12 @@
     {
       "name": "collX",
       "type": "float",
-      "value": 695
+      "value": 642
     },
     {
       "name": "collY",
       "type": "float",
-      "value": 410
+      "value": 80
     },
     {
       "name": "currentAnimation",
@@ -57,7 +57,7 @@
     {
       "name": "hightColl",
       "type": "float",
-      "value": 57
+      "value": 50
     },
     {
       "name": "invisibility",
@@ -87,8 +87,8 @@
     {
       "name": "widthColl",
       "type": "float",
-      "value": 40.74
+      "value": 30
     }
   ],
-  "height": 100
+  "height": 95
 }}

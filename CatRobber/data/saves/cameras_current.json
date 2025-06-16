@@ -2,10 +2,10 @@
   "isAlert": false,
   "floorPointY": 584,
   "currentAnimation": "normal",
-  "x": 404.5,
-  "width": 67,
-  "y": 520.8333129882812,
+  "x": 404.8333435058594,
+  "width": 55,
+  "y": 512.9166870117188,
   "type": "Camera",
-  "height": 33,
-  "direction": "RIGHT"
+  "height": 25,
+  "direction": "LEFT"
 }}

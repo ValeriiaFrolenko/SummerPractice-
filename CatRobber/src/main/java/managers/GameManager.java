@@ -70,8 +70,12 @@ public class GameManager implements Savable {
         return gameState;
     }
 
+    public void restartCurrentLevel() {
+        loadLevel(currentLevelId, true);
+    }
+
     // Перелік станів гри
-    public enum GameState {MENU, PLAYING, PAUSED, GAME_OVER}
+    public enum GameState {MENU, PLAYING, PAUSED, VICTORY, GAME_OVER}
 
     // Внутрішній клас Room для представлення кімнат
     public static class Room {
@@ -93,7 +97,7 @@ public class GameManager implements Savable {
     }
 
     // Переводить гру в меню, зберігаючи стан і призупиняючи гру
-    public void stopGame() {
+    public void stopGameAndGoToMenu() {
         // Зупиняємо рух гравця перед збереженням
         if (player != null) {
             player.stopMovement();
@@ -127,6 +131,45 @@ public class GameManager implements Savable {
             uiManager.clearSceneForMenu(); // Новий метод для очищення та підготовки сцени
             uiManager.showMenu();
             GameWindow.getInstance().hideTitleBar();
+        } else {
+            System.err.println("UIManager не доступний для переходу в меню");
+            return;
+        }
+    }
+
+
+    public void stopGame() {
+        // Зупиняємо рух гравця перед збереженням
+        if (player != null) {
+            player.stopMovement();
+        }
+
+        // Скидаємо глобальну тривогу
+        if (isGlobalAlert) {
+            isGlobalAlert = false;
+            globalAlertTimer = 0.0;
+            for (Police police1 : police) {
+                if (police1.getState() == Police.PoliceState.ALERT) {
+                    police1.setState(Police.PoliceState.PATROL);
+                    police1.setAnimationState("patrol");
+                }
+            }
+        }
+
+        // Зберігаємо прогрес
+        saveProgress();
+        saveGame();
+
+        // Очищаємо поточний стан гри
+        clearGameState();
+
+        // Налаштовуємо UI для меню
+        UIManager uiManager = GameWindow.getInstance().getUIManager();
+        if (uiManager != null) {
+            uiManager.hideInteractionPrompt();
+            uiManager.forceHideInteractiveObjectUI();
+            uiManager.hideMenuButton();
+            uiManager.clearSceneForMenu(); // Новий метод для очищення та підготовки сцени
         } else {
             System.err.println("UIManager не доступний для переходу в меню");
             return;
@@ -207,7 +250,7 @@ public class GameManager implements Savable {
 
         inputHandler.registerCallback(KeyCode.ESCAPE, () -> {
             if (gameState == GameState.PLAYING) {
-                stopGame();
+                stopGameAndGoToMenu();
             }
         });
     }
@@ -410,8 +453,16 @@ public class GameManager implements Savable {
         for (SecurityCamera camera : cameras) {
             camera.detectPlayer(player, police);
         }
+        checkGameOver();
         checkCollisions();
         checkInteractions();
+    }
+
+    private void checkGameOver() {
+        UIManager uiManager = GameWindow.getInstance().getUIManager();
+        if (player.getDetectionCount()>=3){
+            uiManager.createWindow(UIManager.WindowType.GAME_OVER, new JSONObject());
+        }
     }
 
     // Рендерить гру, викликається з GameWindow.render()

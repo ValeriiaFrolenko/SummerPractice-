@@ -120,6 +120,7 @@ public class InteractiveObject implements GameObject, Interactable {
                     GameManager.getInstance().addMoney(200);
                     isMoneyGiven = true;
                 }
+                GameManager.getInstance().setGameState(GameManager.GameState.VICTORY);
                 uiManager.createWindow(UIManager.WindowType.VICTORY, properties);
                 break;
         }

@@ -13,7 +13,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import org.json.JSONObject;
-import managers.GameManager;
 import main.GameWindow;
 import ui.*;
 import utils.GameLoader;
@@ -169,7 +168,7 @@ public class UIManager implements Renderable {
 
         menuButton.setOnAction(e -> {
             hideMenuButton();
-            GameManager.getInstance().stopGame();
+            GameManager.getInstance().stopGameAndGoToMenu();
             e.consume();
         });
 
@@ -702,11 +701,6 @@ public class UIManager implements Renderable {
         if (currentWindow != null) {
             event.consume();
             return;
-        }
-        if (GameManager.getInstance().getGameState() == GameManager.GameState.PLAYING &&
-                event.getCode() == KeyCode.ESCAPE) {
-            GameManager.getInstance().stopGame();
-            event.consume();
         }
     }
 

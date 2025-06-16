@@ -36,6 +36,7 @@ public class GameApplication extends Application {
     public void stop() {
         if (gameManager != null && saveManager != null) {
             gameManager.saveGame();
+
         }
         if (gameWindow != null) {
             gameWindow.cleanup(); // Очищаємо ресурси GameWindow

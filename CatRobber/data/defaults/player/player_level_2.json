@@ -3,8 +3,8 @@
   "visible": true,
   "rotation": 0,
   "name": "",
-  "width": 100,
-  "x": 969.333333333333,
+  "width": 95,
+  "x": 972.333333333333,
   "y": 366,
   "id": 74,
   "type": "Player",
@@ -27,12 +27,12 @@
     {
       "name": "collX",
       "type": "float",
-      "value": 1004
+      "value": 1006
     },
     {
       "name": "collY",
       "type": "float",
-      "value": 296
+      "value": 302
     },
     {
       "name": "currentAnimation",
@@ -57,7 +57,7 @@
     {
       "name": "hightColl",
       "type": "float",
-      "value": 57
+      "value": 50
     },
     {
       "name": "invisibility",
@@ -87,8 +87,8 @@
     {
       "name": "widthColl",
       "type": "float",
-      "value": 40.74
+      "value": 30
     }
   ],
-  "height": 100
+  "height": 95
 }}

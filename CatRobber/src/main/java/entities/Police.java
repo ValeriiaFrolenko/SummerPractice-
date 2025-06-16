@@ -6,10 +6,14 @@ import javafx.geometry.BoundingBox;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
+import main.GameWindow;
 import managers.GameManager;
+import managers.UIManager;
 import org.json.JSONObject;
 import utils.GameLoader;
 import utils.Vector2D;
+
+import javax.swing.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,6 +42,7 @@ public class Police implements Animatable, GameObject, Interactable {
     private static final double MAX_STUN_DURATION = 3.0; // Максимальна тривалість оглушення (в секундах)
     private boolean canSeePlayer;
     private boolean inSameRoom;
+    private boolean wasPlayerDetectedLastFrame = false; // Нове поле для відстеження попереднього стану
     private double alarmDuration = 3;
     private double frameDuration = 0.2;
 
@@ -148,7 +153,8 @@ public class Police implements Animatable, GameObject, Interactable {
      * @param rooms список кімнат, у яких може перебувати гравець або поліцейський
      * @param player об'єкт гравця
      */
-    public void update(double deltaTime, List<GameManager.Room> rooms, Player player) {
+    public void update(double deltaTime, List rooms, Player player) {
+        UIManager uiManager = GameWindow.getInstance().getUIManager();
         // Оновлення стану оглушення
         if (state == PoliceState.STUNNED) {
             stunDuration -= deltaTime;
@@ -172,6 +178,7 @@ public class Police implements Animatable, GameObject, Interactable {
             }
             return;
         }
+
         if (state == PoliceState.ALERT) {
             alarmDuration -= deltaTime;
             if (alarmDuration <= 0) {
@@ -203,8 +210,20 @@ public class Police implements Animatable, GameObject, Interactable {
 
             // Перевірка перетину меж
             if (player.getBounds().intersects(getBounds())) {
+                // Перевірка на майже повний перетин - гра програна
+                double playerMinX = player.getBounds().getMinX();
+                double playerMaxX = player.getBounds().getMaxX();
+                double overlapWidth = Math.min(playerMaxX, policeMaxX) - Math.max(playerMinX, policeMinX);
+                double playerWidth = player.getBounds().getWidth();
+
+                // Якщо гравець перетинається більш ніж на 80% своєї ширини
+                if (overlapWidth >= playerWidth * 0.8) {
+                    uiManager.createWindow(UIManager.WindowType.GAME_OVER, new JSONObject());
+                    return;
+                }
+
                 // Повний перетин: гравець повністю в межах поліцейського
-                if (player.getBounds().getMinX() >= policeMinX && player.getBounds().getMaxX() <= policeMaxX) {
+                if (playerMinX >= policeMinX && playerMaxX <= policeMaxX) {
                     canSeePlayer = true;
                 } else {
                     // Часткове перетин: перевіряємо передню половину
@@ -214,7 +233,6 @@ public class Police implements Animatable, GameObject, Interactable {
                         canSeePlayer = true; // Гравець у передній половині (права для RIGHT)
                     } else {
                         // Задня половина: перевіряємо, чи перетин більше половини
-                        double overlapWidth = Math.min(player.getBounds().getMaxX(), policeMaxX) - Math.max(player.getBounds().getMinX(), policeMinX);
                         if (overlapWidth > policeWidth / 2.0) {
                             canSeePlayer = true; // Перетин ззаду більше половини
                         }
@@ -224,7 +242,11 @@ public class Police implements Animatable, GameObject, Interactable {
 
             // Якщо гравець виявлений, переслідуємо
             if (canSeePlayer) {
-                player.increaseDetection();
+                // Викликаємо increaseDetection() лише якщо гравець не був виявлений на попередньому кадрі
+                if (!wasPlayerDetectedLastFrame) {
+                    player.increaseDetection();
+                }
+
                 state = PoliceState.CHASE;
                 setAnimationState("patrol"); // Використовуємо анімацію бігу для переслідування
                 // Визначаємо напрямок до гравця
@@ -247,6 +269,9 @@ public class Police implements Animatable, GameObject, Interactable {
             setAnimationState("patrol");
             patrol(deltaTime, normalSpeed, rooms);
         }
+
+        // Оновлюємо стан виявлення для наступного кадру
+        wasPlayerDetectedLastFrame = canSeePlayer;
     }
 
     /**
@@ -349,6 +374,8 @@ public class Police implements Animatable, GameObject, Interactable {
         state = PoliceState.STUNNED;
         setAnimationState("stunned");
         stunDuration = MAX_STUN_DURATION; // Встановлюємо тривалість оглушення
+        // Скидаємо стан виявлення при оглушенні
+        wasPlayerDetectedLastFrame = false;
     }
 
     // --- Рендеринг ---
@@ -388,12 +415,12 @@ public class Police implements Animatable, GameObject, Interactable {
                 double questionHeight = imageHeight * 0.2;
                 double questionX = collX + (collWidth - questionWidth) / 2; // Центруємо над головою
                 double questionY = collY - 25; // Розміщуємо над головою з відступом
-                    gc.save();
-                    gc.translate(questionX + questionWidth, questionY);
-                    gc.scale(-1, 1);
-                    gc.drawImage(questionFrame, 0, 0, questionWidth, questionHeight);
-                    gc.restore();
-                    gc.drawImage(questionFrame, questionX, questionY, questionWidth, questionHeight);
+                gc.save();
+                gc.translate(questionX + questionWidth, questionY);
+                gc.scale(-1, 1);
+                gc.drawImage(questionFrame, 0, 0, questionWidth, questionHeight);
+                gc.restore();
+                gc.drawImage(questionFrame, questionX, questionY, questionWidth, questionHeight);
             }
 
             // Малюємо червону рамку для колізійної області
@@ -432,7 +459,7 @@ public class Police implements Animatable, GameObject, Interactable {
     // --- Серіалізація ---
 
     /**
-     * Повертає JSON-об’єкт, що містить дані для збереження стану поліцейського.
+     * Повертає JSON-об'єкт, що містить дані для збереження стану поліцейського.
      * Викликається з SaveManager.savePolice().
      * Дані включають позицію, розміри, напрямок, стан, анімацію і час оглушення.
      *
@@ -454,6 +481,7 @@ public class Police implements Animatable, GameObject, Interactable {
         data.put("state", state.toString());
         data.put("currentAnimation", currentAnimation);
         data.put("stunDuration", stunDuration);
+        data.put("wasPlayerDetectedLastFrame", wasPlayerDetectedLastFrame); // Додаємо нове поле
         return data;
     }
 
@@ -476,6 +504,7 @@ public class Police implements Animatable, GameObject, Interactable {
         this.collWidth = data.optDouble("widthColl", collWidth);
         this.collHeight = data.optDouble("hightColl", collHeight);
         this.stunDuration = data.optDouble("stunDuration", stunDuration);
+        this.wasPlayerDetectedLastFrame = data.optBoolean("wasPlayerDetectedLastFrame", false); // Відновлюємо нове поле
         try {
             this.direction = PoliceDirection.valueOf(data.optString("direction", direction.toString()));
         } catch (IllegalArgumentException e) {

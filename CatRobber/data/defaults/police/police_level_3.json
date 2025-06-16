@@ -3,7 +3,7 @@
   "visible": true,
   "rotation": 0,
   "name": "",
-  "width": 101.948,
+  "width": 90,
   "x": 402.734333333333,
   "y": 589.692666666667,
   "id": 74,
@@ -22,12 +22,12 @@
     {
       "name": "collX",
       "type": "float",
-      "value": 431
+      "value": 430
     },
     {
       "name": "collY",
       "type": "float",
-      "value": 510
+      "value": 518
     },
     {
       "name": "currentAnimation",
@@ -47,7 +47,7 @@
     {
       "name": "hightColl",
       "type": "float",
-      "value": 68
+      "value": 60
     },
     {
       "name": "state",
@@ -57,8 +57,8 @@
     {
       "name": "widthColl",
       "type": "float",
-      "value": 43
+      "value": 35
     }
   ],
-  "height": 101.948
+  "height": 90
 }}

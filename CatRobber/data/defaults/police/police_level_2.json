@@ -4,7 +4,7 @@
     "visible": true,
     "rotation": 0,
     "name": "",
-    "width": 101.948,
+    "width": 90,
     "x": 488.026,
     "y": 587.526,
     "id": 76,
@@ -23,12 +23,12 @@
       {
         "name": "collX",
         "type": "float",
-        "value": 514
+        "value": 517
       },
       {
         "name": "collY",
         "type": "float",
-        "value": 507
+        "value": 517
       },
       {
         "name": "currentAnimation",
@@ -48,7 +48,7 @@
       {
         "name": "hightColl",
         "type": "float",
-        "value": 68
+        "value": 60
       },
       {
         "name": "state",
@@ -58,17 +58,17 @@
       {
         "name": "widthColl",
         "type": "float",
-        "value": 43
+        "value": 35
       }
     ],
-    "height": 101.948
+    "height": 90
   },
   "police_83": {
     "gid": 48,
     "visible": true,
     "rotation": 0,
     "name": "",
-    "width": 101.948,
+    "width": 90,
     "x": 647.276,
     "y": 139.526,
     "id": 83,
@@ -92,7 +92,7 @@
       {
         "name": "collY",
         "type": "float",
-        "value": 60
+        "value": 69
       },
       {
         "name": "currentAnimation",
@@ -112,7 +112,7 @@
       {
         "name": "hightColl",
         "type": "float",
-        "value": 68
+        "value": 60
       },
       {
         "name": "state",
@@ -122,9 +122,9 @@
       {
         "name": "widthColl",
         "type": "float",
-        "value": 43
+        "value": 35
       }
     ],
-    "height": 101.948
+    "height": 90
   }
 }

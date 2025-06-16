@@ -2048,61 +2048,8 @@
                  "y":472
                 }, 
                 {
-                 "gid":39,
-                 "height":33,
-                 "id":72,
-                 "name":"",
-                 "properties":[
-                        {
-                         "name":"animationFrame",
-                         "type":"int",
-                         "value":0
-                        }, 
-                        {
-                         "name":"animationTime",
-                         "type":"int",
-                         "value":0
-                        }, 
-                        {
-                         "name":"currentAnimation",
-                         "type":"string",
-                         "value":"normal"
-                        }, 
-                        {
-                         "name":"direction",
-                         "type":"string",
-                         "value":"LEFT"
-                        }, 
-                        {
-                         "name":"floorPointY",
-                         "type":"float",
-                         "value":250
-                        }, 
-                        {
-                         "name":"hightColl",
-                         "type":"int",
-                         "value":13
-                        }, 
-                        {
-                         "name":"isAlert",
-                         "type":"bool",
-                         "value":false
-                        }, 
-                        {
-                         "name":"widthColl",
-                         "type":"int",
-                         "value":14
-                        }],
-                 "rotation":0,
-                 "type":"Camera",
-                 "visible":true,
-                 "width":67,
-                 "x":576.833333333333,
-                 "y":184.833333333333
-                }, 
-                {
                  "gid":2147483688,
-                 "height":100,
+                 "height":95,
                  "id":74,
                  "name":"",
                  "properties":[
@@ -2124,12 +2071,12 @@
                         {
                          "name":"collX",
                          "type":"float",
-                         "value":1004
+                         "value":1006
                         }, 
                         {
                          "name":"collY",
                          "type":"float",
-                         "value":296
+                         "value":302
                         }, 
                         {
                          "name":"currentAnimation",
@@ -2154,7 +2101,7 @@
                         {
                          "name":"hightColl",
                          "type":"float",
-                         "value":57
+                         "value":50
                         }, 
                         {
                          "name":"invisibility",
@@ -2184,29 +2131,29 @@
                         {
                          "name":"widthColl",
                          "type":"float",
-                         "value":40.74
+                         "value":30
                         }],
                  "rotation":0,
                  "type":"Player",
                  "visible":true,
-                 "width":100,
-                 "x":969.333333333333,
+                 "width":95,
+                 "x":972.333333333333,
                  "y":366
                 }, 
                 {
-                 "height":57,
+                 "height":50,
                  "id":75,
                  "name":"",
                  "rotation":0,
                  "type":"PlayerColl",
                  "visible":true,
-                 "width":40,
-                 "x":1004,
-                 "y":296
+                 "width":30,
+                 "x":1006,
+                 "y":302
                 }, 
                 {
                  "gid":48,
-                 "height":101.948,
+                 "height":90,
                  "id":76,
                  "name":"",
                  "properties":[
@@ -2223,12 +2170,12 @@
                         {
                          "name":"collX",
                          "type":"float",
-                         "value":514
+                         "value":517
                         }, 
                         {
                          "name":"collY",
                          "type":"float",
-                         "value":507
+                         "value":517
                         }, 
                         {
                          "name":"currentAnimation",
@@ -2248,7 +2195,7 @@
                         {
                          "name":"hightColl",
                          "type":"float",
-                         "value":68
+                         "value":60
                         }, 
                         {
                          "name":"state",
@@ -2258,18 +2205,18 @@
                         {
                          "name":"widthColl",
                          "type":"float",
-                         "value":43
+                         "value":35
                         }],
                  "rotation":0,
                  "type":"Police",
                  "visible":true,
-                 "width":101.948,
+                 "width":90,
                  "x":488.026,
                  "y":587.526
                 }, 
                 {
                  "gid":48,
-                 "height":101.948,
+                 "height":90,
                  "id":83,
                  "name":"",
                  "properties":[
@@ -2291,7 +2238,7 @@
                         {
                          "name":"collY",
                          "type":"float",
-                         "value":60
+                         "value":69
                         }, 
                         {
                          "name":"currentAnimation",
@@ -2311,7 +2258,7 @@
                         {
                          "name":"hightColl",
                          "type":"float",
-                         "value":68
+                         "value":60
                         }, 
                         {
                          "name":"state",
@@ -2321,36 +2268,36 @@
                         {
                          "name":"widthColl",
                          "type":"float",
-                         "value":43
+                         "value":35
                         }],
                  "rotation":0,
                  "type":"Police",
                  "visible":true,
-                 "width":101.948,
+                 "width":90,
                  "x":647.276,
                  "y":139.526
                 }, 
                 {
-                 "height":68,
+                 "height":60,
                  "id":77,
                  "name":"",
                  "rotation":0,
                  "type":"PoliceCollision",
                  "visible":true,
-                 "width":43,
-                 "x":516.5,
-                 "y":507
+                 "width":35,
+                 "x":517,
+                 "y":517
                 }, 
                 {
-                 "height":68,
+                 "height":60,
                  "id":84,
                  "name":"",
                  "rotation":0,
                  "type":"PoliceCollision",
                  "visible":true,
-                 "width":43,
+                 "width":35,
                  "x":675,
-                 "y":60
+                 "y":69
                 }, 
                 {
                  "gid":60,
@@ -2424,8 +2371,7 @@
                  "width":0,
                  "x":210,
                  "y":516
-                },
-            
+                }, 
                 {
                  "height":0,
                  "id":81,
@@ -2447,7 +2393,8 @@
                  "width":0,
                  "x":276.5,
                  "y":544.5
-                }, 
+                },
+            
                 {
                  "height":0,
                  "id":82,
@@ -2851,6 +2798,92 @@
                  "width":181.698,
                  "x":67.901,
                  "y":492
+                }, 
+                {
+                 "gid":39,
+                 "height":25,
+                 "id":113,
+                 "name":"",
+                 "properties":[
+                        {
+                         "name":"animationFrame",
+                         "type":"int",
+                         "value":0
+                        }, 
+                        {
+                         "name":"animationTime",
+                         "type":"int",
+                         "value":0
+                        }, 
+                        {
+                         "name":"currentAnimation",
+                         "type":"string",
+                         "value":"normal"
+                        }, 
+                        {
+                         "name":"direction",
+                         "type":"string",
+                         "value":"LEFT"
+                        }, 
+                        {
+                         "name":"floorPointY",
+                         "type":"float",
+                         "value":250
+                        }, 
+                        {
+                         "name":"hightColl",
+                         "type":"int",
+                         "value":13
+                        }, 
+                        {
+                         "name":"isAlert",
+                         "type":"bool",
+                         "value":false
+                        }, 
+                        {
+                         "name":"widthColl",
+                         "type":"int",
+                         "value":14
+                        }],
+                 "rotation":0,
+                 "type":"Camera",
+                 "visible":true,
+                 "width":55,
+                 "x":584,
+                 "y":177.5
+                }, 
+                {
+                 "height":21.3333333333333,
+                 "id":114,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":26,
+                 "x":594,
+                 "y":155
+                }, 
+                {
+                 "height":169.666666666667,
+                 "id":115,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":132,
+                 "x":357,
+                 "y":1
+                }, 
+                {
+                 "height":7,
+                 "id":116,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":138,
+                 "x":567.333333333333,
+                 "y":105.666666666667
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -2859,7 +2892,7 @@
          "y":0
         }],
  "nextlayerid":7,
- "nextobjectid":113,
+ "nextobjectid":117,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.2",

@@ -3,5 +3,6 @@ module org.example.catrobber {
     requires org.json;
     requires javafx.media;
     requires javafx.graphics;
+    requires java.desktop;
     exports main;
 }

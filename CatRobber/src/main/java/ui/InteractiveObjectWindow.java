@@ -2,16 +2,17 @@ package ui;
 
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.image.Image;
+import javafx.scene.effect.DropShadow;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.geometry.Insets;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.LinearGradient;
+import javafx.scene.paint.Stop;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.shape.Rectangle;
-import javafx.scene.image.ImageView;
 import javafx.scene.control.TextField;
 import managers.FontManager;
 import managers.GameManager;
@@ -46,11 +47,15 @@ public class InteractiveObjectWindow {
     }
 
     private void initializeUI(JSONObject config) {
-        // Розмір залежить від типу вікна
         if (windowType == UIManager.WindowType.COMPUTER) {
             root.setPrefSize(800, 600);
             root.setMinSize(800, 600);
             root.setMaxSize(800, 600);
+        } else if (windowType == UIManager.WindowType.VICTORY || windowType == UIManager.WindowType.GAME_OVER) {
+            // Збільшуємо розмір для вікон кінця гри
+            root.setPrefSize(450, 400);
+            root.setMinSize(450, 400);
+            root.setMaxSize(450, 400);
         } else {
             root.setPrefSize(400, 300);
             root.setMinSize(400, 300);
@@ -517,42 +522,248 @@ public class InteractiveObjectWindow {
     private void createEndGameContent() {
         boolean isVictory = (windowType == UIManager.WindowType.VICTORY);
 
-        Label title = new Label(isVictory ? "🎉 ПЕРЕМОГА! 🎉" : "💀 ПОРАЗКА 💀");
-        title.setFont(FontManager.getInstance().getFont("Hardpixel", 26));
-        title.setStyle("-fx-font-weight: bold;");
-        title.setTextFill(isVictory ? Color.GOLD : Color.RED);
-        title.setLayoutX(100);
-        title.setLayoutY(50);
-        root.getChildren().add(title);
+        // Встановлюємо градієнтний фон як в меню
+        if (isVictory) {
+            Stop[] stops = {
+                    new Stop(0, Color.web("#3C2F2F")),
+                    new Stop(0.3, Color.web("#2A2525")),
+                    new Stop(0.7, Color.web("#3C2F2F")),
+                    new Stop(1, Color.web("#1E1A1A"))
+            };
+            LinearGradient gradient = new LinearGradient(0, 0, 0, 1, true, null, stops);
+            root.setBackground(new Background(new BackgroundFill(gradient, null, null)));
+        } else {
+            // Для поразки залишаємо темний фон
+            root.setBackground(new Background(new BackgroundFill(
+                    Color.rgb(0, 0, 0, 0.9), CornerRadii.EMPTY, Insets.EMPTY)));
+        }
 
-        String message = config.optString("message",
-                isVictory ? "Ви успішно завершили гру!" : "Спробуйте ще раз!");
+        if (isVictory) {
+            // Заголовок перемоги
+            Label title = new Label("🎉 МІСІЯ ВИКОНАНА! 🎉");
+            title.setFont(FontManager.getInstance().getFont("Hardpixel", 32));
+            title.setStyle("-fx-font-weight: bold;");
+            title.setTextFill(Color.web("#EAD9C2"));
 
-        Label messageLabel = new Label(message);
-        messageLabel.setFont(FontManager.getInstance().getFont("Hardpixel", 18));
-        messageLabel.setTextFill(Color.WHITE);
-        messageLabel.setLayoutX(50);
-        messageLabel.setLayoutY(120);
-        messageLabel.setWrapText(true);
-        messageLabel.setPrefWidth(300);
-        root.getChildren().add(messageLabel);
+            // Додаємо тінь до заголовка
+            DropShadow titleShadow = new DropShadow();
+            titleShadow.setColor(Color.web("#8B5A2B"));
+            titleShadow.setOffsetX(3);
+            titleShadow.setOffsetY(3);
+            titleShadow.setRadius(8);
+            title.setEffect(titleShadow);
 
-        Button restartButton = new Button("Почати заново");
-        restartButton.setFont(FontManager.getInstance().getFont("Hardpixel", 16));
-        restartButton.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-border-radius: 5; -fx-background-radius: 5;");
-        restartButton.setLayoutX(150);
-        restartButton.setLayoutY(200);
-        restartButton.setPrefSize(120, 35);
+            title.setLayoutX(70);
+            title.setLayoutY(50);
+            root.getChildren().add(title);
 
-        restartButton.setOnAction(e -> {
-            //GameManager.getInstance().restartGame();
+            // Котяча іконка
+            Label catIcon = new Label("🐾");
+            catIcon.setFont(FontManager.getInstance().getFont("Hardpixel", 60));
+            catIcon.setTextFill(Color.web("#D4A76A"));
+            catIcon.setLayoutX(200);
+            catIcon.setLayoutY(110);
+            root.getChildren().add(catIcon);
+
+            // Повідомлення про перемогу
+            String message = config.optString("message", "Відмінна робота! Ви успішно завершили місію!");
+            Label messageLabel = new Label(message);
+            messageLabel.setFont(FontManager.getInstance().getFont("Hardpixel", 16));
+            messageLabel.setTextFill(Color.web("#D4A76A"));
+            messageLabel.setLayoutX(75);
+            messageLabel.setLayoutY(200);
+            messageLabel.setWrapText(true);
+            messageLabel.setPrefWidth(300);
+            messageLabel.setTextAlignment(TextAlignment.CENTER);
+            messageLabel.setAlignment(Pos.CENTER);
+            root.getChildren().add(messageLabel);
+
+            // Кнопка "Продовжити" (наступний рівень)
+            Button continueButton = createStyledButton("ПРОДОВЖИТИ", Color.web("#4A7043"));
+            continueButton.setLayoutX(115);
+            continueButton.setLayoutY(260);
+            continueButton.setOnAction(e -> {
+                // Переходимо до наступного рівня
+                int currentLevel = GameManager.getInstance().getCurrentLevelId();
+                int nextLevel = currentLevel + 1;
+
+                // Перевіряємо чи існує наступний рівень (максимум 3 рівні)
+                if (nextLevel <= 3) {
+                    closeWindow();
+                    GameManager.getInstance().completeLevel(currentLevel);
+                    GameManager.getInstance().loadLevel(nextLevel, true);
+                } else {
+                    GameManager.getInstance().completeLevel(currentLevel);
+                    showAllLevelsCompleted();
+                }
+            });
+            root.getChildren().add(continueButton);
+
+            // Кнопка "Вийти в меню"
+            Button menuButton = createStyledButton("В МЕНЮ", Color.web("#7B3F3F"));
+            menuButton.setLayoutX(115);
+            menuButton.setLayoutY(320);
+            menuButton.setOnAction(e -> {
+                closeWindow();
+                GameManager.getInstance().saveProgress();
+                GameManager.getInstance().saveGame();
+                GameManager.getInstance().stopGameAndGoToMenu();
+                UIManager.getInstance().hideMenuButton();
+            });
+            root.getChildren().add(menuButton);
+
+        } else {
+            GameManager.getInstance().gameOver();
+            // Контент для поразки
+            Label title = new Label("💀 МІСІЯ ПРОВАЛЕНА 💀");
+            title.setFont(FontManager.getInstance().getFont("Hardpixel", 28));
+            title.setStyle("-fx-font-weight: bold;");
+            title.setTextFill(Color.RED);
+            title.setLayoutX(80);
+            title.setLayoutY(60);
+            root.getChildren().add(title);
+
+            String message = config.optString("message", "Не засмучуйтесь! Спробуйте ще раз!");
+            Label messageLabel = new Label(message);
+            messageLabel.setFont(FontManager.getInstance().getFont("Hardpixel", 16));
+            messageLabel.setTextFill(Color.WHITE);
+            messageLabel.setLayoutX(75);
+            messageLabel.setLayoutY(140);
+            messageLabel.setWrapText(true);
+            messageLabel.setPrefWidth(300);
+            root.getChildren().add(messageLabel);
+
+            // Кнопка "Спробувати знову"
+            Button retryButton = createStyledButton("СПРОБУВАТИ ЗНОВУ", Color.web("#4A7043"));
+            retryButton.setLayoutX(115);
+            retryButton.setLayoutY(210);
+            retryButton.setOnAction(e -> {
+                closeWindow();
+                GameManager.getInstance().restartCurrentLevel();
+            });
+            root.getChildren().add(retryButton);
+
+            // Кнопка "Вийти в меню"
+            Button menuButton = createStyledButton("В МЕНЮ", Color.web("#7B3F3F"));
+            menuButton.setLayoutX(115);
+            menuButton.setLayoutY(270);
+            menuButton.setOnAction(e -> {
+                closeWindow();
+                GameManager.getInstance().saveProgress();
+                GameManager.getInstance().saveGame();
+                GameManager.getInstance().stopGameAndGoToMenu();
+                UIManager.getInstance().hideMenuButton();
+
+            });
+            root.getChildren().add(menuButton);
+        }
+    }
+
+    private void showAllLevelsCompleted() {
+        Label completedLabel = new Label("🏆 ВСІ РІВНІ ПРОЙДЕНО! 🏆");
+        completedLabel.setFont(FontManager.getInstance().getFont("Hardpixel", 24));
+        completedLabel.setStyle("-fx-font-weight: bold;");
+        completedLabel.setTextFill(Color.GOLD);
+        completedLabel.setLayoutX(50);
+        completedLabel.setLayoutY(100);
+
+        Label congratsLabel = new Label("Вітаємо! Ви майстер котячого грабежу!");
+        congratsLabel.setFont(FontManager.getInstance().getFont("Hardpixel", 16));
+        congratsLabel.setTextFill(Color.web("#D4A76A"));
+        congratsLabel.setLayoutX(50);
+        congratsLabel.setLayoutY(150);
+        congratsLabel.setPrefWidth(300);
+        congratsLabel.setWrapText(true);
+
+        // Очищаємо попередній контент
+        root.getChildren().clear();
+
+        // Додаємо новий контент
+        root.getChildren().addAll(completedLabel, congratsLabel);
+
+        // Кнопка повернення в меню
+        Button menuButton = createStyledButton("ПОВЕРНУТИСЯ В МЕНЮ", Color.web("#4A7043"));
+        menuButton.setLayoutX(90);
+        menuButton.setLayoutY(250);
+        menuButton.setOnAction(e -> {
             closeWindow();
+            GameManager.getInstance().saveProgress();
+            GameManager.getInstance().saveGame();
+            GameManager.getInstance().stopGameAndGoToMenu();
+            UIManager.getInstance().hideMenuButton();
+
+
+        });
+        root.getChildren().add(menuButton);
+    }
+
+    private String toHexString(Color color) {
+        return String.format("#%02X%02X%02X",
+                (int) (color.getRed() * 255),
+                (int) (color.getGreen() * 255),
+                (int) (color.getBlue() * 255));
+    }
+
+    private Button createStyledButton(String text, Color color) {
+        Button button = new Button(text);
+        button.setFont(FontManager.getInstance().getFont("Hardpixel", 16));
+        button.setPrefSize(220, 40);
+
+        String baseStyle = String.format(
+                "-fx-background-color: #2A2525;" +
+                        "-fx-text-fill: %s;" +
+                        "-fx-border-color: %s;" +
+                        "-fx-border-width: 2px;" +
+                        "-fx-border-radius: 10px;" +
+                        "-fx-background-radius: 10px;" +
+                        "-fx-cursor: hand;" +
+                        "-fx-font-family: 'Hardpixel';" +
+                        "-fx-font-size: 16px;",
+                toHexString(Color.web("#EAD9C2")), toHexString(color)
+        );
+
+        String hoverTextColor = color.equals(Color.web("#4A7043")) ? "#1E1A1A" : "#EAD9C2";
+        String hoverStyle = String.format(
+                "-fx-background-color: %s;" +
+                        "-fx-text-fill: %s;" +
+                        "-fx-border-color: #D4A76A;" +
+                        "-fx-border-width: 3px;" +
+                        "-fx-border-radius: 10px;" +
+                        "-fx-background-radius: 10px;" +
+                        "-fx-cursor: hand;" +
+                        "-fx-font-family: 'Hardpixel';" +
+                        "-fx-font-size: 16px;",
+                toHexString(color), hoverTextColor
+        );
+
+        button.setStyle(baseStyle);
+
+        // Додаємо тінь до кнопки
+        DropShadow buttonShadow = new DropShadow();
+        buttonShadow.setColor(Color.web("#8B5A2B"));
+        buttonShadow.setOffsetX(2);
+        buttonShadow.setOffsetY(2);
+        buttonShadow.setRadius(5);
+        button.setEffect(buttonShadow);
+
+        button.setOnMouseEntered(e -> {
+            button.setStyle(hoverStyle);
+            DropShadow hoverShadow = new DropShadow();
+            hoverShadow.setColor(Color.web("#D4A76A"));
+            hoverShadow.setOffsetX(3);
+            hoverShadow.setOffsetY(3);
+            hoverShadow.setRadius(8);
+            button.setEffect(hoverShadow);
         });
 
-        root.getChildren().add(restartButton);
+        button.setOnMouseExited(e -> {
+            button.setStyle(baseStyle);
+            button.setEffect(buttonShadow);
+        });
 
-        createCloseButton();
+        return button;
     }
+
 
     private void createCloseButton() {
         Button closeButton = new Button("✖");

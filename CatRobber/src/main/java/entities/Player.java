@@ -98,6 +98,9 @@ public class Player implements Animatable, GameObject, Interactable {
         animations.put("shoot", loader.splitSpriteSheet(spritePaths[3], 2));
     }
 
+    public int getDetectionCount(){
+        return detectionCount;
+    }
     // Ініціалізує інвентар із mapData
     private void initializeInventory() {
         // Перевіряємо наявність предметів у mapData
@@ -250,7 +253,7 @@ public class Player implements Animatable, GameObject, Interactable {
 
     // Збільшує рівень виявлення
     public void increaseDetection() {
-        // Реалізація відсутня
+        detectionCount++;
     }
 
     public void teleportToRoom(Door door) {

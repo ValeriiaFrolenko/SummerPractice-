@@ -3,9 +3,9 @@
   "visible": true,
   "rotation": 0,
   "name": "",
-  "width": 67,
-  "x": 404.5,
-  "y": 520.833333333333,
+  "width": 55,
+  "x": 404.833333333333,
+  "y": 512.916666666666,
   "id": 77,
   "type": "Camera",
   "properties": [
@@ -50,5 +50,5 @@
       "value": 14
     }
   ],
-  "height": 33
+  "height": 25
 }}

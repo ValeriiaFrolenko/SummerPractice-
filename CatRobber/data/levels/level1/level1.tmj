@@ -1579,12 +1579,12 @@
                         {
                          "name":"collX",
                          "type":"float",
-                         "value":59.43
+                         "value":482
                         }, 
                         {
                          "name":"collY",
                          "type":"float",
-                         "value":65.2
+                         "value":426
                         }, 
                         {
                          "name":"currentAnimation",
@@ -1609,7 +1609,7 @@
                         {
                          "name":"hightColl",
                          "type":"float",
-                         "value":57.15
+                         "value":55
                         }, 
                         {
                          "name":"invisibility",
@@ -1639,14 +1639,14 @@
                         {
                          "name":"widthColl",
                          "type":"float",
-                         "value":40.74
+                         "value":32
                         }],
                  "rotation":0,
                  "type":"Player",
                  "visible":true,
                  "width":100.948246196698,
-                 "x":33.5525357997892,
-                 "y":135.100775251752
+                 "x":448.885869133123,
+                 "y":495.100775251752
                 }, 
                 {
                  "gid":13,
@@ -1766,15 +1766,15 @@
                 },
             
                 {
-                 "height":57.1528239944074,
+                 "height":55,
                  "id":126,
                  "name":"playerCollision",
                  "rotation":0,
                  "type":"PlayerCOLISSION",
                  "visible":true,
-                 "width":40.7406431019961,
-                 "x":59.4257263314337,
-                 "y":65.204420482757
+                 "width":32,
+                 "x":482,
+                 "y":426
                 }, 
                 {
                  "height":68,
