@@ -10,6 +10,7 @@ import javafx.scene.paint.Color;
 import javafx.util.Duration;
 import main.GameWindow;
 import managers.GameManager;
+import managers.SoundManager;
 import managers.UIManager;
 import org.json.JSONObject;
 import puzzles.LaserLockPuzzle;
@@ -29,6 +30,7 @@ public class InteractiveObject implements GameObject, Interactable {
     private boolean isMoneyGiven = false;
     private boolean isPictureMoved = false;
     private double targetImageX;
+    private final SoundManager soundManager = SoundManager.getInstance();
 
     public enum Type { NOTE, PICTURE, COMPUTER, ELECTRICAL_PANEL, WITH_MONEY, FINAL_PRIZE }
 
@@ -68,10 +70,12 @@ public class InteractiveObject implements GameObject, Interactable {
 
         switch (type) {
             case NOTE:
+                soundManager.playSound(SoundManager.SoundType.TAKE_NOTE);
                 uiManager.createWindow(UIManager.WindowType.NOTE, properties);
                 break;
             case PICTURE:
                 if (!isPictureMoved) {
+                    soundManager.playSound(SoundManager.SoundType.MOVE_PICTURE);
                     animatePicture(uiManager);
                 } else {
                     uiManager.createWindow(UIManager.WindowType.PICTURE, properties);
@@ -111,6 +115,7 @@ public class InteractiveObject implements GameObject, Interactable {
                 break;
             case WITH_MONEY:
                 if (!isMoneyGiven) {
+                    soundManager.playSound(SoundManager.SoundType.COLLECT_MONEY);
                     GameManager.getInstance().addMoney(100);
                     isMoneyGiven = true;
                 }

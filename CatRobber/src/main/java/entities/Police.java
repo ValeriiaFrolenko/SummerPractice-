@@ -8,6 +8,7 @@ import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import main.GameWindow;
 import managers.GameManager;
+import managers.SoundManager;
 import managers.UIManager;
 import org.json.JSONObject;
 import utils.GameLoader;
@@ -45,6 +46,7 @@ public class Police implements Animatable, GameObject, Interactable {
     private boolean wasPlayerDetectedLastFrame = false; // Нове поле для відстеження попереднього стану
     private double alarmDuration = 3;
     private double frameDuration = 0.2;
+    private final SoundManager soundManager = SoundManager.getInstance();
 
     /**
      * Метод, що реалізує взаємодію між гравцем і поліцейським

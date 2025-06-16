@@ -12,6 +12,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
 import javafx.util.Duration;
 import main.GameWindow;
+import managers.SoundManager;
 import org.json.JSONObject;
 import utils.GameLoader;
 
@@ -35,6 +36,8 @@ public class LockPickPuzzle extends Puzzle {
     private EventHandler<KeyEvent> keyPressedHandler;
     private EventHandler<KeyEvent> keyReleasedHandler;
 
+    private final SoundManager soundManager = SoundManager.getInstance();
+
     public LockPickPuzzle(JSONObject defaultData) {
         super(defaultData);
         this.solution = "SUCCESS";
@@ -52,12 +55,14 @@ public class LockPickPuzzle extends Puzzle {
         }
 
         if (input.equals(solution)) {
+            soundManager.playSound(SoundManager.SoundType.PICK_LOCK_OPEN);
             state = PuzzleState.SOLVED;
             if (callback != null) {
                 callback.onPuzzleSolved(true, linkedDoor);
             }
             System.out.println("LockPickPuzzle: Solved!");
         } else {
+            soundManager.playSound(SoundManager.SoundType.PICK_LOCK_CLOSED);
             state = PuzzleState.UNSOLVED;
             if (callback != null) {
                 callback.onPuzzleSolved(false, linkedDoor);

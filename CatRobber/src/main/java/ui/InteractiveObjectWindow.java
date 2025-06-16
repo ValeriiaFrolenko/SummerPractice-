@@ -16,6 +16,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.control.TextField;
 import managers.FontManager;
 import managers.GameManager;
+import managers.SoundManager;
 import managers.UIManager;
 import org.json.JSONObject;
 import utils.GameLoader;
@@ -36,6 +37,7 @@ public class InteractiveObjectWindow {
     private Button nextButton;
     private String vaultCode;
     private GameLoader gameLoader;
+    private final SoundManager soundManager = SoundManager.getInstance();
 
     public InteractiveObjectWindow(UIManager.WindowType windowType, JSONObject config) {
         this.config = config;
@@ -198,11 +200,15 @@ public class InteractiveObjectWindow {
         prevButton.setLayoutY(570);
         prevButton.setPrefSize(80, 25);
 
-        prevButton.setOnAction(e -> navigatePage(-1));
-        prevButton.setOnMouseEntered(e ->
-                prevButton.setStyle("-fx-background-color: #5a6578; -fx-text-fill: white; -fx-border-radius: 5; -fx-background-radius: 5;"));
-        prevButton.setOnMouseExited(e ->
-                prevButton.setStyle("-fx-background-color: #4a5568; -fx-text-fill: white; -fx-border-radius: 5; -fx-background-radius: 5;"));
+        prevButton.setOnAction(e -> {
+            soundManager.playSound(SoundManager.SoundType.KEYBOARD_TYPING);
+            navigatePage(-1);
+        });
+        prevButton.setOnMouseEntered(e -> {
+                prevButton.setStyle("-fx-background-color: #5a6578; -fx-text-fill: white; -fx-border-radius: 5; -fx-background-radius: 5;");});
+
+        prevButton.setOnMouseExited(e -> {
+                prevButton.setStyle("-fx-background-color: #4a5568; -fx-text-fill: white; -fx-border-radius: 5; -fx-background-radius: 5;");});
 
         nextButton = new Button("Вперед ▶");
         nextButton.setFont(FontManager.getInstance().getFont("Hardpixel", 14));
@@ -211,11 +217,14 @@ public class InteractiveObjectWindow {
         nextButton.setLayoutY(570);
         nextButton.setPrefSize(80, 25);
 
-        nextButton.setOnAction(e -> navigatePage(1));
-        nextButton.setOnMouseEntered(e ->
-                nextButton.setStyle("-fx-background-color: #5a6578; -fx-text-fill: white; -fx-border-radius: 5; -fx-background-radius: 5;"));
-        nextButton.setOnMouseExited(e ->
-                nextButton.setStyle("-fx-background-color: #4a5568; -fx-text-fill: white; -fx-border-radius: 5; -fx-background-radius: 5;"));
+        nextButton.setOnAction(e -> {
+            soundManager.playSound(SoundManager.SoundType.KEYBOARD_TYPING);
+            navigatePage(1);
+        });
+        nextButton.setOnMouseEntered(e -> {
+                nextButton.setStyle("-fx-background-color: #5a6578; -fx-text-fill: white; -fx-border-radius: 5; -fx-background-radius: 5;");});
+        nextButton.setOnMouseExited(e -> {
+                nextButton.setStyle("-fx-background-color: #4a5568; -fx-text-fill: white; -fx-border-radius: 5; -fx-background-radius: 5;");});
 
         root.getChildren().addAll(prevButton, nextButton);
     }
@@ -228,11 +237,15 @@ public class InteractiveObjectWindow {
         closeButton.setLayoutY(10);
         closeButton.setPrefSize(30, 30);
 
-        closeButton.setOnAction(e -> closeWindow());
-        closeButton.setOnMouseEntered(e ->
-                closeButton.setStyle("-fx-background-color: #ff6666; -fx-text-fill: white; -fx-border-radius: 3; -fx-background-radius: 3;"));
-        closeButton.setOnMouseExited(e ->
-                closeButton.setStyle("-fx-background-color: #ff4444; -fx-text-fill: white; -fx-border-radius: 3; -fx-background-radius: 3;"));
+        closeButton.setOnAction(e -> {
+            soundManager.playSound(SoundManager.SoundType.KEYBOARD_TYPING);
+            closeWindow();
+        });
+        closeButton.setOnMouseEntered(e -> {
+                closeButton.setStyle("-fx-background-color: #ff6666; -fx-text-fill: white; -fx-border-radius: 3; -fx-background-radius: 3;");});
+        closeButton.setOnMouseExited(e -> {
+                soundManager.playSound(SoundManager.SoundType.KEYBOARD_TYPING);
+                closeButton.setStyle("-fx-background-color: #ff4444; -fx-text-fill: white; -fx-border-radius: 3; -fx-background-radius: 3;");});
 
         root.getChildren().add(closeButton);
     }
@@ -539,6 +552,7 @@ public class InteractiveObjectWindow {
         }
 
         if (isVictory) {
+            soundManager.playSound(SoundManager.SoundType.VICTORY_GAME);
             // Заголовок перемоги
             Label title = new Label("🎉 МІСІЯ ВИКОНАНА! 🎉");
             title.setFont(FontManager.getInstance().getFont("Hardpixel", 32));
@@ -613,6 +627,7 @@ public class InteractiveObjectWindow {
             root.getChildren().add(menuButton);
 
         } else {
+            soundManager.playSound(SoundManager.SoundType.FAIL_GAME);
             GameManager.getInstance().gameOver();
             // Контент для поразки
             Label title = new Label("💀 МІСІЯ ПРОВАЛЕНА 💀");

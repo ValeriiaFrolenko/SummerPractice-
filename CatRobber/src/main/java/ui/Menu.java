@@ -17,6 +17,7 @@ import javafx.scene.paint.Stop;
 import javafx.util.Duration;
 import managers.FontManager;
 import managers.GameManager;
+import managers.SoundManager;
 import managers.UIManager;
 import org.json.JSONObject;
 import utils.GameLoader;
@@ -33,6 +34,7 @@ public class Menu implements UIWindow {
     private ComboBox<String> locationChoice;
     private GameLoader gameLoader = new GameLoader();
     private UIManager uiManager;
+    private final SoundManager soundManager = SoundManager.getInstance();
 
     public Menu(JSONObject defaultData) {
         uiManager = GameWindow.getInstance().getUIManager();
@@ -133,10 +135,22 @@ public class Menu implements UIWindow {
         Button shopButton = createCuteButton("КРАМНИЦЯ", Color.web("#7B3F3F"));
         Button exitButton = createCuteButton("ВИЙТИ", Color.web("#3C3C3C"));
 
-        continueButton.setOnAction(e -> continueGame());
-        selectLevelButton.setOnAction(e -> showLevelSelect());
-        shopButton.setOnAction(e -> openShop());
-        exitButton.setOnAction(e -> System.exit(0));
+        continueButton.setOnAction(e -> {
+            soundManager.playSound(SoundManager.SoundType.BUTTON_CLICK);
+            continueGame();
+        });
+        selectLevelButton.setOnAction(e -> {
+            soundManager.playSound(SoundManager.SoundType.BUTTON_CLICK);
+            showLevelSelect();
+        });
+        shopButton.setOnAction(e -> {
+            soundManager.playSound(SoundManager.SoundType.BUTTON_CLICK);
+            openShop();
+        });
+        exitButton.setOnAction(e -> {
+            soundManager.playSound(SoundManager.SoundType.BUTTON_CLICK);
+            System.exit(0);
+        });
 
         VBox.setMargin(title, new Insets(0, 0, 20, 0));
         VBox.setMargin(subtitle, new Insets(0, 0, 40, 0));
@@ -225,12 +239,16 @@ public class Menu implements UIWindow {
 
         Button confirmButton = createCuteButton("ПІДТВЕРДИТИ", Color.web("#4A7043"));
         confirmButton.setOnAction(e -> {
+            soundManager.playSound(SoundManager.SoundType.BUTTON_CLICK);
             int selectedLevel = getSelectedLevel();
             startLevel(selectedLevel);
         });
 
         Button backButton = createCuteButton("ПОВЕРНУТИСЯ", Color.web("#7B3F3F"));
-        backButton.setOnAction(e -> showMainMenu());
+        backButton.setOnAction(e -> {
+            soundManager.playSound(SoundManager.SoundType.BUTTON_CLICK);
+            showMainMenu();
+        });
 
         VBox.setMargin(levelTitle, new Insets(0, 0, 20, 0));
         VBox.setMargin(subtitle, new Insets(0, 0, 30, 0));
@@ -253,6 +271,7 @@ public class Menu implements UIWindow {
     }
 
     private void startSplashSequence() {
+        soundManager.playMusic("menu.mp3");
         Label catPaw = (Label) splashPane.getChildren().get(1);
         ScaleTransition logoScale = new ScaleTransition(Duration.seconds(1.2), catPaw);
         logoScale.setFromX(0.5);
@@ -379,6 +398,7 @@ public class Menu implements UIWindow {
     }
 
     private void continueGame() {
+        soundManager.playMusic("game.mp3");
         GameManager.getInstance().setGameState(GameManager.GameState.PLAYING);
         JSONObject progress = gameLoader.loadJSON("data/saves/game_progress.json");
         int currentLevel = progress != null ? progress.optInt("currentLevelId", 1) : 1;
@@ -401,6 +421,7 @@ public class Menu implements UIWindow {
     }
 
     private void startLevel(int levelId) {
+        soundManager.playMusic("game.mp3");
         GameManager.getInstance().setGameState(GameManager.GameState.PLAYING);
         // Спочатку ховаємо поточне меню
         hide();

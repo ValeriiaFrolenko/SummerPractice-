@@ -52,6 +52,7 @@ public class GameManager implements Savable {
     private GameLoader gameLoader = new GameLoader(); // Додано поле
     private Map<ShopItem, Integer> inventory;
     private InputHandler inputHandler;
+    private final SoundManager soundManager = SoundManager.getInstance();
 
 
     public void setGameState(GameState gameState) {
@@ -269,16 +270,25 @@ public class GameManager implements Savable {
         checkCollisions();
     }
 
+    private boolean wasHitting = false; // додай як поле класу
+
     private void managePlayerHit(InputHandler inputHandler, double deltaTime) {
-        if (inputHandler.isKeyPressed(KeyCode.Q)) {
+        boolean isHitting = inputHandler.isKeyPressed(KeyCode.Q);
+
+        if (isHitting && !wasHitting) {
+            soundManager.playSound(SoundManager.SoundType.HIT);
             player.attack(false);
             for (Interactable interactable : interactables) {
                 if (interactable instanceof Police && interactable.canInteract(player)) {
+                    soundManager.playSound(SoundManager.SoundType.HITTED);
                     interactable.interact(player);
                 }
             }
         }
+        wasHitting = isHitting;
     }
+
+    private boolean wasMoving = false;
 
     // Рух гравця
     private void managePlayerMoving(InputHandler inputHandler, double deltaTime) {
@@ -316,7 +326,15 @@ public class GameManager implements Savable {
         if (!isMoving) {
             player.stopMovement();
         }
+        if (isMoving && !wasMoving) {
+            soundManager.startRunSound();
+        } else if (!isMoving && wasMoving) {
+            soundManager.stopRunSound();
+        }
+        wasMoving = isMoving;
+
     }
+
 
 
     // Встановлює список ігрових об’єктів, сортує їх за типами
@@ -807,6 +825,7 @@ public class GameManager implements Savable {
 
             if (gunItem != null && player.useItem(gunItem)) {
                 UIManager.getInstance().updateAllBoostCounts(); // <--- ДОДАЙТЕ ЦЕЙ РЯДОК
+                soundManager.playSound(SoundManager.SoundType.SHOOT);
                 player.attack(true);
                 Police target = findTargetPolice();
                 if (target != null) {

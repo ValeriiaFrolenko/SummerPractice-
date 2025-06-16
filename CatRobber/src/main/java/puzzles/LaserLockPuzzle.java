@@ -1,4 +1,5 @@
 package puzzles;
+import managers.SoundManager;
 
 import javafx.animation.PauseTransition;
 import javafx.application.Platform;
@@ -16,7 +17,8 @@ import utils.GameLoader;
 
 public class LaserLockPuzzle extends Puzzle {
     private ImageView cutterView;
-    private final GameManager manager = GameManager.getInstance();
+    private final GameManager gameManager = GameManager.getInstance();
+    private final SoundManager soundManager = SoundManager.getInstance();
 
     public LaserLockPuzzle(JSONObject defaultData) {
         super(defaultData);
@@ -38,7 +40,7 @@ public class LaserLockPuzzle extends Puzzle {
         if (state == PuzzleState.SOLVED) {
             return null;
         }
-
+        soundManager.playSound(SoundManager.SoundType.MOVE_SHIELD);
         // Створюємо UI, якщо пазл не вирішений
         Pane pane = new Pane();
         pane.setPrefSize(512, 640);
@@ -67,7 +69,10 @@ public class LaserLockPuzzle extends Puzzle {
         closeButton.setStyle("-fx-font-size: 13; -fx-background-color: red; -fx-text-fill: white;");
         closeButton.setLayoutX(512 - 35);
         closeButton.setLayoutY(4);
-        closeButton.setOnAction(e -> GameWindow.getInstance().getUIManager().hidePuzzleUI());
+        closeButton.setOnAction(e -> {
+            soundManager.playSound(SoundManager.SoundType.BUTTON_CLICK);
+            GameWindow.getInstance().getUIManager().hidePuzzleUI();
+        });
         pane.getChildren().add(closeButton);
 
         Image cutterOpenImage = gameLoader.loadImage("puzzles/laserLock/cutter_opened.png");
@@ -88,8 +93,8 @@ public class LaserLockPuzzle extends Puzzle {
 
         for (int i = 0; i < 3; i++) {
             int wireIndex = i + 1;
-            String wirePath = "puzzles/laserLock/level" + manager.getCurrentLevelId() + "/wire" + wireIndex + ".png";
-            String cutWirePath = "puzzles/laserLock/level" + manager.getCurrentLevelId() + "/wire" + wireIndex + "_cut.png";
+            String wirePath = "puzzles/laserLock/level" + gameManager.getCurrentLevelId() + "/wire" + wireIndex + ".png";
+            String cutWirePath = "puzzles/laserLock/level" + gameManager.getCurrentLevelId() + "/wire" + wireIndex + "_cut.png";
 
             Image wireImage = gameLoader.loadImage(wirePath);
             Image cutWireImage = gameLoader.loadImage(cutWirePath);
@@ -110,6 +115,7 @@ public class LaserLockPuzzle extends Puzzle {
                 });
 
                 wireView.setOnMouseClicked(e -> {
+                    soundManager.playSound(SoundManager.SoundType.WIRE_CUT);
                     wireView.setImage(cutWireImages[cutterIndexPosition]);
                     cutterView.setImage(cutterClosedImage);
                     cutterView.toFront();
@@ -146,7 +152,7 @@ public class LaserLockPuzzle extends Puzzle {
             });
             pause.play();
         } else {
-            manager.alert();
+            gameManager.alert();
             PauseTransition pause = new PauseTransition(Duration.millis(1000));
             pause.setOnFinished(e -> {
                 solve(solution);
