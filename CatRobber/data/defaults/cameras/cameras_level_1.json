@@ -35,6 +35,11 @@
       "value": 130
     },
     {
+      "name": "hasGrating",
+      "type": "bool",
+      "value": false
+    },
+    {
       "name": "hightColl",
       "type": "int",
       "value": 13

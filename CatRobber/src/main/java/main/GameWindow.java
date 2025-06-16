@@ -27,7 +27,7 @@ public class GameWindow {
     private GraphicsContext graphicsContext;
     private GameManager gameManager;
     private UIManager uiManager;
-    private SoundManager soundManager;
+    private final SoundManager soundManager = SoundManager.getInstance();
     private SaveManager saveManager;
     private InputHandler inputHandler;
     private AnimationTimer animationTimer;
@@ -94,6 +94,7 @@ public class GameWindow {
         });
 
         closeButton.setOnMouseClicked(e -> {
+            soundManager.playSound(SoundManager.SoundType.BUTTON_CLICK);
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Вийти з гри?");
             if (alert.showAndWait().get() == ButtonType.OK) {
                 cleanup();
@@ -102,8 +103,14 @@ public class GameWindow {
             e.consume();
         });
 
-        closeLine1.setOnMouseClicked(e -> closeButton.getOnMouseClicked().handle(e));
-        closeLine2.setOnMouseClicked(e -> closeButton.getOnMouseClicked().handle(e));
+        closeLine1.setOnMouseClicked(e -> {
+            soundManager.playSound(SoundManager.SoundType.BUTTON_CLICK);
+            closeButton.getOnMouseClicked().handle(e);
+        });
+        closeLine2.setOnMouseClicked(e -> {
+            soundManager.playSound(SoundManager.SoundType.BUTTON_CLICK);
+            closeButton.getOnMouseClicked().handle(e);
+        });
 
         titleBar.setOnMousePressed(e -> {
             xOffset = e.getSceneX();
@@ -142,7 +149,6 @@ public class GameWindow {
         FontManager.getInstance().initializeFonts();
 
         uiManager = new UIManager(canvas);
-        soundManager = new SoundManager();
 
         Group root = new Group();
 
@@ -272,6 +278,7 @@ public class GameWindow {
         JSONObject menuConfig = new JSONObject();
         primaryStage.requestFocus();
         uiManager.createWindow(UIManager.WindowType.MENU, menuConfig);
+        /*soundManager.playMusic("menu.mp3");*/
     }
 
     private void loadSavedGame(int levelId) {

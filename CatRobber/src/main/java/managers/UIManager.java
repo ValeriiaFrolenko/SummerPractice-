@@ -167,6 +167,7 @@ public class UIManager implements Renderable {
         });
 
         menuButton.setOnAction(e -> {
+            SoundManager.getInstance().playSound(SoundManager.SoundType.BUTTON_CLICK);
             hideMenuButton();
             GameManager.getInstance().stopGameAndGoToMenu();
             e.consume();
@@ -224,6 +225,7 @@ public class UIManager implements Renderable {
         });
 
         boostButton.setOnAction(e -> {
+            SoundManager.getInstance().playSound(SoundManager.SoundType.BUTTON_CLICK);
             if (isBoostPaneVisible) {
                 hideBoostPane();
             } else {
@@ -295,6 +297,7 @@ public class UIManager implements Renderable {
 
             boostButton.setOnAction(e -> {
                 // Тепер просто викликаємо activateBoost, логіка перевірки кількості буде там
+                SoundManager.getInstance().playSound(SoundManager.SoundType.BUTTON_CLICK);
                 activateBoost(index);
                 e.consume();
             });
@@ -336,6 +339,8 @@ public class UIManager implements Renderable {
                 System.out.println("Не вдалося активувати: " + itemToUse.getName() + ", немає в наявності.");
                 return;
             }
+            GameManager.getInstance().updateInventoryFromPlayer(); // Оновлюємо інвентар
+
         }
 
         updateAllBoostCounts();
@@ -673,6 +678,7 @@ public class UIManager implements Renderable {
     }
 
     public void showPuzzleUI(Node uiNode) {
+        SoundManager.getInstance().stopSoundEffects();
         hideInteractionPrompt();
         if (overlayPane != null && uiNode != null) {
             overlayPane.getChildren().clear();

@@ -6,6 +6,7 @@ import javafx.geometry.BoundingBox;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
+import managers.SoundManager;
 import org.json.JSONObject;
 import ui.ShopItem;
 import utils.GameLoader;
@@ -43,6 +44,8 @@ public class Player implements Animatable, GameObject, Interactable {
     private Map<ShopItem, Integer> inventory; // Інвентар: предмет -> кількість
     private Map<ShopItem, Boolean> itemUsage; // Стан використання: предмет -> чи використовується
     private JSONObject mapData; // Дані карти для синхронізації
+
+    private final SoundManager soundManager = SoundManager.getInstance();
 
     // entities/Player.java
 
@@ -231,6 +234,7 @@ public class Player implements Animatable, GameObject, Interactable {
 
     // Рухає гравця в заданому напрямку
     public void move(Direction direction, double deltaTime) {
+        //soundManager.playRun(SoundManager.SoundType.RUN);
         if (canMove) {
             this.direction = direction;
             setAnimationState("run");
@@ -245,6 +249,7 @@ public class Player implements Animatable, GameObject, Interactable {
             imageX += deltaX;
         }
     }
+
 
     // Зупиняє рух гравця
     public void stopMovement() {
@@ -310,6 +315,7 @@ public class Player implements Animatable, GameObject, Interactable {
 
     // Виконує атаку
     public void attack(boolean isRanged) {
+
         if (!isAttacking) {
             isAttacking = true;
             setAnimationState(isRanged ? "shoot" : "hit");
@@ -318,11 +324,6 @@ public class Player implements Animatable, GameObject, Interactable {
                 attackAnimationDuration = frames.length * 0.2;
             }
         }
-    }
-
-    // Піднімається по драбині
-    public void climb(InteractiveObject ladder) {
-        setAnimationState("climb");
     }
 
     // Збільшує рівень виявлення

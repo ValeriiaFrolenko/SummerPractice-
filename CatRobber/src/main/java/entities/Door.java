@@ -5,6 +5,7 @@ import javafx.geometry.Bounds;
 import javafx.geometry.BoundingBox;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
+import managers.SoundManager;
 import org.json.JSONObject;
 import puzzles.*;
 import utils.GameLoader;
@@ -25,6 +26,7 @@ public class Door implements GameObject, Interactable {
     private final String path = "background/doors/"; //дефолтний шлях до будь-якої картинки з дверми
     private int sharedId; //ID, який об’єднує двері
     private LockType lockType; //тип замка: CODE_LOCK, PICK_LOCK, LASER_LOCK, NONE
+    private final SoundManager soundManager = SoundManager.getInstance();
 
     /**
      * Конструктор, що приймає координати та JSON з інформацією про двері
@@ -67,6 +69,10 @@ public class Door implements GameObject, Interactable {
         sprites.put("stairsLocked", loader.loadImage(spritePaths[9]));
         sprites.put("laserLocked", loader.loadImage(spritePaths[10]));
         sprites.put("laserUnlocked", loader.loadImage(spritePaths[11]));
+    }
+
+    public String getDirection() {
+        return direction;
     }
 
     /**
@@ -153,6 +159,9 @@ public class Door implements GameObject, Interactable {
     public void openLinkedDoors() {
         for (Interactable interactable : GameManager.getInstance().getInteractables()) {
             if (interactable instanceof Door otherDoor && otherDoor.getSharedId() == this.sharedId) {
+                if (!otherDoor.isOpen) {
+                    soundManager.playSound(SoundManager.SoundType.DOOR_OPEN);
+                }
                 otherDoor.isOpen = true;
                 System.out.println("Linked door opened: " + otherDoor.getSharedId());
             }
@@ -164,6 +173,9 @@ public class Door implements GameObject, Interactable {
         this.isOpen = true;
         for (Interactable interactable : GameManager.getInstance().getInteractables()) {
             if (interactable instanceof Door otherDoor && otherDoor.getSharedId() == this.sharedId) {
+                if (otherDoor.getLockType() != LockType.LASER_LOCK) {
+                    soundManager.playSound(SoundManager.SoundType.DOOR_OPEN);
+                }
                 otherDoor.isLocked = false;
                 otherDoor.isOpen = true;
                 System.out.println("Linked door unlocked: " + otherDoor.getSharedId());

@@ -16,6 +16,7 @@ import javafx.scene.paint.Stop;
 import javafx.scene.effect.DropShadow;
 import managers.FontManager;
 import managers.GameManager;
+import managers.SoundManager;
 import managers.UIManager;
 import utils.GameLoader;
 
@@ -118,7 +119,11 @@ public class ShopPane implements UIWindow {
             itemContainer.setAlignment(Pos.CENTER);
             shopPane.add(itemContainer, i % 2, 1 + (i / 2));
             itemButtons[i] = button;
-            button.setOnAction(e -> buyItem((ShopItem) button.getUserData()));
+            button.setOnAction(e -> {
+                SoundManager.getInstance().playSound(SoundManager.SoundType.BUTTON_CLICK);
+                SoundManager.getInstance().playSound(SoundManager.SoundType.COLLECT_MONEY);
+                buyItem((ShopItem) button.getUserData());
+            });
         }
 
         HBox backButtonContainer = new HBox();
@@ -129,6 +134,7 @@ public class ShopPane implements UIWindow {
 
         backButton.setOnAction(e -> {
             hide();
+            SoundManager.getInstance().playSound(SoundManager.SoundType.BUTTON_CLICK);
             UIManager.getInstance().setCurrentWindow(null); // Явно очищаємо currentWindow
             UIManager.getInstance().hideCurrentWindowToMenu();
         });

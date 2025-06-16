@@ -3,49 +3,181 @@ package managers;
 import javafx.scene.media.AudioClip;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
+
+import java.io.File;
+import java.util.EnumMap;
 import java.util.Map;
 
-// Керує звуками та музикою
 public class SoundManager {
-    // Поля
-    private Map<SoundType, AudioClip> sounds; // Звуки за типами
-    private MediaPlayer currentMusic; // Поточна музика
-    private double masterVolume; // Загальна гучність
-    private double soundVolume; // Гучність звуків
-    private double musicVolume; // Гучність музики
+    public enum SoundType {
+        BUTTON_CLICK, CODE_LOCK_CLICK, CODE_LOCK_CLOSED, CODE_LOCK_OPEN,
+        COLLECT_MONEY, DOOR_OPEN, FAIL_GAME, HIT, HITTED,
+        KEYBOARD_TYPING, MOVE_PICTURE, MOVE_SHIELD, PICK_LOCK_CLOSED, PICK_LOCK_OPEN, RUN, SHOOT,
+        TAKE_NOTE, VICTORY_GAME, WIRE_CUT
+    }
 
-    // Енум для типів звуків
-    public enum SoundType { STEP, DOOR_OPEN, ALARM, BUTTON_CLICK }
+    private Map<SoundType, AudioClip> sounds;
+    private MediaPlayer currentMusic;
+    private MediaPlayer currentSound;
+    private double masterVolume = 1;
+    private double soundVolume = 1;
+    private double musicVolume = 1;
+    private boolean isRunningSoundPlay = false;
 
-    // Конструктор
-    public SoundManager() {}
+    private static SoundManager instance;
 
-    // Відтворює звук
-    // Отримує тип звуку (STEP, DOOR_OPEN, тощо)
-    public void playSound(SoundType type) {}
+    public static SoundManager getInstance() {
+        if (instance == null) {
+            instance = new SoundManager();
+        }
+        return instance;
+    }
 
-    // Відтворює музику
-    // Отримує шлях із /assets/music/ (наприклад, background.mp3)
-    public void playMusic(String track) {}
+    private SoundManager() {
+        sounds = new EnumMap<>(SoundType.class);
+        loadSounds();
+        initRunSound();
+    }
 
-    // Встановлює загальну гучність
-    // Отримує значення від Settings
-    public void setMasterVolume(double volume) {}
+    public void initRunSound() {
+        String path = getFilePath("assets\\music\\sounds\\run.mp3" );
+        System.out.println("Спроба завантажити музику з: " + path);
+        Media media = new Media(path);
+        currentSound = new MediaPlayer(media);
+        currentSound.setCycleCount(MediaPlayer.INDEFINITE);
+        currentSound.setVolume(masterVolume * soundVolume);
+    }
 
-    // Встановлює гучність звуків
-    // Отримує значення від Settings
-    public void setSoundVolume(double volume) {}
+    public void startRunSound() {
+        if (!isRunningSoundPlay && currentSound != null) {
+            currentSound.play();
+            isRunningSoundPlay = true;
+        }
+    }
 
-    // Встановлює гучність музики
-    // Отримує значення від Settings
-    public void setMusicVolume(double volume) {}
+    public void stopRunSound() {
+        if (isRunningSoundPlay && currentSound != null) {
+            currentSound.pause();
+            isRunningSoundPlay = false;
+        }
+    }
 
-    // Зупиняє всі звуки
-    public void stopAllSounds() {}
+    private void loadSounds() {
+        loadSound(SoundType.BUTTON_CLICK, "assets/music/sounds/button_click.mp3");
+        loadSound(SoundType.CODE_LOCK_CLICK, "assets/music/sounds/code_lock_click.mp3");
+        loadSound(SoundType.CODE_LOCK_CLOSED, "assets/music/sounds/code_lock_closed.mp3");
+        loadSound(SoundType.CODE_LOCK_OPEN, "assets/music/sounds/code_lock_open.mp3");
+        loadSound(SoundType.COLLECT_MONEY, "assets/music/sounds/collect_money.mp3");
+        loadSound(SoundType.DOOR_OPEN, "assets/music/sounds/door_open.mp3");
+        loadSound(SoundType.FAIL_GAME, "assets/music/sounds/fail_game.mp3");
+        loadSound(SoundType.HIT, "assets/music/sounds/hit.mp3");
+        loadSound(SoundType.HITTED, "assets/music/sounds/hitted.mp3");
+        loadSound(SoundType.KEYBOARD_TYPING, "assets/music/sounds/keyboard_typing.mp3");
+        loadSound(SoundType.MOVE_PICTURE, "assets/music/sounds/move_picture.mp3");
+        loadSound(SoundType.MOVE_SHIELD, "assets/music/sounds/move_shield.mp3");
+        loadSound(SoundType.PICK_LOCK_CLOSED, "assets/music/sounds/pick_lock_closed.mp3");
+        loadSound(SoundType.PICK_LOCK_OPEN, "assets/music/sounds/pick_lock_open.mp3");
+        loadSound(SoundType.RUN, "assets/music/sounds/run.mp3");
+        loadSound(SoundType.SHOOT, "assets/music/sounds/shoot.mp3");
+        loadSound(SoundType.TAKE_NOTE, "assets/music/sounds/take_note.mp3");
+        loadSound(SoundType.VICTORY_GAME, "assets/music/sounds/victory_game.mp3");
+        loadSound(SoundType.WIRE_CUT, "assets/music/sounds/wire_cut.mp3");
+    }
 
-    // Ставить музику на паузу
-    public void pauseMusic() {}
+    private String getFilePath(String relativePath) {
+        try {
+            File file = new File(System.getProperty("user.dir"), relativePath);
+            return file.toURI().toString();
+        } catch (Exception e) {
+            System.err.println("Помилка отримання шляху: " + relativePath);
+            return null;
+        }
+    }
 
-    // Відновлює музику
-    public void resumeMusic() {}
+    private void loadSound(SoundType type, String relativePath) {
+        try {
+            File file = new File(System.getProperty("user.dir"), relativePath);
+            AudioClip clip = new AudioClip(file.toURI().toString());
+            sounds.put(type, clip);
+        } catch (Exception e) {
+            System.err.println("Не вдалося завантажити звук: " + relativePath);
+            e.printStackTrace();
+        }
+    }
+
+    public void playSound(SoundType type) {
+        AudioClip clip = sounds.get(type);
+        if (clip != null) {
+            clip.setVolume(masterVolume * soundVolume);
+            clip.play();
+        }
+    }
+
+
+    public void playMusic(String trackName) {
+        stopMusic(); // зупинити поточну
+        try {
+            String path = getFilePath("assets\\music\\background\\" + trackName);
+            System.out.println("Спроба завантажити музику з: " + path);
+            Media media = new Media(path);
+            currentMusic = new MediaPlayer(media);
+            currentMusic.setVolume(masterVolume * musicVolume);
+            currentMusic.setCycleCount(MediaPlayer.INDEFINITE);
+            currentMusic.play();
+        } catch (Exception e) {
+            System.err.println("Не вдалося завантажити музику: " + trackName);
+            e.printStackTrace();
+        }
+    }
+
+    public void stopMusic() {
+        if (currentMusic != null) {
+            currentMusic.stop();
+            currentMusic = null;
+        }
+    }
+
+    public void stopSoundEffects() {
+        for (AudioClip clip : sounds.values()) {
+            clip.stop();
+        }
+        stopRunSound(); // якщо біжить звук бігу — теж зупиняємо
+    }
+
+    public void stopAllSounds() {
+        for (AudioClip clip : sounds.values()) {
+            clip.stop();
+        }
+        stopMusic();
+    }
+
+    public void pauseMusic() {
+        if (currentMusic != null) {
+            currentMusic.pause();
+        }
+    }
+
+    public void resumeMusic() {
+        if (currentMusic != null) {
+            currentMusic.play();
+        }
+    }
+
+    public void setMasterVolume(double volume) {
+        masterVolume = volume;
+        if (currentMusic != null) {
+            currentMusic.setVolume(masterVolume * musicVolume);
+        }
+    }
+
+    public void setSoundVolume(double volume) {
+        soundVolume = volume;
+    }
+
+    public void setMusicVolume(double volume) {
+        musicVolume = volume;
+        if (currentMusic != null) {
+            currentMusic.setVolume(masterVolume * musicVolume);
+        }
+    }
 }

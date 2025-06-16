@@ -1,54 +1,140 @@
-{"camera_77": {
-  "gid": 50,
-  "visible": true,
-  "rotation": 0,
-  "name": "",
-  "width": 55,
-  "x": 404.833333333333,
-  "y": 512.916666666666,
-  "id": 77,
-  "type": "Camera",
-  "properties": [
-    {
-      "name": "animationFrame",
-      "type": "int",
-      "value": 0
-    },
-    {
-      "name": "animationTime",
-      "type": "int",
-      "value": 0
-    },
-    {
-      "name": "currentAnimation",
-      "type": "string",
-      "value": "normal"
-    },
-    {
-      "name": "direction",
-      "type": "string",
-      "value": "LEFT"
-    },
-    {
-      "name": "floorPointY",
-      "type": "float",
-      "value": 584
-    },
-    {
-      "name": "hightColl",
-      "type": "int",
-      "value": 13
-    },
-    {
-      "name": "isAlert",
-      "type": "bool",
-      "value": false
-    },
-    {
-      "name": "widthColl",
-      "type": "int",
-      "value": 14
-    }
-  ],
-  "height": 25
-}}
+{
+  "camera_77": {
+    "gid": 50,
+    "visible": true,
+    "rotation": 0,
+    "name": "",
+    "width": 55,
+    "x": 404.833333333333,
+    "y": 512.916666666666,
+    "id": 77,
+    "type": "Camera",
+    "properties": [
+      {
+        "name": "animationFrame",
+        "type": "int",
+        "value": 0
+      },
+      {
+        "name": "animationTime",
+        "type": "int",
+        "value": 0
+      },
+      {
+        "name": "currentAnimation",
+        "type": "string",
+        "value": "normal"
+      },
+      {
+        "name": "direction",
+        "type": "string",
+        "value": "LEFT"
+      },
+      {
+        "name": "floorPointY",
+        "type": "float",
+        "value": 584
+      },
+      {
+        "name": "gratingHeight",
+        "type": "float",
+        "value": 91
+      },
+      {
+        "name": "gratingWidth",
+        "type": "float",
+        "value": 25
+      },
+      {
+        "name": "gratingX",
+        "type": "float",
+        "value": 753
+      },
+      {
+        "name": "gratingY",
+        "type": "float",
+        "value": 583
+      },
+      {
+        "name": "hasGrating",
+        "type": "bool",
+        "value": true
+      },
+      {
+        "name": "hightColl",
+        "type": "int",
+        "value": 13
+      },
+      {
+        "name": "isAlert",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "widthColl",
+        "type": "int",
+        "value": 14
+      }
+    ],
+    "height": 25
+  },
+  "camera_113": {
+    "gid": 50,
+    "visible": true,
+    "rotation": 0,
+    "name": "",
+    "width": 55,
+    "x": 678.5,
+    "y": 179,
+    "id": 113,
+    "type": "Camera",
+    "properties": [
+      {
+        "name": "animationFrame",
+        "type": "int",
+        "value": 0
+      },
+      {
+        "name": "animationTime",
+        "type": "int",
+        "value": 0
+      },
+      {
+        "name": "currentAnimation",
+        "type": "string",
+        "value": "normal"
+      },
+      {
+        "name": "direction",
+        "type": "string",
+        "value": "LEFT"
+      },
+      {
+        "name": "floorPointY",
+        "type": "float",
+        "value": 250
+      },
+      {
+        "name": "hasGrating",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "hightColl",
+        "type": "int",
+        "value": 13
+      },
+      {
+        "name": "isAlert",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "widthColl",
+        "type": "int",
+        "value": 14
+      }
+    ],
+    "height": 25
+  }
+}

@@ -14,6 +14,7 @@ import javafx.util.Duration;
 import managers.FontManager;
 import main.GameWindow;
 import managers.GameManager;
+import managers.SoundManager;
 import org.json.JSONObject;
 
 public class CodeLockPuzzle extends Puzzle {
@@ -26,6 +27,7 @@ public class CodeLockPuzzle extends Puzzle {
     private static int globalAttempts = 3; // Статична змінна для збереження спроб між відкриттями
     private int imageWidth = 400;
     private int imageHeight = 300;
+    private final SoundManager soundManager = SoundManager.getInstance();
 
     public CodeLockPuzzle(JSONObject defaultData) {
         super(defaultData);
@@ -37,12 +39,14 @@ public class CodeLockPuzzle extends Puzzle {
     @Override
     public void solve(Object input) {
         if (input.equals(solution)) {
+            soundManager.playSound(SoundManager.SoundType.CODE_LOCK_OPEN);
             state = PuzzleState.SOLVED;
             if (callback != null) {
                 callback.onPuzzleSolved(true, linkedDoor);
             }
             System.out.println("CodeLockPuzzle solved with code: " + input);
         } else {
+            soundManager.playSound(SoundManager.SoundType.CODE_LOCK_CLOSED);
             globalAttempts--;
             updateAttemptsDisplay();
             enteredCode.setLength(0); // Очищаємо при невірному коді
@@ -174,7 +178,7 @@ public class CodeLockPuzzle extends Puzzle {
         // Обробка клавіатури
         pane.setOnKeyPressed(event -> {
             System.out.println("Key pressed: " + event.getCode());
-
+            soundManager.playSound(SoundManager.SoundType.CODE_LOCK_CLICK);
             KeyCode key = event.getCode();
 
             if (key.isDigitKey() && enteredCode.length() < 4) {
