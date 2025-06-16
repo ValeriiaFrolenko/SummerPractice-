@@ -1,73 +1,63 @@
 {
-  "interactiveObjects_6": {
-    "fileName": "chest2.png",
-    "isPictureMoved": false,
-    "x": 656,
-    "width": 50,
-    "y": 243.6666717529297,
-    "typeObj": "WITH_MONEY",
-    "type": "InteractiveObject",
-    "height": 40
-  },
   "interactiveObjects_5": {
-    "fileName": "chest3.png",
+    "fileName": "atm.png",
     "isPictureMoved": false,
-    "x": 173.5,
-    "width": 50,
-    "y": 468.5,
+    "x": 565.5,
+    "width": 55,
+    "y": 576,
     "typeObj": "WITH_MONEY",
-    "type": "InteractiveObject",
-    "height": 40
-  },
-  "interactiveObjects_0": {
-    "fileName": "diamont.png",
-    "isPictureMoved": false,
-    "x": 119,
-    "width": 100,
-    "y": 242.33349609375,
-    "typeObj": "FINAL_PRIZE",
     "type": "InteractiveObject",
     "height": 80
   },
-  "interactiveObjects_4": {
-    "fileName": "chest1.png",
+  "interactiveObjects_0": {
+    "fileName": "computer.png",
+    "code": "8964",
     "isPictureMoved": false,
-    "x": 1077.6666259765625,
-    "width": 50,
-    "y": 128,
-    "typeObj": "WITH_MONEY",
+    "x": 144,
+    "width": 40,
+    "y": 317.3333435058594,
+    "typeObj": "COMPUTER",
     "type": "InteractiveObject",
     "height": 40
   },
-  "interactiveObjects_3": {
-    "fileName": "picture.jpg",
-    "code": "8399",
-    "isPictureMoved": true,
-    "x": 100.66700744628906,
-    "width": 50,
-    "y": 105.66649627685547,
-    "typeObj": "PICTURE",
+  "interactiveObjects_4": {
+    "fileName": "drawer.png",
+    "isPictureMoved": false,
+    "x": 292,
+    "width": 80,
+    "y": 127,
+    "typeObj": "WITH_MONEY",
     "type": "InteractiveObject",
-    "height": 50
+    "height": 70
+  },
+  "interactiveObjects_3": {
+    "fileName": "machine.png",
+    "isPictureMoved": false,
+    "x": 602.8333129882812,
+    "width": 60,
+    "y": 240,
+    "typeObj": "WITH_MONEY",
+    "type": "InteractiveObject",
+    "height": 80
   },
   "interactiveObjects_2": {
     "fileName": "electricalPanel.png",
     "isPictureMoved": false,
-    "x": 82,
+    "x": 474,
     "width": 30,
-    "y": 546.5,
+    "y": 316,
     "typeObj": "ELECTRICAL_PANEL",
     "type": "InteractiveObject",
     "height": 30
   },
   "interactiveObjects_1": {
-    "fileName": "boxes.png",
+    "fileName": "bankDoor.png",
     "isPictureMoved": false,
-    "x": 129.3333282470703,
-    "width": 100,
-    "y": 585,
-    "typeObj": "WITH_MONEY",
+    "x": 718.6666870117188,
+    "width": 120,
+    "y": 138.3333282470703,
+    "typeObj": "FINAL_PRIZE",
     "type": "InteractiveObject",
-    "height": 70
+    "height": 100
   }
 }

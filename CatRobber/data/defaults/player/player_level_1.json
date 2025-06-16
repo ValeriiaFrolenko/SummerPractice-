@@ -3,9 +3,9 @@
   "visible": true,
   "rotation": 0,
   "name": "player",
-  "width": 100,
-  "x": 216.219202466456,
-  "y": 375.767441918419,
+  "width": 100.948246196698,
+  "x": 33.5525357997892,
+  "y": 135.100775251752,
   "id": 123,
   "type": "Player",
   "properties": [
@@ -27,12 +27,12 @@
     {
       "name": "collX",
       "type": "float",
-      "value": 241
+      "value": 59.43
     },
     {
       "name": "collY",
       "type": "float",
-      "value": 306
+      "value": 65.2
     },
     {
       "name": "currentAnimation",
@@ -70,6 +70,11 @@
       "value": 0
     },
     {
+      "name": "money",
+      "type": "int",
+      "value": 0
+    },
+    {
       "name": "speedBoost",
       "type": "int",
       "value": 0
@@ -85,5 +90,5 @@
       "value": 40.74
     }
   ],
-  "height": 100
+  "height": 100.948246196698
 }}

@@ -1,17 +1,17 @@
 {"player_0": {
   "canMove": true,
   "currentAnimation": "idle",
-  "collY": 74,
-  "collX": 179.61124500000025,
+  "collY": 410,
+  "collX": 614.3914929999997,
   "type": "Player",
   "detectionCount": 0,
   "widthColl": 40.74,
-  "x": 145.94457324707068,
+  "x": 579.3914929999997,
   "width": 100,
-  "y": 143,
+  "y": 478.3333435058594,
   "hightColl": 57,
   "state": "IDLE",
   "itemUsage": {},
   "height": 100,
-  "direction": "RIGHT"
+  "direction": "LEFT"
 }}

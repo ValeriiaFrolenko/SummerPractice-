@@ -1,6 +1,6 @@
 {
   "puzzle_2": {
-    "puzzleType": "CodeLockPuzzle",
+    "puzzleType": "LockPickPuzzle",
     "state": "UNSOLVED",
     "type": "Puzzle"
   },
@@ -9,8 +9,13 @@
     "state": "UNSOLVED",
     "type": "Puzzle"
   },
-  "puzzle_0": {
+  "puzzle_3": {
     "puzzleType": "LaserLockPuzzle",
+    "state": "UNSOLVED",
+    "type": "Puzzle"
+  },
+  "puzzle_0": {
+    "puzzleType": "CodeLockPuzzle",
     "state": "UNSOLVED",
     "type": "Puzzle"
   }
