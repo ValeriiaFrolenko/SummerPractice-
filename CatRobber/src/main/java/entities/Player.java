@@ -44,6 +44,26 @@ public class Player implements Animatable, GameObject, Interactable {
     private Map<ShopItem, Boolean> itemUsage; // Стан використання: предмет -> чи використовується
     private JSONObject mapData; // Дані карти для синхронізації
 
+    // entities/Player.java
+
+    // ... після поля private JSONObject mapData;
+    private double baseSpeed; // Для збереження початкової швидкості
+    private boolean isSpeedBoosted;
+    private double speedBoostTimer;
+
+
+    // entities/Player.java
+
+    // ... після полів для speed boost
+    private boolean isInvisible;
+    private double invisibilityTimer;
+
+
+    // entities/Player.java
+
+    // ... після поля private double invisibilityTimer;
+    private boolean hasUniversalKey;
+
     // Напрями та стани гравця
     public enum Direction { LEFT, RIGHT, UP, DOWN }
     public enum PlayerState { IDLE, RUN, HIT, CLIMB, INVISIBLE, SHOOT }
@@ -79,6 +99,35 @@ public class Player implements Animatable, GameObject, Interactable {
             System.err.println("Невірне значення direction: " + directionStr + ". Встановлюю RIGHT.");
             this.direction = Direction.RIGHT;
         }
+
+        // В конструкторі Player(Vector2D position, JSONObject defaultData)
+
+// ... після this.direction = Direction.RIGHT;
+        this.state = PlayerState.IDLE;
+        this.speed = 70.0;
+        this.baseSpeed = this.speed; // Зберігаємо базову швидкість
+        this.isSpeedBoosted = false;
+        this.speedBoostTimer = 0.0;
+        this.isVisible = true;
+
+
+        // В конструкторі Player(Vector2D position, JSONObject defaultData)
+
+// ... після this.speedBoostTimer = 0.0;
+        this.isInvisible = false;
+        this.invisibilityTimer = 0.0;
+
+        // В конструкторі Player(Vector2D position, JSONObject defaultData)
+
+// ... після this.invisibilityTimer = 0.0;
+        this.hasUniversalKey = false;
+        this.isVisible = true;
+// ... решта конструктора
+
+        this.isVisible = true; // Це поле вже є, але воно пов'язане
+// ... решта конструктора
+// ... решта конструктора
+
         this.state = PlayerState.IDLE;
         this.speed = 70.0;
         this.isVisible = true;
@@ -98,9 +147,6 @@ public class Player implements Animatable, GameObject, Interactable {
         animations.put("shoot", loader.splitSpriteSheet(spritePaths[3], 2));
     }
 
-    public int getDetectionCount(){
-        return detectionCount;
-    }
     // Ініціалізує інвентар із mapData
     private void initializeInventory() {
         // Перевіряємо наявність предметів у mapData
@@ -212,15 +258,43 @@ public class Player implements Animatable, GameObject, Interactable {
     }
 
     // Оновлює анімацію гравця
+    // entities/Player.java
+
     @Override
     public void updateAnimation(double deltaTime) {
+        // 1. Оновлюємо час анімації ОДИН РАЗ на початку
         animationTime += deltaTime;
+
+        // Логіка таймера прискорення (вона не залежить від часу анімації) ---
+        if (isSpeedBoosted) {
+            speedBoostTimer -= deltaTime;
+            if (speedBoostTimer <= 0) {
+                isSpeedBoosted = false;
+                this.speed = baseSpeed; // Повертаємо швидкість до базової
+                System.out.println("Дія прискорення закінчилась. Швидкість повернуто до: " + this.speed);
+            }
+        }
+        // Кінець логіки таймера
+
+
+        // --- Логіка таймера невидимості ---
+        if (isInvisible) {
+            invisibilityTimer -= deltaTime;
+            if (invisibilityTimer <= 0) {
+                isInvisible = false;
+                this.state = PlayerState.IDLE; // Повертаємо до звичайного стану
+                System.out.println("Дія невидимості закінчилась.");
+            }
+        }
+
+
         Image[] frames = animations.getOrDefault(currentAnimation, animations.get("idle"));
         if (frames == null || frames.length == 0) return;
 
+        // 2. Розраховуємо кадр анімації, використовуючи вже оновлений animationTime
         if (isAttacking) {
             attackAnimationDuration -= deltaTime;
-            double frameDuration = 0.2;
+            double frameDuration = 0.2; // Можна винести цю змінну за межі if/else
             int frameCount = frames.length;
             animationFrame = (int) (animationTime / frameDuration) % frameCount;
             if (attackAnimationDuration <= 0) {
@@ -253,7 +327,7 @@ public class Player implements Animatable, GameObject, Interactable {
 
     // Збільшує рівень виявлення
     public void increaseDetection() {
-        detectionCount++;
+        // Реалізація відсутня
     }
 
     public void teleportToRoom(Door door) {
@@ -277,7 +351,7 @@ public class Player implements Animatable, GameObject, Interactable {
         stopMovement();
         setAnimationState("idle");
         if (levelId==1){
-        adjustPlayerPosition(120, teleportDirection);
+            adjustPlayerPosition(120, teleportDirection);
         } else {
             adjustPlayerPosition(113, teleportDirection);
         }
@@ -512,5 +586,120 @@ public class Player implements Animatable, GameObject, Interactable {
 
     public boolean isAttacking() {
         return isAttacking;
+    }
+
+
+
+    /**
+     * Використовує один предмет з інвентарю.
+     * @param item Предмет для використання.
+     * @return true, якщо предмет був успішно використаний, інакше false.
+     */
+    public boolean useItem(ShopItem item) {
+        int currentQuantity = inventory.getOrDefault(item, 0);
+        if (currentQuantity > 0) {
+            inventory.put(item, currentQuantity - 1);
+            updateMapData(item); // Оновлюємо дані для збереження
+            System.out.println("Використано предмет: " + item.getName() + ", залишилось: " + (currentQuantity - 1));
+            return true;
+        }
+        System.out.println("Неможливо використати предмет: " + item.getName() + ", немає в наявності.");
+        return false;
+    }
+
+
+
+
+    /**
+     * Активує тимчасове прискорення для гравця.
+     * @param duration Тривалість ефекту в секундах.
+     */
+    public void applySpeedBoost(double duration) {
+        if (!isSpeedBoosted) { // Застосовуємо, тільки якщо буст не активний
+            isSpeedBoosted = true;
+            this.speed *= 5; // Подвоюємо швидкість
+            System.out.println("Прискорення активовано! Нова швидкість: " + this.speed);
+        } else {
+            System.out.println("Прискорення поновлено!");
+        }
+        this.speedBoostTimer = duration; // Встановлюємо або оновлюємо таймер
+    }
+
+
+
+    // entities/Player.java (додайте цей метод в кінець класу)
+
+    /**
+     * Активує тимчасову невидимість для гравця.
+     * @param duration Тривалість ефекту в секундах.
+     */
+    public void applyInvisibility(double duration) {
+        if (!isInvisible) { // Застосовуємо, тільки якщо невидимість не активна
+            this.state = PlayerState.INVISIBLE; // Змінюємо стан
+            System.out.println("Невидимість активовано!");
+        } else {
+            System.out.println("Невидимість поновлено!");
+        }
+        this.isInvisible = true;
+        this.invisibilityTimer = duration; // Встановлюємо або оновлюємо таймер
+    }
+
+    // entities/Player.java (додайте цей метод в кінець класу)
+
+    public boolean isInvisible() {
+        return isInvisible;
+    }
+
+
+    // entities/Player.java (додайте ці методи в кінець класу)
+
+    /**
+     * Дає гравцеві універсальний ключ.
+     */
+    public void giveUniversalKey() {
+        this.hasUniversalKey = true;
+        System.out.println("Гравець отримав універсальний ключ!");
+    }
+
+    /**
+     * Перевіряє, чи є у гравця універсальний ключ.
+     * @return true, якщо ключ є, інакше false.
+     */
+    public boolean hasUniversalKey() {
+        return this.hasUniversalKey;
+    }
+
+    /**
+     * Використовує універсальний ключ. Ключ зникає після використання.
+     */
+    public void useUniversalKey() {
+        if (this.hasUniversalKey) {
+            this.hasUniversalKey = false;
+            System.out.println("Універсальний ключ використано.");
+        }
+    }
+
+    // entities/Player.java
+
+    /**
+     * Перевіряє, чи є у гравця пістолет в інвентарі.
+     * @return true, якщо пістолет є, інакше false.
+     */
+
+    public boolean hasGun() {
+        for (Map.Entry<ShopItem, Integer> entry : inventory.entrySet()) {
+            if (entry.getKey().getItemType() == ShopItem.ItemType.GUN && entry.getValue() > 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Повертає поточну кількість разів, коли гравця було виявлено.
+     * @return кількість виявлень.
+     */
+    public int getDetectionCount() {
+        return this.detectionCount;
     }
 }
