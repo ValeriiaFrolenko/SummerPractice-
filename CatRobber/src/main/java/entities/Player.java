@@ -6,6 +6,7 @@ import javafx.geometry.BoundingBox;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
+import managers.GameManager;
 import managers.SoundManager;
 import org.json.JSONObject;
 import ui.ShopItem;
@@ -183,6 +184,12 @@ public class Player implements Animatable, GameObject, Interactable {
         inventory.put(item, inventory.getOrDefault(item, 0) + 1);
         itemUsage.putIfAbsent(item, false);
         updateMapData(item);
+        if (inventory.get(item) == 0) {
+            inventory.remove(item);
+            itemUsage.remove(item);
+        }
+        updateMapData(item);
+        GameManager.getInstance().updateInventoryFromPlayer();
         System.out.println("Гравець отримав: " + item.getName());
         return true;
     }
@@ -208,8 +215,19 @@ public class Player implements Animatable, GameObject, Interactable {
 
     // Повертає інвентар
     public Map<ShopItem, Integer> getInventory() {
-        return inventory;
+        return new HashMap<>(inventory); // Повертаємо копію інвентаря
     }
+
+
+    public void clearInventory() {
+        inventory.clear();
+        itemUsage.clear();
+        hasUniversalKey = false;
+        isInvisible = false;
+        isSpeedBoosted = false;
+        speed = baseSpeed;
+    }
+
 
     // Встановлює стан використання предмета
     public void setItemUsage(ShopItem item, boolean isUsed) {
