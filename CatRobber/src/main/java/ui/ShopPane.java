@@ -141,7 +141,6 @@ public class ShopPane implements UIWindow {
             itemButtons[i] = button;
             button.setOnAction(e -> {
                 SoundManager.getInstance().playSound(SoundManager.SoundType.BUTTON_CLICK);
-                SoundManager.getInstance().playSound(SoundManager.SoundType.COLLECT_MONEY);
                 buyItem((ShopItem) button.getUserData());
             });
         }
