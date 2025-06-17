@@ -346,7 +346,8 @@ public class Player implements Animatable, GameObject, Interactable {
 
     // Збільшує рівень виявлення
     public void increaseDetection() {
-        // Реалізація відсутня
+        this.detectionCount++;
+        System.out.println("Гравець виявлений! Рівень виявлення: " + this.detectionCount);
     }
 
     public void teleportToRoom(Door door) {

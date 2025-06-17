@@ -24,7 +24,7 @@ public class LockPickPuzzle extends Puzzle {
     private ImageView lockpickView;
 
     private boolean isPicking = false;
-    private final double cylinderSpeed = 2.0;
+    private final double cylinderSpeed = 7.0;
 
     private double successZoneMinX;
     private double successZoneMaxX;
@@ -32,6 +32,9 @@ public class LockPickPuzzle extends Puzzle {
     private boolean leftPressed = false;
     private boolean rightPressed = false;
     private Timeline inputTimeline;
+
+    private int cylinderDirection = 1; // 1 = вправо, -1 = вліво
+
 
     private EventHandler<KeyEvent> keyPressedHandler;
     private EventHandler<KeyEvent> keyReleasedHandler;
@@ -73,11 +76,13 @@ public class LockPickPuzzle extends Puzzle {
     }
 
 
+
     @Override
     public Node getUI() {
         puzzlePane = new Pane();
-        puzzlePane.setPrefSize(800, 600);
-        puzzlePane.setStyle("-fx-background-color: rgba(0, 0, 0, 0.8);");
+        puzzlePane.setPrefSize(1200, 800);
+
+        puzzlePane.setStyle("-fx-background-color: transparent;");
 
         GameLoader loader = new GameLoader();
         Image lockImage = loader.loadImage("puzzles/pickLock/Lock.png");
@@ -90,28 +95,40 @@ public class LockPickPuzzle extends Puzzle {
         }
 
         lockBackgroundView = new ImageView(lockImage);
-        lockBackgroundView.setFitWidth(600);
-        lockBackgroundView.setFitHeight(300);
+        lockBackgroundView.setFitWidth(1200);
+        lockBackgroundView.setFitHeight(600);
         lockBackgroundView.setLayoutX((puzzlePane.getPrefWidth() - lockBackgroundView.getFitWidth()) / 2);
-        lockBackgroundView.setLayoutY((puzzlePane.getPrefHeight() - lockBackgroundView.getFitHeight()) / 2 - 50);
+        lockBackgroundView.setLayoutY((puzzlePane.getPrefHeight() - lockBackgroundView.getFitHeight()) / 2);
 
         cylinderView = new ImageView(cylinderImage);
-        // <--- ЗМІНЕНО: Ширину зменшено вдвічі, як ви просили
-        cylinderView.setFitWidth(150);
-        cylinderView.setFitHeight(81);
-        cylinderView.setLayoutX(lockBackgroundView.getLayoutX() + 182);
-        cylinderView.setLayoutY(lockBackgroundView.getLayoutY() + 145);
+        cylinderView.setFitWidth(300);
+        cylinderView.setFitHeight(162);
+
+        cylinderView.setLayoutX(lockBackgroundView.getLayoutX() + 305);
+        cylinderView.setLayoutY(lockBackgroundView.getLayoutY() + 290);
 
         lockpickView = new ImageView(lockpickImage);
-        lockpickView.setFitWidth(40);
-        lockpickView.setFitHeight(200);
-        lockpickView.setLayoutX(((puzzlePane.getPrefWidth() - lockpickView.getFitWidth()) / 2)+20);
-        lockpickView.setLayoutY(lockBackgroundView.getLayoutY() + lockBackgroundView.getFitHeight() - 65);
+        lockpickView.setFitWidth(80);
+        lockpickView.setFitHeight(400);
+        lockpickView.setLayoutX((puzzlePane.getPrefWidth() - lockpickView.getFitWidth()) / 2 + 40);
+        lockpickView.setLayoutY(lockBackgroundView.getLayoutY() + lockBackgroundView.getFitHeight() - 130);
 
-        double lockCenterX = lockBackgroundView.getLayoutX() + lockBackgroundView.getFitWidth() / 2;
-        double successZoneWidth = 30;
-        successZoneMinX = lockCenterX - successZoneWidth / 2;
-        successZoneMaxX = lockCenterX + successZoneWidth / 2;
+
+        double spaceStartX = lockBackgroundView.getLayoutX() + 364;
+        double spaceEndX = lockBackgroundView.getLayoutX() + lockBackgroundView.getFitWidth() - 305;
+
+        // Розраховуємо крайні точки для позиції циліндра
+        double minX = spaceStartX;
+        double maxX = spaceEndX - cylinderView.getFitWidth();
+
+        //  Знаходимо ЦЕНТР
+        double movementCorridorCenter = (minX + maxX) / 2.0;
+
+        // Розраховуємо зону успіху відносно ЦЕНТРУ РУХУ
+        double successZoneWidth = 40.0;
+        double cylinderCenterOffset = cylinderView.getFitWidth() / 2.0;
+        successZoneMinX = (movementCorridorCenter + cylinderCenterOffset) - (successZoneWidth / 2.0);
+        successZoneMaxX = (movementCorridorCenter + cylinderCenterOffset) + (successZoneWidth / 2.0);
 
         puzzlePane.getChildren().addAll(lockBackgroundView, cylinderView, lockpickView);
         setupInputHandlers();
@@ -123,30 +140,18 @@ public class LockPickPuzzle extends Puzzle {
         puzzlePane.setFocusTraversable(true);
 
         keyPressedHandler = event -> {
-            if (isPicking) return; // Ігноруємо рух під час анімації спроби
 
-            if (event.getCode() == KeyCode.LEFT || event.getCode() == KeyCode.A) {
-                leftPressed = true;
-            } else if (event.getCode() == KeyCode.RIGHT || event.getCode() == KeyCode.D) {
-                rightPressed = true;
-            } else if (event.getCode() == KeyCode.SPACE) {
-                isPicking = true; // Блокуємо рух циліндра
-                leftPressed = false;
-                rightPressed = false;
-                animateLockpick(); // Починаємо анімацію спроби
+
+            if (event.getCode() == KeyCode.SPACE) {
+                isPicking = true; // Зупиняємо рух циліндра на час анімації
+                animateLockpick();
             } else if (event.getCode() == KeyCode.ESCAPE) {
                 if (inputTimeline != null) inputTimeline.stop();
                 solve("FAILED_BY_ESCAPE");
             }
         };
 
-        keyReleasedHandler = event -> {
-            if (event.getCode() == KeyCode.LEFT || event.getCode() == KeyCode.A) {
-                leftPressed = false;
-            } else if (event.getCode() == KeyCode.RIGHT || event.getCode() == KeyCode.D) {
-                rightPressed = false;
-            }
-        };
+        keyReleasedHandler = event -> {};
 
         puzzlePane.sceneProperty().addListener((obs, oldScene, newScene) -> {
             if (newScene != null) {
@@ -168,39 +173,38 @@ public class LockPickPuzzle extends Puzzle {
     }
 
 
+
     private void moveCylinder() {
-        if (isPicking) return; // Не рухаємо, якщо йде спроба (натиснуто Space)
+        if (isPicking) return;
 
-        double spaceStartX = lockBackgroundView.getLayoutX() + 182; // Початок "вікна" всередині замка
-        double spaceEndX = lockBackgroundView.getLayoutX() + lockBackgroundView.getFitWidth() - 182; // Кінець "вікна"
+        // Межі "віконця" всередині замка
+        double spaceStartX = lockBackgroundView.getLayoutX() + 364;
+        double spaceEndX = lockBackgroundView.getLayoutX() + lockBackgroundView.getFitWidth() - 305;
 
-        // minX - це позиція, коли лівий край циліндра торкається лівої межі простору.
+        // Правильний розрахунок крайніх точок для позиції (лівого краю) циліндра
         double minX = spaceStartX;
-        // maxX - це позиція, коли правий край циліндра торкається правої межі простору.
-        double maxX = spaceEndX - cylinderView.getFitWidth()+32;
+        double maxX = spaceEndX - cylinderView.getFitWidth(); // Кінець вікна мінус ширина циліндра
 
-        // рух
+        // Рух циліндра
         double currentX = cylinderView.getLayoutX();
+        currentX += cylinderSpeed * cylinderDirection;
 
-        if (leftPressed && !rightPressed) {
-            currentX -= cylinderSpeed;
-        } else if (rightPressed && !leftPressed) {
-            currentX += cylinderSpeed;
+        // Перевірка на зіткнення зі стінками
+        if (currentX >= maxX) {
+            currentX = maxX;
+            cylinderDirection = -1; // Змінюємо напрямок
+        } else if (currentX <= minX) {
+            currentX = minX;
+            cylinderDirection = 1; // Змінюємо напрямок
         }
-
-        // Обмежуємо рух, щоб циліндр не виходив за межі "вікна".
-        currentX = Math.max(minX, Math.min(currentX, maxX));
 
         cylinderView.setLayoutX(currentX);
     }
 
-
-
-
     private void animateLockpick() {
-        // Створюємо анімацію руху вгору (0.2 секунди)
+        // Створюємо анімацію руху вгору
         javafx.animation.TranslateTransition moveUp = new javafx.animation.TranslateTransition(Duration.millis(200), lockpickView);
-        moveUp.setByY(-100); // Рухаємо на 80 пікселів ВГОРУ
+        moveUp.setByY(-150); // Рухаємо на 150 пікселів ВГОРУ
 
         // Створюємо КОРОТКУ паузу на 0.2 секунди
         javafx.animation.PauseTransition pause = new javafx.animation.PauseTransition(Duration.millis(200)); // <-- ЗМІНЕНО З 3000 на 200
@@ -210,7 +214,6 @@ public class LockPickPuzzle extends Puzzle {
 
         // Встановлюємо дію, яка виконається ПІСЛЯ завершення ВСІЄЇ послідовності
         sequence.setOnFinished(event -> {
-            // Перевіряємо результат.
             checkResult();
         });
 
@@ -219,12 +222,16 @@ public class LockPickPuzzle extends Puzzle {
     }
 
 
+
     private void checkResult() {
-        double cylinderCenterX = cylinderView.getLayoutX() + cylinderView.getFitWidth() / 2;
+        double cylinderCenterX = cylinderView.getLayoutX() + cylinderView.getFitWidth() / 2.0;
+
+        System.out.println("Спроба! Центр циліндра: " + cylinderCenterX);
 
         if (cylinderCenterX >= successZoneMinX && cylinderCenterX <= successZoneMaxX) {
             solve("SUCCESS");
         } else {
+            isPicking = false; // Дозволяємо циліндру рухатись знову
             solve("FAILURE");
         }
     }
