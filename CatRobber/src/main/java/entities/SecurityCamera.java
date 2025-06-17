@@ -194,7 +194,6 @@ public class SecurityCamera implements GameObject, Animatable {
             alertTimer = ALERT_DURATION;
             setAnimationState("alert");
             GameManager.getInstance().alert();
-            player.increaseDetection();
         }
     }
 

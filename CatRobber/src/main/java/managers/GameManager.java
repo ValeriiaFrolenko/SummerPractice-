@@ -149,6 +149,8 @@ public class GameManager implements Savable {
     }
 
 
+
+
     public void stopGame() {
         // Зупиняємо рух гравця перед збереженням
         if (player != null) {
@@ -450,6 +452,7 @@ public class GameManager implements Savable {
             }
             if (player != null) {
                 player.increaseDetection(); // Збільшуємо лічильник виявлення один раз
+                UIManager.getInstance().showSirenAlert();
             }
         }
     }

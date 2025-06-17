@@ -17,6 +17,9 @@ import org.json.JSONObject;
 import main.GameWindow;
 import ui.*;
 import utils.GameLoader;
+import javafx.animation.FadeTransition;
+import javafx.scene.image.Image;
+import javafx.util.Duration;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,6 +44,7 @@ public class UIManager implements Renderable {
     private Pane boostPane;
     private boolean isBoostPaneVisible = false;
     private GameLoader gameLoader;
+    private ImageView sirenIndicator;
 
     public static UIManager getInstance() {
         if (instance == null) {
@@ -119,6 +123,50 @@ public class UIManager implements Renderable {
 
         // Додаємо boost панель до menuButtonPane
         this.menuButtonPane.getChildren().add(boostPane);
+        setupSirenIndicator();
+
+    }
+
+
+    private void setupSirenIndicator() {
+        Image sirenImage = gameLoader.loadImage("CatRobber/assets/images/UI/Siren.png");
+        if (sirenImage != null) {
+            sirenIndicator = new ImageView(sirenImage);
+            sirenIndicator.setFitWidth(120);
+            sirenIndicator.setFitHeight(120);
+            sirenIndicator.setVisible(false); // Початково приховано
+
+            // Додаємо до панелі, але поки не встановлюємо позицію
+            if (!menuButtonPane.getChildren().contains(sirenIndicator)) {
+                menuButtonPane.getChildren().add(sirenIndicator);
+            }
+        } else {
+            // Використовуємо ваш скріншот, щоб показати правильну структуру
+            System.err.println("Помилка: зображення UI/Siren.png не знайдено!");
+            System.err.println("Перевірте, чи структура вашого проєкту така: CatRobber -> assets -> images -> UI -> Siren.png");
+        }
+    }
+
+
+    public void showSirenAlert() {
+        if (sirenIndicator != null) {
+            // 2. ВСТАНОВЛЮЄМО ПОЗИЦІЮ ПРЯМО ПЕРЕД ПОКАЗОМ
+            // Це гарантує, що canvas.getWidth() має правильне значення
+            sirenIndicator.setLayoutX(canvas.getWidth() - 200); // Трохи лівіше від краю
+            sirenIndicator.setLayoutY(40);
+
+            sirenIndicator.setOpacity(1.0);
+            sirenIndicator.setVisible(true);
+
+            // Створюємо анімацію зникнення
+            FadeTransition fadeOut = new FadeTransition(Duration.seconds(2.0), sirenIndicator);
+            fadeOut.setFromValue(1.0);
+            fadeOut.setToValue(0.0);
+
+            // Після завершення анімації ховаємо зображення
+            fadeOut.setOnFinished(e -> sirenIndicator.setVisible(false));
+            fadeOut.play();
+        }
     }
 
     private void createMenuButton() {
@@ -467,6 +515,11 @@ public class UIManager implements Renderable {
             if (!menuButtonPane.getChildren().contains(boostPane)) {
                 menuButtonPane.getChildren().add(boostPane);
             }
+
+            if (sirenIndicator != null && !menuButtonPane.getChildren().contains(sirenIndicator)) {
+                menuButtonPane.getChildren().add(sirenIndicator);
+            }
+
 
             menuButtonPane.setVisible(true);
             menuButtonPane.setMouseTransparent(false);

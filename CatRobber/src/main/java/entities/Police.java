@@ -157,7 +157,6 @@ public class Police implements Animatable, GameObject, Interactable {
      */
     public void update(double deltaTime, List rooms, Player player) {
         UIManager uiManager = GameWindow.getInstance().getUIManager();
-        // Оновлення стану оглушення
         if (state == PoliceState.STUNNED) {
             stunDuration -= deltaTime;
             if (stunDuration <= 0) {
@@ -245,9 +244,11 @@ public class Police implements Animatable, GameObject, Interactable {
 
             // Якщо гравець виявлений, переслідуємо
             if (canSeePlayer) {
-                // Викликаємо increaseDetection() лише якщо гравець не був виявлений на попередньому кадрі
+                // Якщо гравця тільки-но виявили (на попередньому кадрі не бачили)
                 if (!wasPlayerDetectedLastFrame) {
-                    player.increaseDetection();
+                    // Запускаємо глобальну тривогу через GameManager.
+                    // Це автоматично збільшить лічильник виявлення і покаже сирену.
+                    GameManager.getInstance().alert();
                 }
 
                 state = PoliceState.CHASE;
