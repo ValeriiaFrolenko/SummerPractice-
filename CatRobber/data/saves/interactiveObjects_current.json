@@ -1,73 +1,53 @@
 {
-  "interactiveObjects_6": {
-    "fileName": "chest2.png",
-    "isPictureMoved": false,
-    "x": 656,
-    "width": 50,
-    "y": 243.6666717529297,
-    "typeObj": "WITH_MONEY",
-    "type": "InteractiveObject",
-    "height": 40
-  },
-  "interactiveObjects_5": {
-    "fileName": "chest3.png",
-    "isPictureMoved": false,
-    "x": 173.5,
-    "width": 50,
-    "y": 468.5,
-    "typeObj": "WITH_MONEY",
-    "type": "InteractiveObject",
-    "height": 40
-  },
   "interactiveObjects_0": {
-    "fileName": "diamont.png",
+    "fileName": "electricalPanel.png",
     "isPictureMoved": false,
-    "x": 119,
-    "width": 100,
-    "y": 242.33349609375,
+    "x": 402.4986267089844,
+    "width": 44,
+    "y": 219.95018005371094,
+    "typeObj": "ELECTRICAL_PANEL",
+    "type": "InteractiveObject",
+    "height": 40
+  },
+  "interactiveObjects_4": {
+    "fileName": "boxes.png",
+    "isPictureMoved": false,
+    "x": 246.8011016845703,
+    "width": 120,
+    "y": 250.36485290527344,
+    "typeObj": "WITH_MONEY",
+    "type": "InteractiveObject",
+    "height": 80
+  },
+  "interactiveObjects_3": {
+    "fileName": "safe.png",
+    "isPictureMoved": false,
+    "x": 1180.8348388671875,
+    "width": 50,
+    "y": 362.11651611328125,
+    "typeObj": "WITH_MONEY",
+    "type": "InteractiveObject",
+    "height": 40
+  },
+  "interactiveObjects_2": {
+    "fileName": "finalPrize.png",
+    "isPictureMoved": false,
+    "x": 531.6666870117188,
+    "width": 80,
+    "y": 484.6666564941406,
     "typeObj": "FINAL_PRIZE",
     "type": "InteractiveObject",
     "height": 80
   },
-  "interactiveObjects_4": {
-    "fileName": "chest1.png",
+  "interactiveObjects_1": {
+    "fileName": "note.png",
+    "code": "1536",
     "isPictureMoved": false,
-    "x": 1077.6666259765625,
+    "x": 173.90467834472656,
     "width": 50,
-    "y": 128,
-    "typeObj": "WITH_MONEY",
-    "type": "InteractiveObject",
-    "height": 40
-  },
-  "interactiveObjects_3": {
-    "fileName": "picture.jpg",
-    "code": "8094",
-    "isPictureMoved": false,
-    "x": 150.66700744628906,
-    "width": 50,
-    "y": 105.66649627685547,
-    "typeObj": "PICTURE",
+    "y": 320.8509216308594,
+    "typeObj": "NOTE",
     "type": "InteractiveObject",
     "height": 50
-  },
-  "interactiveObjects_2": {
-    "fileName": "electricalPanel.png",
-    "isPictureMoved": false,
-    "x": 82,
-    "width": 30,
-    "y": 546.5,
-    "typeObj": "ELECTRICAL_PANEL",
-    "type": "InteractiveObject",
-    "height": 30
-  },
-  "interactiveObjects_1": {
-    "fileName": "boxes.png",
-    "isPictureMoved": false,
-    "x": 129.3333282470703,
-    "width": 100,
-    "y": 585,
-    "typeObj": "WITH_MONEY",
-    "type": "InteractiveObject",
-    "height": 70
   }
 }

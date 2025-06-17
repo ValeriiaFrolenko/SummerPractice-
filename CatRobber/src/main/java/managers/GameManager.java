@@ -566,7 +566,7 @@ public class GameManager implements Savable {
             }
         }
 
-        if (laserBounds != null && player.getBounds().intersects(laserBounds)) {
+        if (laserBounds != null && player.getBounds().intersects(laserBounds)&&door.isLocked()) {
             player.adjustPlayerPosition(1, Player.Direction.LEFT);
             if (player.getDirection().equals(Player.Direction.RIGHT)) {
                 player.adjustPlayerPosition(1, Player.Direction.LEFT);

@@ -170,8 +170,6 @@ public class GameWindow {
 
         scene = new Scene(root, 1280, 670); // Збільшуємо висоту сцени на 30px для заголовка
         scene.setFill(Color.rgb(139, 90, 43)); // Коричневий фон сцени
-        scene.setOnMouseMoved(e -> System.out.println("Mouse moved on scene: " + e.getX() + ", " + e.getY()));
-        scene.setOnMouseClicked(e -> System.out.println("Mouse clicked on scene at (" + e.getX() + ", " + e.getY() + ")"));
         root.setMouseTransparent(false);
         root.setFocusTraversable(true);
         root.requestFocus();

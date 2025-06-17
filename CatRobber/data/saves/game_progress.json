@@ -1,8 +1,8 @@
 {
   "completedLevels": [],
-  "currentLevelId": 2,
+  "currentLevelId": 1,
   "code": "5156",
-  "totalMoney": 100,
-  "temporaryMoney": 100,
+  "totalMoney": 0,
+  "temporaryMoney": 0,
   "gameState": "PLAYING"
 }

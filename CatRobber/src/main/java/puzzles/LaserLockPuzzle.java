@@ -1,4 +1,5 @@
 package puzzles;
+import managers.FontManager;
 import managers.SoundManager;
 
 import javafx.animation.PauseTransition;
@@ -14,6 +15,8 @@ import main.GameWindow;
 import managers.GameManager;
 import org.json.JSONObject;
 import utils.GameLoader;
+import javafx.scene.control.Label;
+
 
 public class LaserLockPuzzle extends Puzzle {
     private ImageView cutterView;
@@ -127,8 +130,9 @@ public class LaserLockPuzzle extends Puzzle {
                     }
                     e.consume();
                 });
-
                 pane.getChildren().add(wireView);
+                Label promptLabel = showLaserLockPrompt();
+                pane.getChildren().add(promptLabel);
             }
         }
 
@@ -159,5 +163,28 @@ public class LaserLockPuzzle extends Puzzle {
             });
             pause.play();
         }
+    }
+
+    private Label showLaserLockPrompt() {
+        Label promptLabel = new Label("Наведіть курсор на дріт і клацніть, щоб його перерізати");
+        promptLabel.setFont(FontManager.getInstance().getFont("Hardpixel", 16));
+        promptLabel.setStyle(
+                "-fx-background-color: rgba(0, 0, 0, 0.8); " +
+                        "-fx-text-fill: white; " +
+                        "-fx-padding: 10px 20px; " +
+                        "-fx-background-radius: 5px; " +
+                        "-fx-border-color: #333333; " +
+                        "-fx-border-width: 2px; " +
+                        "-fx-border-radius: 5px;"
+        );
+
+        // Position the prompt at the top of the puzzle
+        Platform.runLater(() -> {
+            double labelWidth = promptLabel.prefWidth(-1);
+            promptLabel.setLayoutX((512 - labelWidth) / 2);
+            promptLabel.setLayoutY(20);
+        });
+
+        return promptLabel;
     }
 }

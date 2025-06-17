@@ -56,6 +56,7 @@ public class LevelManager {
                 JSONObject saveData = gameLoader.loadJSON(saveFile);
                 GameManager.getInstance().setFromData(saveData);
                 GameManager.getInstance().setCurrentLevelId(id);
+                GameManager.getInstance().setGameState(GameManager.GameState.PLAYING);
             }
         } else {
             loadFromSave();
