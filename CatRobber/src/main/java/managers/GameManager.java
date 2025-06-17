@@ -689,6 +689,7 @@ public class GameManager implements Savable {
 
     public boolean buyItem(ShopItem item) {
         if (totalMoney >= item.getPrice()) {
+            SoundManager.getInstance().playSound(SoundManager.SoundType.COLLECT_MONEY);
             totalMoney -= item.getPrice();
             inventory.put(item, inventory.getOrDefault(item, 0) + 1);
             if (player != null) {
