@@ -275,7 +275,6 @@ public class GameWindow {
         JSONObject menuConfig = new JSONObject();
         primaryStage.requestFocus();
         uiManager.createWindow(UIManager.WindowType.MENU, menuConfig);
-        /*soundManager.playMusic("menu.mp3");*/
     }
 
     private void loadSavedGame(int levelId) {

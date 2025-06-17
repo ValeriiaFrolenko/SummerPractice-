@@ -119,6 +119,7 @@ public class InteractiveObject implements GameObject, Interactable {
                 break;
             case WITH_MONEY:
                 if (!isMoneyGiven) {
+                    soundManager.playSound(SoundManager.SoundType.COLLECT_MONEY);
                     GameManager.getInstance().addTemporaryMoney(100);
                     UIManager.getInstance().updateMoneyDisplay(); // Оновлюємо moneyLabel
                     isMoneyGiven = true;
