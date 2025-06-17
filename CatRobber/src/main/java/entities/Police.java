@@ -130,7 +130,6 @@ public class Police implements Animatable, GameObject, Interactable {
         this.animationTime = 0;
     }
 
-    // --- Ініціалізація та оновлення ---
 
     /**
      * Перевіряє, чи гравець у тій самій кімнаті
@@ -440,7 +439,6 @@ public class Police implements Animatable, GameObject, Interactable {
         return frames[animationFrame];
     }
 
-    // --- Взаємодії ---
 
     /**
      * Метод, що встановлює стан анімації
@@ -454,7 +452,6 @@ public class Police implements Animatable, GameObject, Interactable {
         }
     }
 
-    // --- Серіалізація ---
 
     /**
      * Повертає JSON-об'єкт, що містить дані для збереження стану поліцейського.
@@ -516,7 +513,6 @@ public class Police implements Animatable, GameObject, Interactable {
         this.currentAnimation = data.optString("currentAnimation", currentAnimation);
     }
 
-    // --- Геттери/Сеттери ---
 
     /**
      * Повертає тип об'єкта

@@ -18,8 +18,12 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.animation.AnimationTimer;
 
+
+/**
+ * Керує головним вікном гри, сценою, рендерингом на Canvas та ігровим циклом.
+ * Реалізує власний заголовок вікна та обробляє його події.
+ */
 public class GameWindow {
-    // Поля
     private static GameWindow instance; // Singleton-екземпляр
     private Stage primaryStage;
     private Scene scene;
@@ -42,8 +46,12 @@ public class GameWindow {
     private double xOffset = 0;
     private double yOffset = 0;
 
-    // Конструктор
-    public GameWindow(Stage primaryStage, GameManager gameManager, SaveManager saveManager) {
+    /**
+     * Конструктор для створення ігрового вікна.
+     * @param primaryStage Головна сцена, надана JavaFX.
+     * @param gameManager Менеджер ігрової логіки.
+     * @param saveManager Менеджер збережень.
+     */    public GameWindow(Stage primaryStage, GameManager gameManager, SaveManager saveManager) {
         this.primaryStage = primaryStage;
         this.gameManager = gameManager;
         this.saveManager = saveManager;
@@ -55,7 +63,12 @@ public class GameWindow {
         instance = this; // Зберігаємо екземпляр
     }
 
-    // Повертає єдиний екземпляр GameWindow
+
+    /**
+     * Повертає єдиний екземпляр класу GameWindow (патерн Singleton).
+     * @return Екземпляр GameWindow.
+     * @throws IllegalStateException якщо екземпляр ще не було ініціалізовано.
+     */
     public static GameWindow getInstance() {
         if (instance == null) {
             throw new IllegalStateException("GameWindow не ініціалізовано");
@@ -63,7 +76,10 @@ public class GameWindow {
         return instance;
     }
 
-    // Створює власний заголовок з кнопкою закриття
+    /**
+     * Створює та налаштовує власний заголовок вікна з кнопкою закриття та можливістю перетягування.
+     * @param root Коренева група, до якої буде додано заголовок.
+     */
     private void createCustomTitleBar(Group root) {
         titleBarGroup = new Group(); // Окрема група для елементів заголовка
         titleBar = new Rectangle(1280, 30);
@@ -127,19 +143,25 @@ public class GameWindow {
     }
 
 
-    // Ховає заголовок
+    /**
+     * Ховає власний заголовок вікна.
+     */
     public void hideTitleBar() {
         titleBarGroup.setVisible(false);
         titleBarGroup.setMouseTransparent(true);
     }
 
-    // Показує заголовок
+    /**
+     * Показує власний заголовок вікна.
+     */
     public void showTitleBar() {
         titleBarGroup.setVisible(true);
         titleBarGroup.setMouseTransparent(false);
     }
 
-    // Налаштовує вікно, сцену, canvas і менеджери
+    /**
+     * Ініціалізує всі основні компоненти гри: сцену, canvas, менеджери та обробники подій.
+     */
     public void initialize() {
         canvas = new Canvas(1280, 640); // Залишаємо оригінальний розмір для фонового зображення
         canvas.setLayoutY(30); // Зміщуємо canvas вниз на 30px для заголовка
@@ -213,18 +235,19 @@ public class GameWindow {
         gameManager.updateBackgroundScale(scene.getWidth(), 640); // Передаємо оригінальну висоту зображення
     }
 
-    // Повертає UIManager
+    /**
+     * Повертає менеджер інтерфейсу.
+     * @return Екземпляр UIManager.
+     */
     public UIManager getUIManager() {
         return uiManager;
     }
 
-    public void showMenuButtonWhenGameStarts() {
-        // Викликайте це коли гра починається
-        if (gameManager.getGameState() == GameManager.GameState.PLAYING) {
-            uiManager.showMenuButton();
-        }
-    }
-    // Запускає ігровий цикл
+
+    /**
+     * Запускає ігровий цикл за допомогою AnimationTimer.
+     * Цей цикл викликає методи update() та render() на кожному кадрі.
+     */
     public void startGameLoop() {
         isRunning = true;
         animationTimer = new AnimationTimer() {
@@ -241,11 +264,18 @@ public class GameWindow {
         animationTimer.start();
     }
 
+    /**
+     * Оновлює логіку гри на кожному кадрі.
+     * @param deltaTime Час, що минув з попереднього кадру, в секундах.
+     */
     public void update(double deltaTime) {
         gameManager.update(deltaTime);
         gameManager.handleInput(inputHandler, deltaTime);
     }
 
+    /**
+     * Рендерить ігровий світ та інтерфейс на canvas.
+     */
     public void render() {
         graphicsContext.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
         gameManager.render(graphicsContext);
@@ -256,6 +286,10 @@ public class GameWindow {
         // Видаляємо стандартний обробник закриття, тепер він в кнопці
     }
 
+    /**
+     * Виконує очищення ресурсів при закритті гри.
+     * Зупиняє ігровий цикл, зберігає гру та зупиняє всі звуки.
+     */
     public void cleanup() {
         isRunning = false;
         if (animationTimer != null) {
@@ -289,6 +323,10 @@ public class GameWindow {
         return primaryStage;
     }
 
+    /**
+     * Повертає об'єкт сцени JavaFX.
+     * @return Екземпляр Scene.
+     */
     public Scene getScene() {
         return scene;
     }

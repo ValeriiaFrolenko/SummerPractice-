@@ -103,7 +103,7 @@ public class SecurityCamera implements GameObject, Animatable {
             double gratingY = defaultData.getDouble("gratingY");
             double gratingWidth = defaultData.getDouble("gratingWidth");
             double gratingHeight = defaultData.getDouble("gratingHeight");
-            // Замініть ці шляхи на ваші власні
+
             Image[] images = loader.splitSpriteSheet("camera/gates.png", 2);
             this.grating = new Grating(gratingX, gratingY, gratingWidth, gratingHeight, images[0], images[1]);
         }
@@ -341,23 +341,38 @@ public class SecurityCamera implements GameObject, Animatable {
         }
     }
 
-    // Геттери/Сеттери
 
+    /**
+     * Повертає тип об'єкта.
+     * @return Рядок "Camera".
+     */
     @Override
     public String getType() {
         return "Camera";
     }
 
+    /**
+     * Повертає позицію об'єкта.
+     * @return Vector2D з координатами.
+     */
     @Override
     public Vector2D getPosition() {
         return new Vector2D(imageX, imageY);
     }
 
+    /**
+     * Повертає позицію візуального спрайту.
+     * @return Vector2D з координатами.
+     */
     @Override
     public Vector2D getImagePosition() {
         return new Vector2D(imageX, imageY);
     }
 
+    /**
+     * Встановлює позицію об'єкта.
+     * @param position Нова позиція.
+     */
     @Override
     public void setPosition(Vector2D position) {
         this.imageX = position.getX();
@@ -365,6 +380,10 @@ public class SecurityCamera implements GameObject, Animatable {
         updateFieldOfView();
     }
 
+    /**
+     * Встановлює позицію візуального спрайту.
+     * @param position Нова позиція.
+     */
     @Override
     public void setImagePosition(Vector2D position) {
         this.imageX = position.getX();
@@ -372,21 +391,37 @@ public class SecurityCamera implements GameObject, Animatable {
         updateFieldOfView();
     }
 
+    /**
+     * Повертає межі об'єкта.
+     * @return Об'єкт Bounds.
+     */
     @Override
     public Bounds getBounds() {
         return new BoundingBox(imageX, imageY, imageWidth, imageHeight);
     }
 
+    /**
+     * Повертає межі візуального спрайту.
+     * @return Об'єкт Bounds.
+     */
     @Override
     public Bounds getImageBounds() {
         return new BoundingBox(imageX, imageY, imageWidth, imageHeight);
     }
 
+    /**
+     * Повертає шар рендерингу для камери.
+     * @return 1 (камера рендериться на тому ж шарі, що й поліція).
+     */
     @Override
     public int getRenderLayer() {
         return 1;
     }
 
+    /**
+     * Визначає, чи є камера видимою.
+     * @return Завжди true.
+     */
     @Override
     public boolean isVisible() {
         return true;
