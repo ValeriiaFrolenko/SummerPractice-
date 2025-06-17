@@ -445,6 +445,7 @@ public class GameManager implements Savable {
     // Активує глобальну тривогу
     public void alert() {
         if (!isGlobalAlert) { // Активуємо лише якщо тривога ще не увімкнена
+            SoundManager.getInstance().playMusic("alert.mp3");
             isGlobalAlert = true;
             globalAlertTimer = GLOBAL_ALERT_DURATION;
             for (Police police1 : police) {
@@ -468,6 +469,7 @@ public class GameManager implements Savable {
             globalAlertTimer -= deltaTime;
             if (globalAlertTimer <= 0) {
                 isGlobalAlert = false;
+                SoundManager.getInstance().playMusic("game.mp3");
                 for (Police police1 : police) {
                     if (police1.getState() == Police.PoliceState.ALERT) {
                         police1.setState(Police.PoliceState.PATROL);
