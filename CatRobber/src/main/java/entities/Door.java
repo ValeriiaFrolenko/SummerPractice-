@@ -419,13 +419,13 @@ public class Door implements GameObject, Interactable {
     @Override
     public String getInteractionPrompt() {
         if (isLaser && isLocked) {
-            return "Laser door is locked";
+            return "Прохід заблоковано";
         }
         if (isLocked) {
-            return "Door is locked. Press E to unlock the door";
+            return "Двері заблоковано. Натисніть Е, щоб відкрити";
         }
         if (!isOpen) {
-            return "Press E to open the door";
+            return "Натисніть Е, щоб відкрити";
         }
         return null;
     }

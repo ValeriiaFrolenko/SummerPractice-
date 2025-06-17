@@ -1,11 +1,11 @@
 {"police_0": {
   "currentAnimation": "patrol",
   "collY": 537.5,
-  "collX": 432.2758799999999,
+  "collX": 399.63708,
   "stunDuration": 0,
   "type": "Police",
   "widthColl": 43,
-  "x": 403.6584636181639,
+  "x": 371.0196470429686,
   "width": 101.948246196698,
   "y": 618.5289306640625,
   "wasPlayerDetectedLastFrame": false,

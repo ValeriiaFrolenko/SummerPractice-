@@ -1869,6 +1869,11 @@
                          "value":"boxes.png"
                         }, 
                         {
+                         "name":"isMoneyGiven",
+                         "type":"bool",
+                         "value":false
+                        }, 
+                        {
                          "name":"typeObj",
                          "type":"string",
                          "value":"WITH_MONEY"
@@ -1890,6 +1895,11 @@
                          "name":"fileName",
                          "type":"string",
                          "value":"safe.png"
+                        }, 
+                        {
+                         "name":"isMoneyGiven",
+                         "type":"bool",
+                         "value":false
                         }, 
                         {
                          "name":"typeObj",
@@ -1948,29 +1958,6 @@
                  "width":44,
                  "x":402.498639647246,
                  "y":219.950182943991
-                }, 
-                {
-                 "gid":2147483691,
-                 "height":80,
-                 "id":169,
-                 "name":"finalPrize",
-                 "properties":[
-                        {
-                         "name":"fileName",
-                         "type":"string",
-                         "value":"finalPrize.png"
-                        }, 
-                        {
-                         "name":"typeObj",
-                         "type":"string",
-                         "value":"FINAL_PRIZE"
-                        }],
-                 "rotation":0,
-                 "type":"InteractiveObject",
-                 "visible":true,
-                 "width":80,
-                 "x":531.666666666667,
-                 "y":484.666666666667
                 }, 
                 {
                  "height":0,
@@ -2064,6 +2051,34 @@
                  "width":0,
                  "x":976,
                  "y":320
+                }, 
+                {
+                 "gid":44,
+                 "height":100,
+                 "id":176,
+                 "name":"finalPrize",
+                 "properties":[
+                        {
+                         "name":"fileName",
+                         "type":"string",
+                         "value":"finalPrize.png"
+                        }, 
+                        {
+                         "name":"isMoneyGiven",
+                         "type":"bool",
+                         "value":false
+                        }, 
+                        {
+                         "name":"typeObj",
+                         "type":"string",
+                         "value":"FINAL_PRIZE"
+                        }],
+                 "rotation":0,
+                 "type":"InteractiveObject",
+                 "visible":true,
+                 "width":80,
+                 "x":590,
+                 "y":497
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -2072,7 +2087,7 @@
          "y":0
         }],
  "nextlayerid":4,
- "nextobjectid":176,
+ "nextobjectid":177,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.2",
@@ -2153,6 +2168,10 @@
         {
          "firstgid":43,
          "source":"finalPrice.tsx"
+        }, 
+        {
+         "firstgid":44,
+         "source":"safee.tsj"
         }],
  "tilewidth":32,
  "type":"map",

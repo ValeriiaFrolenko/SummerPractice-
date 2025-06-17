@@ -1,0 +1,14 @@
+{ "columns":1,
+ "image":"..\/..\/..\/..\/..\/Downloads\/ChatGPT_Image_17_\u0447\u0435\u0440\u0432._2025_\u0440.__07_56_54-removebg-preview.png",
+ "imageheight":612,
+ "imagewidth":408,
+ "margin":0,
+ "name":"safee",
+ "spacing":0,
+ "tilecount":1,
+ "tiledversion":"1.11.2",
+ "tileheight":612,
+ "tilewidth":408,
+ "type":"tileset",
+ "version":"1.10"
+}

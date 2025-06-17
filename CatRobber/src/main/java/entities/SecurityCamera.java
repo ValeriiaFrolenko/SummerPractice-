@@ -205,7 +205,11 @@ public class SecurityCamera implements GameObject, Animatable {
         Bounds gatesBounds = new BoundingBox(grating.x, grating.y, grating.width, grating.height);
 
         if (playerBounds.intersects(gatesBounds)) {
-            player.adjustPlayerPosition(1, Player.Direction.LEFT);
+            if (player.getDirection().equals(Player.Direction.RIGHT)) {
+                player.adjustPlayerPosition(1, Player.Direction.LEFT);
+            } else {
+                player.adjustPlayerPosition(1, Player.Direction.RIGHT);
+            }
         }
         }
     }

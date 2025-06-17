@@ -189,7 +189,6 @@ public class Player implements Animatable, GameObject, Interactable {
             itemUsage.remove(item);
         }
         updateMapData(item);
-        GameManager.getInstance().updateInventoryFromPlayer();
         System.out.println("Гравець отримав: " + item.getName());
         return true;
     }
@@ -250,21 +249,42 @@ public class Player implements Animatable, GameObject, Interactable {
         this.direction = direction;
     }
 
-    // Рухає гравця в заданому напрямку
+    // entities/Player.java
+
+    /**
+     * Рухає гравця в заданому напрямку, розбиваючи рух на менші кроки при високій швидкості.
+     * @param direction Напрямок руху.
+     * @param deltaTime Час, що минув з останнього кадру.
+     */
     public void move(Direction direction, double deltaTime) {
-        //soundManager.playRun(SoundManager.SoundType.RUN);
         if (canMove) {
             this.direction = direction;
             setAnimationState("run");
+
+            // Обчислюємо базове переміщення
             double movement = speed * deltaTime;
+
+            // Визначаємо кількість мікрокроків (залежить від швидкості)
+            double speedRatio = speed / Math.max(baseSpeed, 1.0); // Відношення поточної швидкості до базової
+            int steps = (int) Math.ceil(speedRatio); // Кількість кроків (округлюємо вгору)
+            double stepMovement = movement / steps; // Переміщення за один крок
+
             double deltaX = 0;
             if (direction == Direction.LEFT) {
-                deltaX = -movement;
+                deltaX = -stepMovement;
             } else if (direction == Direction.RIGHT) {
-                deltaX = movement;
+                deltaX = stepMovement;
             }
-            collX += deltaX;
-            imageX += deltaX;
+
+            // Виконуємо рух по кроках
+            for (int i = 0; i < steps; i++) {
+                // Оновлюємо позицію
+                collX += deltaX;
+                imageX += deltaX;
+
+                // Викликаємо перевірку колізій після кожного кроку
+                GameManager.getInstance().checkPlayerCollisions();
+            }
         }
     }
 
@@ -420,11 +440,8 @@ public class Player implements Animatable, GameObject, Interactable {
             } else {
                 gc.drawImage(frame, renderX, renderY, renderWidth, renderHeight);
             }
-            Bounds collBounds = getBounds();
-            gc.setStroke(Color.RED);
-            gc.setLineWidth(2);
-            gc.strokeRect(collBounds.getMinX(), collBounds.getMinY(), collBounds.getWidth(), collBounds.getHeight());
-        }
+
+             }
     }
 
     @Override
@@ -722,4 +739,5 @@ public class Player implements Animatable, GameObject, Interactable {
     public int getDetectionCount() {
         return this.detectionCount;
     }
+
 }

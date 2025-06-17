@@ -1762,6 +1762,11 @@
                          "value":"atm.png"
                         }, 
                         {
+                         "name":"isMoneyGiven",
+                         "type":"bool",
+                         "value":false
+                        }, 
+                        {
                          "name":"typeObj",
                          "type":"string",
                          "value":"WITH_MONEY"
@@ -1783,6 +1788,11 @@
                          "name":"fileName",
                          "type":"string",
                          "value":"machine.png"
+                        }, 
+                        {
+                         "name":"isMoneyGiven",
+                         "type":"bool",
+                         "value":false
                         }, 
                         {
                          "name":"typeObj",
@@ -1808,6 +1818,11 @@
                          "value":"drawer.png"
                         }, 
                         {
+                         "name":"isMoneyGiven",
+                         "type":"bool",
+                         "value":false
+                        }, 
+                        {
                          "name":"typeObj",
                          "type":"string",
                          "value":"WITH_MONEY"
@@ -1829,6 +1844,11 @@
                          "name":"fileName",
                          "type":"string",
                          "value":"bankDoor.png"
+                        }, 
+                        {
+                         "name":"isMoneyGiven",
+                         "type":"bool",
+                         "value":false
                         }, 
                         {
                          "name":"typeObj",

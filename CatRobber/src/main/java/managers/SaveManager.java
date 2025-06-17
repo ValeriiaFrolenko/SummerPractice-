@@ -42,24 +42,12 @@ public class SaveManager {
     public void saveGame(GameManager.GameState gameState) {
         JSONObject saveData = new JSONObject();
         // Основні дані гри
-        saveData.put("completedLevels", new ArrayList<Integer>());
+        saveData.put("completedLevels", GameManager.getInstance().getCompletedLevels());
         saveData.put("currentLevelId", GameManager.getInstance().getCurrentLevelId());
         saveData.put("totalMoney", GameManager.getInstance().getTotalMoney());
         saveData.put("gameState", gameState.toString());
         saveData.put("code", GameManager.getInstance().getCode());
         saveData.put("temporaryMoney", GameManager.getInstance().getTemporaryMoney());
-        JSONArray inventoryData = new JSONArray();
-        for (Map.Entry<ShopItem, Integer> entry : GameManager.getInstance().getInventory().entrySet()) {
-            JSONObject itemData = new JSONObject();
-            ShopItem item = entry.getKey();
-            itemData.put("name", item.getName());
-            itemData.put("quantity", entry.getValue());
-            itemData.put("price", item.getPrice());
-            itemData.put("description", item.getDescription());
-            itemData.put("type", item.getItemType().toString());
-            itemData.put("imagePath", item.getSpritePath());
-            inventoryData.put(itemData);
-        }
         // Збереження об'єктів гри
         savePlayer(GameManager.getInstance().getPlayer());
         savePolice(GameManager.getInstance().getPolice());

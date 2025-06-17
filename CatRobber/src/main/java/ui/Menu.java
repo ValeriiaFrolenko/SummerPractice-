@@ -131,9 +131,9 @@ public class Menu implements UIWindow {
         subtitle.setTextFill(Color.web("#D4A76A"));
 
         Button continueButton = createCuteButton("ПРОДОВЖИТИ", Color.web("#4A7043"));
-        Button selectLevelButton = createCuteButton("ВИБРАТИ РІВЕНЬ", Color.web("#5A5A5A"));
+        Button selectLevelButton = createCuteButton("ОБРАТИ ЖЕРТВУ", Color.web("#5A5A5A"));
         Button shopButton = createCuteButton("КРАМНИЦЯ", Color.web("#7B3F3F"));
-        Button exitButton = createCuteButton("ВИЙТИ", Color.web("#3C3C3C"));
+        Button exitButton = createCuteButton("ЗАЛЯГТИ НА ДНО", Color.web("#3C3C3C"));
 
         continueButton.setOnAction(e -> {
             soundManager.playSound(SoundManager.SoundType.BUTTON_CLICK);
@@ -182,15 +182,15 @@ public class Menu implements UIWindow {
         levelTitleShadow.setRadius(6);
         levelTitle.setEffect(levelTitleShadow);
 
-        Label subtitle = new Label("🎯 Що будемо грабувати сьогодні, мурлико? 🎯");
+        Label subtitle = new Label("🎯 Обери об'єкт для котячого рейду 🎯");
         subtitle.setFont(FontManager.getInstance().getFont("Hardpixel", 20));
         subtitle.setTextFill(Color.web("#D4A76A"));
 
         locationChoice = new ComboBox<>();
         JSONObject progress = gameLoader.loadJSON("data/saves/game_progress.json");
-        locationChoice.getItems().add("🏠 БУДИНОК — Легко: Розминка для котячих лапок");
-        locationChoice.getItems().add("🏛️ МУЗЕЙ — Середньо: Викрадемо артефакт МяуРа");
-        locationChoice.getItems().add("🏦 БАНК — Важко: Найбільший корм у місті чекає!");
+        locationChoice.getItems().add("🏠 БУДИНОК — Легко: Почни свою грабіжницьку кар’єру з дрібної крадіжки. Шкарпетки не рахуються");
+        locationChoice.getItems().add("🏛️ МУЗЕЙ — Середньо: Увірвися до галереї вночі, щоб таємно повернути кошачий діамант — і зберегти честь гільдії");
+        locationChoice.getItems().add("🏦 БАНК — Важко: Проникни в опечатане сховище, де корпорація «Віскас» зберігає стратегічні запаси корму");
         locationChoice.setValue(locationChoice.getItems().get(0));
         locationChoice.setStyle(
                 "-fx-background-color: #2F2F2F;" +
@@ -487,18 +487,20 @@ public class Menu implements UIWindow {
 
     @Override
     public void show() {
+        // Додаємо до UIManager якщо ще не додано
         if (!uiManager.getMenuPane().getChildren().contains(rootPane)) {
             uiManager.getMenuPane().getChildren().add(rootPane);
         }
+
+        // Відновлюємо всі властивості
         rootPane.setVisible(true);
+        rootPane.setMouseTransparent(false); // ❗ ВАЖЛИВО!
         rootPane.setFocusTraversable(true);
 
+        // Відновлюємо обробник подій
         rootPane.setOnKeyPressed(this::handleInput);
 
-        javafx.application.Platform.runLater(() -> {
-            rootPane.requestFocus();
-        });
-
+        // Налаштовуємо стан панелей
         if (showingSplash) {
             splashPane.setVisible(true);
             menuPane.setVisible(false);
@@ -508,17 +510,22 @@ public class Menu implements UIWindow {
             menuPane.setVisible(true);
             menuVisible = true;
             levelSelectPane.setVisible(false);
+            levelSelectionVisible = false;
         }
+
+        // Запитуємо фокус
+        javafx.application.Platform.runLater(() -> {
+            rootPane.requestFocus();
+        });
     }
 
     @Override
     public void hide() {
-
         // Ховаємо rootPane
         rootPane.setVisible(false);
         rootPane.setMouseTransparent(true);
 
-        // Очищаємо обробники подій
+        // Очищуємо обробники подій
         rootPane.setOnKeyPressed(null);
 
         // Скидаємо стани
@@ -526,7 +533,27 @@ public class Menu implements UIWindow {
         menuVisible = false;
         levelSelectionVisible = false;
 
+        // НЕ очищуємо children - це може пошкодити UI!
     }
+
+    // ДОДАТКОВИЙ МЕТОД ДЛЯ ПОВЕРНЕННЯ З МАГАЗИНУ
+    public void returnFromShop() {
+        System.out.println("Returning from shop to menu");
+
+        // Повністю скидаємо стан
+        showingSplash = false;
+        menuVisible = true;
+        levelSelectionVisible = false;
+
+        // Показуємо правильні панелі
+        splashPane.setVisible(false);
+        menuPane.setVisible(true);
+        levelSelectPane.setVisible(false);
+
+        // Показуємо меню
+        show();
+    }
+
 
     @Override
     public Node getRoot() {

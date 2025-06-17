@@ -5,7 +5,6 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -27,7 +26,7 @@ public class ShopPane implements UIWindow {
     private StackPane rootPane;
     private GridPane shopPane;
     private static List<ShopItem> items;
-    private int playerMoney;
+    private int money;
     private Button[] itemButtons;
     private Label moneyLabel;
     private Button backButton;
@@ -35,7 +34,7 @@ public class ShopPane implements UIWindow {
 
     public ShopPane() {
         gameLoader = new GameLoader();
-        this.playerMoney = GameManager.getInstance().getTotalMoney();
+        this.money = GameManager.getInstance().getTotalMoney();
         initializeItems();
         createShopUI();
         createRootPane();
@@ -51,18 +50,16 @@ public class ShopPane implements UIWindow {
 
     private void initializeItems() {
         items = new ArrayList<>();
-        items.add(new ShopItem("Невидимість", 100, "Стаєш невидимим на 10 секунд", ShopItem.ItemType.INVISIBILITY, "UI/invisibility.png"));
-        items.add(new ShopItem("Буст швидкості", 80, "Збільшує швидкість на 50% на 15 секунд", ShopItem.ItemType.SPEED_BOOST, "UI/speedBoost.png"));
-        items.add(new ShopItem("Універсальний ключ", 120, "Відчиняє будь-які двері", ShopItem.ItemType.KEY, "UI/key.png"));
-        items.add(new ShopItem("Пістолет", 150, "Дозволяє стріляти по ворогах", ShopItem.ItemType.GUN, "UI/gun.png"));
+        items.add(new ShopItem("Невидимість", 100, "Стаєш невидимим на 10 секунд.\nЗастосовується автоматично після купівлі.", ShopItem.ItemType.INVISIBILITY, "UI/invisibility.png"));
+        items.add(new ShopItem("Буст швидкості", 80, "Збільшує швидкість на 50% на 15 секунд.\nЗастосовується автоматично після купівлі.", ShopItem.ItemType.SPEED_BOOST, "UI/speedBoost.png"));
+        items.add(new ShopItem("Універсальний ключ", 120, "Відчиняє будь-які двері.\nЗастосовується до перших дверей,\nзакритих звичайним замком.", ShopItem.ItemType.KEY, "UI/key.png"));
+        items.add(new ShopItem("Пістолет", 150, "Дозволяє стріляти по ворогах.\nВикористовується кнопкою F.", ShopItem.ItemType.GUN, "UI/gun.png"));
     }
 
     private void createShopUI() {
         shopPane = new GridPane();
         shopPane.setAlignment(Pos.CENTER);
-        shopPane.setHgap(20);
-        shopPane.setVgap(10);
-        shopPane.setPadding(new Insets(20));
+        shopPane.setPadding(new Insets(15));
         shopPane.setPrefSize(1280, 640);
 
         Stop[] stops = {
@@ -75,7 +72,7 @@ public class ShopPane implements UIWindow {
         shopPane.setBackground(bg);
 
         Label shopTitle = new Label("КРАМНИЦЯ КОТОГРАБІЖНИКА");
-        shopTitle.setFont(FontManager.getInstance().getFont("Hardpixel", 42));
+        shopTitle.setFont(FontManager.getInstance().getFont("Hardpixel", 32));
         shopTitle.setTextFill(Color.web("#EAD9C2"));
         DropShadow titleShadow = new DropShadow();
         titleShadow.setColor(Color.web("#8B5A2B"));
@@ -84,40 +81,63 @@ public class ShopPane implements UIWindow {
         titleShadow.setRadius(6);
         shopTitle.setEffect(titleShadow);
 
-        moneyLabel = new Label("Гроші: " + playerMoney + " монет");
-        moneyLabel.setFont(FontManager.getInstance().getFont("Hardpixel", 24));
+        moneyLabel = new Label("Гроші: " + money + " монет");
+        moneyLabel.setFont(FontManager.getInstance().getFont("Hardpixel", 20));
         moneyLabel.setTextFill(Color.web("#D4A76A"));
 
-        backButton = createCuteButton("ПОВЕРНУТИСЯ ДО МЕНЮ", Color.web("#7B3F3F"));
-
-        VBox topContainer = new VBox(10, shopTitle, moneyLabel);
+        VBox topContainer = new VBox(5, shopTitle, moneyLabel);
         topContainer.setAlignment(Pos.CENTER);
-        GridPane.setMargin(topContainer, new Insets(0, 0, 30, 0));
-        shopPane.add(topContainer, 0, 0, 2, 1);
+        shopPane.add(topContainer, 0, 0, 4, 1);
+        GridPane.setMargin(topContainer, new Insets(0, 0, 15, 0));
+
+        // Створюємо горизонтальний контейнер для всіх товарів
+        HBox itemsContainer = new HBox(15);
+        itemsContainer.setAlignment(Pos.CENTER);
+        itemsContainer.setPrefWidth(1250);
 
         itemButtons = new Button[items.size()];
         for (int i = 0; i < items.size(); i++) {
             ShopItem item = items.get(i);
-            Button button = createCuteButton("Купити за " + item.getPrice() + " монет", Color.web("#4A7043"));
+            Button button = createCuteButton("Купити за " + item.getPrice(), Color.web("#4A7043"));
             button.setUserData(item);
 
             ImageView imageView = new ImageView(gameLoader.loadImage(item.getSpritePath()));
-            imageView.setFitWidth(100);
-            imageView.setFitHeight(100);
+            imageView.setFitWidth(70);
+            imageView.setFitHeight(70);
             DropShadow imageShadow = new DropShadow();
             imageShadow.setColor(Color.web("#8B5A2B"));
             imageShadow.setRadius(5);
             imageView.setEffect(imageShadow);
 
-            Label description = new Label(item.getName() + ": " + item.getDescription());
-            description.setFont(FontManager.getInstance().getFont("Hardpixel", 16));
+            Label itemName = new Label(item.getName());
+            itemName.setFont(FontManager.getInstance().getFont("Hardpixel", 16));
+            itemName.setTextFill(Color.web("#D4A76A"));
+            itemName.setWrapText(true);
+            itemName.setMaxWidth(280);
+            itemName.setAlignment(Pos.CENTER);
+
+            Label description = new Label(item.getDescription());
+            description.setFont(FontManager.getInstance().getFont("Hardpixel", 12));
             description.setTextFill(Color.web("#EAD9C2"));
             description.setWrapText(true);
-            description.setMaxWidth(200);
+            description.setMaxWidth(280);
+            description.setAlignment(Pos.CENTER);
+            description.setPrefHeight(75);
 
-            VBox itemContainer = new VBox(10, imageView, description, button);
+            VBox itemContainer = new VBox(6, imageView, itemName, description, button);
             itemContainer.setAlignment(Pos.CENTER);
-            shopPane.add(itemContainer, i % 2, 1 + (i / 2));
+            itemContainer.setPrefWidth(285);
+            itemContainer.setPrefHeight(320);
+
+            // Додаємо фон для кожного товару
+            itemContainer.setStyle("-fx-background-color: rgba(42, 37, 37, 0.8); " +
+                    "-fx-background-radius: 12; " +
+                    "-fx-border-color: #8B5A2B; " +
+                    "-fx-border-width: 2; " +
+                    "-fx-border-radius: 12;");
+            itemContainer.setPadding(new Insets(12));
+
+            itemsContainer.getChildren().add(itemContainer);
             itemButtons[i] = button;
             button.setOnAction(e -> {
                 SoundManager.getInstance().playSound(SoundManager.SoundType.BUTTON_CLICK);
@@ -126,17 +146,25 @@ public class ShopPane implements UIWindow {
             });
         }
 
+        shopPane.add(itemsContainer, 0, 1, 4, 1);
+        GridPane.setMargin(itemsContainer, new Insets(10, 0, 15, 0));
+
+        backButton = createCuteButton("ПОВЕРНУТИСЯ ДО МЕНЮ", Color.web("#7B3F3F"));
         HBox backButtonContainer = new HBox();
         backButtonContainer.setAlignment(Pos.CENTER);
         backButtonContainer.getChildren().add(backButton);
-        GridPane.setMargin(backButtonContainer, new Insets(20, 0, 0, 0));
-        shopPane.add(backButtonContainer, 0, 3, 2, 1);
+        shopPane.add(backButtonContainer, 0, 2, 4, 1);
 
         backButton.setOnAction(e -> {
-            hide();
+            System.out.println("Back button clicked");
             SoundManager.getInstance().playSound(SoundManager.SoundType.BUTTON_CLICK);
-            UIManager.getInstance().setCurrentWindow(null); // Явно очищаємо currentWindow
-            UIManager.getInstance().hideCurrentWindowToMenu();
+
+            // Ховаємо магазин
+            hide();
+
+            // Повертаємося до меню через UIManager
+            UIManager.getInstance().setCurrentWindow(null);
+            UIManager.getInstance().showMenu();
         });
     }
 
@@ -150,19 +178,19 @@ public class ShopPane implements UIWindow {
 
     private Button createCuteButton(String text, Color color) {
         Button button = new Button(text);
-        button.setFont(FontManager.getInstance().getFont("Hardpixel", 22));
-        button.setPrefSize(220, 50);
+        button.setFont(FontManager.getInstance().getFont("Hardpixel", 14));
+        button.setPrefSize(250, 35);
 
         String baseStyle = String.format(
                 "-fx-background-color: #2A2525;" +
                         "-fx-text-fill: %s;" +
                         "-fx-border-color: %s;" +
-                        "-fx-border-width: 3px;" +
-                        "-fx-border-radius: 15px;" +
-                        "-fx-background-radius: 15px;" +
+                        "-fx-border-width: 2px;" +
+                        "-fx-border-radius: 12px;" +
+                        "-fx-background-radius: 12px;" +
                         "-fx-cursor: hand;" +
                         "-fx-font-family: 'Hardpixel';" +
-                        "-fx-font-size: 22px;",
+                        "-fx-font-size: 14px;",
                 toHexString(Color.web("#EAD9C2")), toHexString(color)
         );
 
@@ -171,12 +199,12 @@ public class ShopPane implements UIWindow {
                 "-fx-background-color: %s;" +
                         "-fx-text-fill: %s;" +
                         "-fx-border-color: #D4A76A;" +
-                        "-fx-border-width: 4px;" +
-                        "-fx-border-radius: 15px;" +
-                        "-fx-background-radius: 15px;" +
+                        "-fx-border-width: 3px;" +
+                        "-fx-border-radius: 12px;" +
+                        "-fx-background-radius: 12px;" +
                         "-fx-cursor: hand;" +
                         "-fx-font-family: 'Hardpixel';" +
-                        "-fx-font-size: 22px;",
+                        "-fx-font-size: 14px;",
                 toHexString(color), hoverTextColor
         );
 
@@ -221,28 +249,44 @@ public class ShopPane implements UIWindow {
     }
 
     private void updateMoney(int newAmount) {
-        playerMoney = newAmount;
-        moneyLabel.setText("Гроші: " + playerMoney + " монет");
+        money = newAmount;
+        moneyLabel.setText("Гроші: " + money + " монет");
     }
 
     @Override
     public void show() {
+        // Обов'язково відновлюємо всі властивості
         rootPane.setVisible(true);
+        rootPane.setMouseTransparent(false); // ❗ ВАЖЛИВО!
         rootPane.setFocusTraversable(true);
+
+        // Відновлюємо обробник клавіш
+        rootPane.setOnKeyPressed(this::handleInput);
+
+        // Оновлюємо гроші
         updateMoney(GameManager.getInstance().getTotalMoney());
 
+        // Запитуємо фокус через Platform.runLater
         javafx.application.Platform.runLater(() -> {
             rootPane.requestFocus();
         });
     }
+
     @Override
     public void hide() {
+        // НЕ очищуємо children - це руйнує кнопки!
         rootPane.setVisible(false);
         rootPane.setMouseTransparent(true);
+
+        // Очищуємо тільки обробник подій
         rootPane.setOnKeyPressed(null);
-        rootPane.getChildren().clear();
-        shopPane.getChildren().clear();
+
+        // НЕ робимо clear() - це головна проблема:
+        // rootPane.getChildren().clear(); // ❌ НЕ РОБИТИ!
+        // shopPane.getChildren().clear(); // ❌ НЕ РОБИТИ!
     }
+
+
 
     @Override
     public Node getRoot() {

@@ -18,6 +18,8 @@ import utils.GameLoader;
 import utils.InputHandler;
 import utils.Vector2D;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.*;
 
 // Клас GameManager керує логікою гри, включаючи об'єкти, стан, колізії, взаємодії
@@ -105,7 +107,6 @@ public class GameManager implements Savable {
         }
     }
 
-    // Переводить гру в меню, зберігаючи стан і призупиняючи гру
     public void stopGameAndGoToMenu() {
         // Зупиняємо рух гравця перед збереженням
         if (player != null) {
@@ -124,8 +125,6 @@ public class GameManager implements Savable {
             }
         }
 
-        addMoney(getTemporaryMoney());
-
         // Зберігаємо прогрес
         saveProgress();
         saveGame();
@@ -139,15 +138,13 @@ public class GameManager implements Savable {
             uiManager.hideInteractionPrompt();
             uiManager.forceHideInteractiveObjectUI();
             uiManager.hideMenuButton();
-            uiManager.clearSceneForMenu(); // Новий метод для очищення та підготовки сцени
+            uiManager.clearSceneForMenu();
             uiManager.showMenu();
             GameWindow.getInstance().hideTitleBar();
         } else {
             System.err.println("UIManager не доступний для переходу в меню");
-            return;
         }
     }
-
 
 
 
@@ -459,6 +456,7 @@ public class GameManager implements Savable {
 
     // Оновлює логіку гри, викликається з GameWindow.update()
     public void update(double deltaTime) {
+        System.out.println(temporaryMoney);
         if (gameState != GameState.PLAYING) {
             return;
         }
@@ -528,21 +526,6 @@ public class GameManager implements Savable {
         gc.drawImage(backgroundImage, 0, 0, 1280, 640); // Малюємо фон із фіксованими розмірами
     }
 
-    // Малює контури кімнат (для тестування), викликається з GameWindow.render()
-    public void drawRoomOutlines(GraphicsContext gc) {
-        gc.setStroke(Color.RED); // Встановлюємо червоний колір для контурів
-        gc.setLineWidth(2); // Встановлюємо товщину лінії
-
-        for (Room room : rooms) {
-            Bounds bounds = room.getBounds(); // Отримуємо межі кімнати
-            gc.strokeRect(
-                    bounds.getMinX(),
-                    bounds.getMinY(),
-                    bounds.getWidth(),
-                    bounds.getHeight()
-            ); // Малюємо контур
-        }
-    }
 
     // Перевіряє колізії гравця з кімнатами
     public void checkCollisions() {
@@ -570,7 +553,6 @@ public class GameManager implements Savable {
         }
 
         if (laserBounds != null && player.getBounds().intersects(laserBounds)&&door.isLocked()) {
-            player.adjustPlayerPosition(1, Player.Direction.LEFT);
             if (player.getDirection().equals(Player.Direction.RIGHT)) {
                 player.adjustPlayerPosition(1, Player.Direction.LEFT);
             } else {
@@ -618,7 +600,7 @@ public class GameManager implements Savable {
 
     }
 
-    private void checkPlayerCollisions() {
+    public void checkPlayerCollisions() {
         if (player == null) return; // Виходимо, якщо гравець не ініціалізований
 
         Bounds playerBounds = player.getBounds(); // Отримуємо межі гравця
@@ -692,7 +674,8 @@ public class GameManager implements Savable {
             if (player != null) {
                 player.buyItem(item);
             }
-            temporaryMoney = totalMoney; // Синхронізуємо temporaryMoney
+            saveGameManagerState();
+            UIManager.getInstance().updateMoneyDisplay();
             return true;
         } else {
             System.out.println("Недостатньо грошей для покупки: " + item.getName());
@@ -761,26 +744,42 @@ public class GameManager implements Savable {
         }
     }
 
+
+    /**
+     * Додає тимчасовий прибуток до загальних грошей і обнуляє тимчасовий прибуток.
+     */
     public void addMoney(int amount) {
-        totalMoney = temporaryMoney;
+        totalMoney += temporaryMoney; // Додаємо тимчасовий прибуток до загальних грошей
+        temporaryMoney = 0; // Обнуляємо тимчасовий прибуток
+        saveGameManagerState(); // Зберігаємо стан
+        UIManager.getInstance().updateMoneyDisplay(); // Оновлюємо відображення
+    }
+
+    /**
+     * Додає тимчасовий прибуток під час рівня.
+     */
+    public void addTemporaryMoney(int amount) {
+        temporaryMoney += amount;
+        saveGameManagerState(); // Зберігаємо стан для відновлення
+        UIManager.getInstance().updateMoneyDisplay(); // Оновлюємо відображення
+    }
+
+    /**
+     * Встановлює тимчасовий прибуток (використовується при програші або відновленні).
+     */
+    public void setTemporaryMoney(int amount) {
+        temporaryMoney = amount;
+        saveGameManagerState(); // Зберігаємо стан
+        UIManager.getInstance().updateMoneyDisplay(); // Оновлюємо відображення
     }
 
     public int getTotalMoney() {
         return totalMoney;
     }
 
-    public void addTemporaryMoney(int amount) {
-        temporaryMoney += amount;
-        saveProgress();
-        saveGame();
-    }
 
     public int getTemporaryMoney() {
-        return totalMoney;
-    }
-
-    public void setTemporaryMoney(int i){
-        temporaryMoney = i;
+        return temporaryMoney;
     }
 
     public List<Integer> getCompletedLevels() {
@@ -790,7 +789,6 @@ public class GameManager implements Savable {
 
     public void setCurrentLevelId(int levelId) {
         this.currentLevelId = levelId;
-        saveProgress();
     }
 
     public Image getBackgroundImage() {
@@ -823,7 +821,33 @@ public class GameManager implements Savable {
         saveManager.saveGame(gameState);
     }
 
+    /**
+     * Зберігає лише поля GameManager у файл data/saves/game_progress.json, не зачіпаючи ігрові об'єкти.
+     */
+    public void saveGameManagerState() {
+        JSONObject data = new JSONObject();
+        data.put("gameState", GameState.PLAYING.toString());
+        data.put("currentLevelId", currentLevelId);
+        data.put("code", code);
+        data.put("totalMoney", totalMoney);
+        data.put("temporaryMoney", temporaryMoney);
+        data.put("completedLevels", new JSONArray(completedLevels));
 
+        // Зберігаємо інвентар
+        JSONObject inventoryData = new JSONObject();
+        for (Map.Entry<ShopItem, Integer> entry : inventory.entrySet()) {
+            inventoryData.put(entry.getKey().getName(), entry.getValue());
+        }
+        data.put("inventory", inventoryData);
+
+        // Записуємо дані у файл
+        try (FileWriter file = new FileWriter("data/saves/game_progress.json")) {
+            file.write(data.toString(4)); // Записуємо JSON з відступами для читабельності
+            file.flush();
+        } catch (IOException e) {
+            System.err.println("Помилка при збереженні стану GameManager: " + e.getMessage());
+        }
+    }
 
     // Повертає ID поточного рівня
     public int getCurrentLevelId() {

@@ -24,6 +24,7 @@ public class GameApplication extends Application {
     public void start(Stage primaryStage) {
         this.primaryStage = primaryStage; // Зберіг
         // аємо посилання на головне вікно
+
         this.gameManager = GameManager.getInstance(); // Ініціалізуємо GameManager
         this.saveManager = new SaveManager(); // Ініціалізуємо SaveManager
         this.gameWindow = new GameWindow(primaryStage, gameManager, saveManager); // Передаємо менеджери в GameWindow

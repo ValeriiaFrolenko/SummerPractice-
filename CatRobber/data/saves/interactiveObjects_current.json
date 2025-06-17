@@ -10,6 +10,7 @@
     "height": 40
   },
   "interactiveObjects_4": {
+    "isMoneyGiven": false,
     "fileName": "boxes.png",
     "isPictureMoved": false,
     "x": 246.8011016845703,
@@ -20,6 +21,18 @@
     "height": 80
   },
   "interactiveObjects_3": {
+    "isMoneyGiven": false,
+    "fileName": "finalPrize.png",
+    "isPictureMoved": false,
+    "x": 590,
+    "width": 80,
+    "y": 497,
+    "typeObj": "FINAL_PRIZE",
+    "type": "InteractiveObject",
+    "height": 100
+  },
+  "interactiveObjects_2": {
+    "isMoneyGiven": false,
     "fileName": "safe.png",
     "isPictureMoved": false,
     "x": 1180.8348388671875,
@@ -29,19 +42,9 @@
     "type": "InteractiveObject",
     "height": 40
   },
-  "interactiveObjects_2": {
-    "fileName": "finalPrize.png",
-    "isPictureMoved": false,
-    "x": 531.6666870117188,
-    "width": 80,
-    "y": 484.6666564941406,
-    "typeObj": "FINAL_PRIZE",
-    "type": "InteractiveObject",
-    "height": 80
-  },
   "interactiveObjects_1": {
     "fileName": "note.png",
-    "code": "1536",
+    "code": "6283",
     "isPictureMoved": false,
     "x": 173.90467834472656,
     "width": 50,

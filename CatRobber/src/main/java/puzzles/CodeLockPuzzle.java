@@ -2,6 +2,7 @@ package puzzles;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.application.Platform;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -159,7 +160,6 @@ public class CodeLockPuzzle extends Puzzle {
         attemptsLabel.setLayoutY(imageHeight - 30); // Внизу зліва
         attemptsLabel.setFocusTraversable(false); // Не дозволяємо забирати фокус
         pane.getChildren().add(attemptsLabel);
-
         // Очищуємо введений код при кожному відкритті (але зберігаємо спроби)
         enteredCode.setLength(0);
         updateCodeDisplay();
@@ -250,4 +250,5 @@ public class CodeLockPuzzle extends Puzzle {
 
         return pane;
     }
+
 }

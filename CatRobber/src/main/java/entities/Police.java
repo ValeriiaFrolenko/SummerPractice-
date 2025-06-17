@@ -95,7 +95,7 @@ public class Police implements Animatable, GameObject, Interactable {
      */
     @Override
     public String getInteractionPrompt() {
-        return "Press Q to hit";
+        return "Натисніть Q, щоб вдарити";
     }
 
     /** Напрями та стани поліцейського **/
@@ -426,12 +426,6 @@ public class Police implements Animatable, GameObject, Interactable {
                 gc.restore();
                 gc.drawImage(questionFrame, questionX, questionY, questionWidth, questionHeight);
             }
-
-            // Малюємо червону рамку для колізійної області
-            Bounds collBounds = getBounds();
-            gc.setStroke(Color.RED);
-            gc.setLineWidth(2);
-            gc.strokeRect(collBounds.getMinX(), collBounds.getMinY(), collBounds.getWidth(), collBounds.getHeight());
         }
     }
 

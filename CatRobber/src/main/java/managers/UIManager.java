@@ -45,6 +45,7 @@ public class UIManager implements Renderable {
     private boolean isBoostPaneVisible = false;
     private GameLoader gameLoader;
     private ImageView sirenIndicator;
+    private Label moneyLabel;
 
     public static UIManager getInstance() {
         if (instance == null) {
@@ -120,6 +121,7 @@ public class UIManager implements Renderable {
         createMenuButton();
         createBoostButton();
         createBoostPane();
+        createMoneyPanel();
 
         // Додаємо boost панель до menuButtonPane
         this.menuButtonPane.getChildren().add(boostPane);
@@ -128,8 +130,30 @@ public class UIManager implements Renderable {
     }
 
 
+    private void createMoneyPanel() {
+        moneyLabel = new Label("$0");
+        moneyLabel.setStyle(
+                "-fx-background-color: rgba(101, 67, 33, 0.9); " +
+                        "-fx-text-fill: white; " +
+                        "-fx-font-size: 16px; " +
+                        "-fx-font-weight: bold; " +
+                        "-fx-padding: 8px 12px; " +
+                        "-fx-background-radius: 8px; " +
+                        "-fx-border-color: rgba(139, 90, 43, 0.8); " +
+                        "-fx-border-width: 2px; " +
+                        "-fx-border-radius: 8px;"
+        );
+
+        moneyLabel.setLayoutX(canvas.getWidth() - 200); // Поряд з boost кнопкою
+        moneyLabel.setLayoutY(40);
+        moneyLabel.setFocusTraversable(false);
+
+        // Додаємо до menuButtonPane
+        menuButtonPane.getChildren().add(moneyLabel);
+    }
+
     private void setupSirenIndicator() {
-        Image sirenImage = gameLoader.loadImage("CatRobber/assets/images/UI/Siren.png");
+        Image sirenImage = gameLoader.loadImage("UI/Siren.png");
         if (sirenImage != null) {
             sirenIndicator = new ImageView(sirenImage);
             sirenIndicator.setFitWidth(120);
@@ -142,9 +166,7 @@ public class UIManager implements Renderable {
             }
         } else {
             // Використовуємо ваш скріншот, щоб показати правильну структуру
-            System.err.println("Помилка: зображення UI/Siren.png не знайдено!");
-            System.err.println("Перевірте, чи структура вашого проєкту така: CatRobber -> assets -> images -> UI -> Siren.png");
-        }
+            }
     }
 
 
@@ -217,6 +239,7 @@ public class UIManager implements Renderable {
         menuButton.setOnAction(e -> {
             SoundManager.getInstance().playSound(SoundManager.SoundType.BUTTON_CLICK);
             hideMenuButton();
+            GameManager.getInstance().addMoney(GameManager.getInstance().getTemporaryMoney());
             GameManager.getInstance().stopGameAndGoToMenu();
             e.consume();
         });
@@ -387,7 +410,6 @@ public class UIManager implements Renderable {
                 System.out.println("Не вдалося активувати: " + itemToUse.getName() + ", немає в наявності.");
                 return;
             }
-            GameManager.getInstance().updateInventoryFromPlayer(); // Оновлюємо інвентар
 
         }
 
@@ -511,6 +533,10 @@ public class UIManager implements Renderable {
             createMenuButton();
             createBoostButton();
 
+            if (!menuButtonPane.getChildren().contains(moneyLabel)) {
+                createMoneyPanel();
+            }
+
             // boostPane вже додана в конструкторі, просто додаємо її знову якщо потрібно
             if (!menuButtonPane.getChildren().contains(boostPane)) {
                 menuButtonPane.getChildren().add(boostPane);
@@ -525,13 +551,22 @@ public class UIManager implements Renderable {
             menuButtonPane.setMouseTransparent(false);
 
             updateAllBoostCounts();
+            updateMoneyDisplay();
 
               javafx.application.Platform.runLater(() -> {
                 menuButton.setLayoutX(canvas.getWidth() - 80);
                 menuButton.setLayoutY(40);
                 boostButton.setLayoutX(canvas.getWidth() - 120); // Поряд з menu кнопкою
                 boostButton.setLayoutY(40);
+                  moneyLabel.setLayoutX(canvas.getWidth() - 200); // Між boost і menu кнопками
+                  moneyLabel.setLayoutY(40);
             });
+        }
+    }
+
+    public void updateMoneyDisplay() {
+        if (moneyLabel != null) {
+            moneyLabel.setText("$" + (GameManager.getInstance().getTemporaryMoney()+GameManager.getInstance().getTotalMoney()));
         }
     }
 
@@ -927,7 +962,11 @@ public class UIManager implements Renderable {
     }
 
     @Override
-    public void render(GraphicsContext gc) {}
+    public void render(GraphicsContext gc) {
+        if (isMenuButtonVisible && moneyLabel != null) {
+            updateMoneyDisplay();
+        }
+    }
 
     @Override
     public int getRenderLayer() {

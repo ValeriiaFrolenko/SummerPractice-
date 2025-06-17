@@ -16,6 +16,11 @@
         "value": "diamont.png"
       },
       {
+        "name": "isMoneyGiven",
+        "type": "bool",
+        "value": false
+      },
+      {
         "name": "typeObj",
         "type": "string",
         "value": "FINAL_PRIZE"
@@ -38,6 +43,11 @@
         "name": "fileName",
         "type": "string",
         "value": "boxes.png"
+      },
+      {
+        "name": "isMoneyGiven",
+        "type": "bool",
+        "value": false
       },
       {
         "name": "typeObj",
@@ -112,6 +122,11 @@
         "value": "chest1.png"
       },
       {
+        "name": "isMoneyGiven",
+        "type": "bool",
+        "value": false
+      },
+      {
         "name": "typeObj",
         "type": "string",
         "value": "WITH_MONEY"
@@ -136,6 +151,11 @@
         "value": "chest3.png"
       },
       {
+        "name": "isMoneyGiven",
+        "type": "bool",
+        "value": false
+      },
+      {
         "name": "typeObj",
         "type": "string",
         "value": "WITH_MONEY"
@@ -158,6 +178,11 @@
         "name": "fileName",
         "type": "string",
         "value": "chest2.png"
+      },
+      {
+        "name": "isMoneyGiven",
+        "type": "bool",
+        "value": false
       },
       {
         "name": "typeObj",

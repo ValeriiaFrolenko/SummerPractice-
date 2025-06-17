@@ -35,6 +35,9 @@ public class InteractiveObject implements GameObject, Interactable {
     public enum Type { NOTE, PICTURE, COMPUTER, ELECTRICAL_PANEL, WITH_MONEY, FINAL_PRIZE }
 
     public InteractiveObject(Vector2D position, JSONObject properties) {
+        if (type == Type.WITH_MONEY||type == Type.FINAL_PRIZE) {
+            this.isMoneyGiven = properties.getBoolean("isMoneyGiven");
+        }
         this.properties = properties;
         this.imageWidth = properties.optDouble("width", 32.0);
         this.imageHeight = properties.optDouble("height", 32.0);
@@ -51,6 +54,7 @@ public class InteractiveObject implements GameObject, Interactable {
             String code = generateRandomCode();
             properties.put("code", code);
             GameManager.getInstance().setCode(code); // Зберігаємо в GameManager
+            GameManager.getInstance().saveGameManagerState();
         }
     }
 
@@ -117,12 +121,14 @@ public class InteractiveObject implements GameObject, Interactable {
                 if (!isMoneyGiven) {
                     soundManager.playSound(SoundManager.SoundType.COLLECT_MONEY);
                     GameManager.getInstance().addTemporaryMoney(100);
+                    UIManager.getInstance().updateMoneyDisplay(); // Оновлюємо moneyLabel
                     isMoneyGiven = true;
                 }
                 break;
             case FINAL_PRIZE:
                 if (!isMoneyGiven) {
                     GameManager.getInstance().addTemporaryMoney(200);
+                    UIManager.getInstance().updateMoneyDisplay(); // Оновлюємо moneyLabel
                     isMoneyGiven = true;
                 }
                 GameManager.getInstance().setGameState(GameManager.GameState.VICTORY);
@@ -157,6 +163,9 @@ public class InteractiveObject implements GameObject, Interactable {
         if ((type == Type.NOTE||type == Type.PICTURE||type == Type.COMPUTER) && properties.has("code")) {
             data.put("code", properties.getString("code")); // Зберігаємо код нотатки
         }
+        if (type == Type.WITH_MONEY ||type == Type.FINAL_PRIZE) {
+            data.put("isMoneyGiven", isMoneyGiven);
+        }
         return data;
     }
 
@@ -186,6 +195,9 @@ public class InteractiveObject implements GameObject, Interactable {
             properties.put("code", data.getString("code"));
             GameManager.getInstance().setCode(data.getString("code"));
         }
+        if (type == Type.WITH_MONEY ||type == Type.FINAL_PRIZE) {
+            this.isMoneyGiven = data.getBoolean("isMoneyGiven");
+        }
     }
 
     @Override
@@ -194,10 +206,6 @@ public class InteractiveObject implements GameObject, Interactable {
             gc.setImageSmoothing(false);
             gc.drawImage(sprite, imageX, imageY, imageWidth, imageHeight);
         }
-
-        gc.setStroke(Color.RED);
-        gc.setLineWidth(1);
-        gc.strokeRect(imageX, imageY, imageWidth, imageHeight);
 
         if (GameManager.getInstance().getClosestInteractable() == this) {
             gc.setStroke(Color.WHITE);
@@ -274,7 +282,7 @@ public class InteractiveObject implements GameObject, Interactable {
 
     @Override
     public String getInteractionPrompt() {
-        return "Press E to interact with object";
+        return "Натисніть Е, щоб взаємодіяти з об'єктом";
     }
 
     @Override

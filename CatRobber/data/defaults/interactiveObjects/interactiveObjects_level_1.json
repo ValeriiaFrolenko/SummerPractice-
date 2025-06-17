@@ -47,30 +47,6 @@
     ],
     "height": 50
   },
-  "interactiveObjects_169": {
-    "gid": 2147483691,
-    "visible": true,
-    "rotation": 0,
-    "name": "finalPrize",
-    "width": 80,
-    "x": 531.666666666667,
-    "y": 484.666666666667,
-    "id": 169,
-    "type": "InteractiveObject",
-    "properties": [
-      {
-        "name": "fileName",
-        "type": "string",
-        "value": "finalPrize.png"
-      },
-      {
-        "name": "typeObj",
-        "type": "string",
-        "value": "FINAL_PRIZE"
-      }
-    ],
-    "height": 80
-  },
   "interactiveObjects_165": {
     "gid": 40,
     "visible": true,
@@ -88,12 +64,46 @@
         "value": "safe.png"
       },
       {
+        "name": "isMoneyGiven",
+        "type": "bool",
+        "value": false
+      },
+      {
         "name": "typeObj",
         "type": "string",
         "value": "WITH_MONEY"
       }
     ],
     "height": 40
+  },
+  "interactiveObjects_176": {
+    "gid": 44,
+    "visible": true,
+    "rotation": 0,
+    "name": "finalPrize",
+    "width": 80,
+    "x": 590,
+    "y": 497,
+    "id": 176,
+    "type": "InteractiveObject",
+    "properties": [
+      {
+        "name": "fileName",
+        "type": "string",
+        "value": "finalPrize.png"
+      },
+      {
+        "name": "isMoneyGiven",
+        "type": "bool",
+        "value": false
+      },
+      {
+        "name": "typeObj",
+        "type": "string",
+        "value": "FINAL_PRIZE"
+      }
+    ],
+    "height": 100
   },
   "interactiveObjects_164": {
     "gid": 39,
@@ -110,6 +120,11 @@
         "name": "fileName",
         "type": "string",
         "value": "boxes.png"
+      },
+      {
+        "name": "isMoneyGiven",
+        "type": "bool",
+        "value": false
       },
       {
         "name": "typeObj",

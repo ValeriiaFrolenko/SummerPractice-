@@ -5,6 +5,7 @@ import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
@@ -12,6 +13,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
 import javafx.util.Duration;
 import main.GameWindow;
+import managers.FontManager;
 import managers.SoundManager;
 import org.json.JSONObject;
 import utils.GameLoader;
@@ -130,7 +132,8 @@ public class LockPickPuzzle extends Puzzle {
         successZoneMinX = (movementCorridorCenter + cylinderCenterOffset) - (successZoneWidth / 2.0);
         successZoneMaxX = (movementCorridorCenter + cylinderCenterOffset) + (successZoneWidth / 2.0);
 
-        puzzlePane.getChildren().addAll(lockBackgroundView, cylinderView, lockpickView);
+        Label promptLabel = showLockPickPrompt();
+        puzzlePane.getChildren().addAll(lockBackgroundView, cylinderView, lockpickView, promptLabel);
         setupInputHandlers();
         return puzzlePane;
     }
@@ -235,4 +238,26 @@ public class LockPickPuzzle extends Puzzle {
             solve("FAILURE");
         }
     }
+    private Label showLockPickPrompt() {
+        Label promptLabel = new Label("Вкиористовуйте пробіл, щоб відкрити");
+        promptLabel.setFont(FontManager.getInstance().getFont("Hardpixel", 16));
+        promptLabel.setStyle(
+                "-fx-background-color: rgba(0, 0, 0, 0.8); " +
+                        "-fx-text-fill: white; " +
+                        "-fx-padding: 10px 20px; " +
+                        "-fx-background-radius: 5px; " +
+                        "-fx-border-color: #333333; " +
+                        "-fx-border-width: 2px; " +
+                        "-fx-border-radius: 5px;"
+        );
+
+        promptLabel.setLayoutX(450);
+        promptLabel.setLayoutY(120);
+
+        // Виносимо на передній план
+        Platform.runLater(() -> promptLabel.toFront());
+
+        return promptLabel;
+    }
+
 }

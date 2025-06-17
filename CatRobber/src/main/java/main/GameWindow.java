@@ -249,7 +249,6 @@ public class GameWindow {
     public void render() {
         graphicsContext.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
         gameManager.render(graphicsContext);
-        gameManager.drawRoomOutlines(graphicsContext);
         uiManager.render(graphicsContext);
     }
 

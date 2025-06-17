@@ -42,7 +42,7 @@ public class InteractiveObjectWindow {
     public InteractiveObjectWindow(UIManager.WindowType windowType, JSONObject config) {
         this.config = config;
         this.windowType = windowType;
-        this.vaultCode = config.optString("code", "0000");
+        this.vaultCode = GameManager.getInstance().getCode();
         this.root = new Pane();
         this.gameLoader = new GameLoader();
         initializeUI(config);
@@ -604,6 +604,10 @@ public class InteractiveObjectWindow {
                 // Перевіряємо чи існує наступний рівень (максимум 3 рівні)
                 if (nextLevel <= 3) {
                     closeWindow();
+                    soundManager.stopSoundEffects();
+                    GameManager.getInstance().addMoney(GameManager.getInstance().getTemporaryMoney());
+                    GameManager.getInstance().saveProgress();
+                    GameManager.getInstance().saveGame();
                     GameManager.getInstance().completeLevel(currentLevel);
                     GameManager.getInstance().loadLevel(nextLevel, true);
                 } else {
@@ -619,6 +623,7 @@ public class InteractiveObjectWindow {
             menuButton.setLayoutY(320);
             menuButton.setOnAction(e -> {
                 closeWindow();
+                GameManager.getInstance().addMoney(GameManager.getInstance().getTemporaryMoney());
                 GameManager.getInstance().saveProgress();
                 GameManager.getInstance().saveGame();
                 GameManager.getInstance().stopGameAndGoToMenu();
@@ -654,6 +659,7 @@ public class InteractiveObjectWindow {
             retryButton.setLayoutY(210);
             retryButton.setOnAction(e -> {
                 closeWindow();
+                soundManager.stopSoundEffects();
                 GameManager.getInstance().restartCurrentLevel();
             });
             root.getChildren().add(retryButton);
@@ -702,6 +708,8 @@ public class InteractiveObjectWindow {
         menuButton.setLayoutY(250);
         menuButton.setOnAction(e -> {
             closeWindow();
+            soundManager.stopSoundEffects();
+            GameManager.getInstance().addMoney(GameManager.getInstance().getTemporaryMoney());
             GameManager.getInstance().saveProgress();
             GameManager.getInstance().saveGame();
             GameManager.getInstance().stopGameAndGoToMenu();
