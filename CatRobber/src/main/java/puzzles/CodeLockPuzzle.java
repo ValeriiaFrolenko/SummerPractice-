@@ -18,18 +18,45 @@ import managers.GameManager;
 import managers.SoundManager;
 import org.json.JSONObject;
 
+/**
+ * Клас для реалізації головоломки з кодовим замком. Наслідує клас Puzzle.
+ */
 public class CodeLockPuzzle extends Puzzle {
+    /** Шлях до зображення кодового замка. */
     private String imagePath = "assets/images/puzzles/codeLock/codeLock.png";
-    private String solution; // Код із нотатки
-    private StringBuilder enteredCode; // Введений код
-    private Label codeDisplay; // Відображення введених цифр
-    private Label attemptsLabel; // Відображення спроб
-    private Pane pane; // Зберігаємо для фокусу
-    private static int globalAttempts = 3; // Статична змінна для збереження спроб між відкриттями
+
+    /** Рішення головоломки (правильний код). */
+    private String solution;
+
+    /** Введений користувачем код. */
+    private StringBuilder enteredCode;
+
+    /** Мітка для відображення введених цифр. */
+    private Label codeDisplay;
+
+    /** Мітка для відображення кількості спроб. */
+    private Label attemptsLabel;
+
+    /** Панель для інтерфейсу головоломки. */
+    private Pane pane;
+
+    /** Статична змінна для збереження кількості спроб між відкриттями. */
+    private static int globalAttempts = 3;
+
+    /** Ширина зображення кодового замка. */
     private int imageWidth = 400;
+
+    /** Висота зображення кодового замка. */
     private int imageHeight = 300;
+
+    /** Менеджер звуків для відтворення звукових ефектів. */
     private final SoundManager soundManager = SoundManager.getInstance();
 
+    /**
+     * Конструктор для ініціалізації головоломки з кодовим замком.
+     *
+     * @param defaultData JSON-об’єкт із початковими даними
+     */
     public CodeLockPuzzle(JSONObject defaultData) {
         super(defaultData);
         String code = GameManager.getInstance().getCode();
@@ -37,6 +64,11 @@ public class CodeLockPuzzle extends Puzzle {
         this.enteredCode = new StringBuilder();
     }
 
+    /**
+     * Перевіряє введений код і оновлює стан головоломки.
+     *
+     * @param input введений код
+     */
     @Override
     public void solve(Object input) {
         if (input.equals(solution)) {
@@ -45,37 +77,38 @@ public class CodeLockPuzzle extends Puzzle {
             if (callback != null) {
                 callback.onPuzzleSolved(true, linkedDoor);
             }
-            System.out.println("CodeLockPuzzle solved with code: " + input);
         } else {
             soundManager.playSound(SoundManager.SoundType.CODE_LOCK_CLOSED);
             globalAttempts--;
             updateAttemptsDisplay();
-            enteredCode.setLength(0); // Очищаємо при невірному коді
+            enteredCode.setLength(0);
             updateCodeDisplay();
-            System.out.println("Incorrect code entered: " + input + ", attempts left: " + globalAttempts);
-
             if (globalAttempts <= 0) {
                 triggerGlobalAlarm();
-                // Скидаємо спроби після тривоги
                 globalAttempts = 3;
-                // Закриваємо вікно після спрацювання тривоги
                 GameWindow.getInstance().getUIManager().hidePuzzleUI();
             }
         }
     }
 
+    /**
+     * Викликає глобальну тривогу в грі.
+     */
     private void triggerGlobalAlarm() {
         GameManager.getInstance().alert();
     }
 
-    // Метод для ручного скидання спроб (якщо потрібно з інших частин гри)
+    /**
+     * Скидає кількість спроб до початкового значення (3).
+     */
     public static void resetAttempts() {
         globalAttempts = 3;
-        System.out.println("Спроби скинуто вручну");
     }
 
+    /**
+     * Оновлює відображення введеного коду на екрані.
+     */
     private void updateCodeDisplay() {
-        // Відображаємо введені цифри з підкресленнями для порожніх позицій
         StringBuilder display = new StringBuilder();
         for (int i = 0; i < 4; i++) {
             if (i < enteredCode.length()) {
@@ -88,26 +121,33 @@ public class CodeLockPuzzle extends Puzzle {
         codeDisplay.setText(display.toString());
     }
 
+    /**
+     * Оновлює відображення кількості спроб.
+     */
     private void updateAttemptsDisplay() {
         attemptsLabel.setText("Спроби: " + globalAttempts);
     }
 
-    // Метод для забезпечення фокусу
+    /**
+     * Забезпечує фокус на панелі головоломки.
+     */
     private void ensureFocus() {
         if (pane != null) {
             javafx.application.Platform.runLater(() -> {
                 pane.requestFocus();
-                System.out.println("Фокус встановлено на pane");
             });
         }
     }
 
+    /**
+     * Повертає вузол інтерфейсу для головоломки.
+     *
+     * @return вузол інтерфейсу (Pane)
+     */
     @Override
     public Node getUI() {
         pane = new Pane();
-        pane.setPrefSize(imageWidth, imageHeight); // Розмір точно як зображення
-
-        // Завантажуємо зображення кодового замка
+        pane.setPrefSize(imageWidth, imageHeight);
         Image lockImage;
         try {
             lockImage = new Image("file:assets/images/puzzles/codeLock/codeLock.png");
@@ -120,76 +160,53 @@ public class CodeLockPuzzle extends Puzzle {
             System.err.println("Не вдалося завантажити зображення: " + imagePath + ": " + e.getMessage());
             lockImage = null;
         }
-
         ImageView lockView = new ImageView(lockImage);
         lockView.setFitWidth(imageWidth);
         lockView.setFitHeight(imageHeight);
-        lockView.setPreserveRatio(false); // Точно відповідає розміру
+        lockView.setPreserveRatio(false);
         pane.getChildren().add(lockView);
-
-        // Хрестик для закриття - в межах зображення
         Button closeButton = new Button("✖");
         closeButton.setStyle("-fx-font-size: 14; -fx-background-color: red; -fx-text-fill: white;");
-        closeButton.setLayoutX(imageWidth - 34); // В межах зображення
+        closeButton.setLayoutX(imageWidth - 34);
         closeButton.setLayoutY(2);
         closeButton.setOnAction(e -> {
-            System.out.println("CodeLockPuzzle closed");
             GameWindow.getInstance().getUIManager().hidePuzzleUI();
         });
-        // Важливо: не дозволяємо кнопці забирати фокус
         closeButton.setFocusTraversable(false);
         pane.getChildren().add(closeButton);
-
-        // Дисплей для введених цифр - зверху з відступом 50 пікселів
         codeDisplay = new Label("");
         codeDisplay.setFont(FontManager.getInstance().getFont("DS-Digital", 36));
         codeDisplay.setTextFill(Color.RED);
         codeDisplay.setStyle("-fx-font-weight: bold;");
-        codeDisplay.setLayoutX(imageWidth / 2 - 80); // Центруємо по горизонталі
-        codeDisplay.setLayoutY(50); // Відступ зверху 50 пікселів
-        codeDisplay.setFocusTraversable(false); // Не дозволяємо забирати фокус
-        updateCodeDisplay(); // Ініціалізуємо відображення
+        codeDisplay.setLayoutX(imageWidth / 2 - 80);
+        codeDisplay.setLayoutY(50);
+        codeDisplay.setFocusTraversable(false);
+        updateCodeDisplay();
         pane.getChildren().add(codeDisplay);
-
-        // Лічильник спроб
         attemptsLabel = new Label("Спроби: " + globalAttempts);
         attemptsLabel.setFont(FontManager.getInstance().getFont("DS-Digital", 20));
         attemptsLabel.setTextFill(Color.YELLOW);
         attemptsLabel.setStyle("-fx-font-weight: bold;");
         attemptsLabel.setLayoutX(10);
-        attemptsLabel.setLayoutY(imageHeight - 30); // Внизу зліва
-        attemptsLabel.setFocusTraversable(false); // Не дозволяємо забирати фокус
+        attemptsLabel.setLayoutY(imageHeight - 30);
+        attemptsLabel.setFocusTraversable(false);
         pane.getChildren().add(attemptsLabel);
-        // Очищуємо введений код при кожному відкритті (але зберігаємо спроби)
         enteredCode.setLength(0);
         updateCodeDisplay();
-
-        // Налаштовуємо pane для отримання фокусу
         pane.setFocusTraversable(true);
-        pane.setStyle("-fx-background-color: transparent;"); // Прозорий фон
-
-        // Обробка кліків миші для встановлення фокусу
+        pane.setStyle("-fx-background-color: transparent;");
         pane.setOnMouseClicked(e -> {
-            System.out.println("Mouse clicked on CodeLockPuzzle pane at (" + e.getX() + ", " + e.getY() + ")");
             pane.requestFocus();
-            e.consume(); // Споживаємо подію
+            e.consume();
         });
-
-        // Обробка клавіатури
         pane.setOnKeyPressed(event -> {
-            System.out.println("Key pressed: " + event.getCode());
             soundManager.playSound(SoundManager.SoundType.CODE_LOCK_CLICK);
             KeyCode key = event.getCode();
-
             if (key.isDigitKey() && enteredCode.length() < 4) {
                 String digit = event.getText();
                 enteredCode.append(digit);
                 updateCodeDisplay();
-                System.out.println("Введено цифру: " + digit + ", поточний код: " + enteredCode);
-
-                // Перевіряємо код лише після затримки, щоб 4-та цифра встигла відобразитися
                 if (enteredCode.length() == 4) {
-                    // Використовуємо Timeline для затримки без блокування UI
                     Timeline timeline = new Timeline(new KeyFrame(Duration.millis(300), e -> {
                         solve(enteredCode.toString());
                     }));
@@ -198,27 +215,17 @@ public class CodeLockPuzzle extends Puzzle {
             } else if (key == KeyCode.BACK_SPACE && enteredCode.length() > 0) {
                 enteredCode.deleteCharAt(enteredCode.length() - 1);
                 updateCodeDisplay();
-                System.out.println("Видалено цифру, поточний код: " + enteredCode);
             }
-
-            event.consume(); // Споживаємо подію
+            event.consume();
         });
-
-        // Слухач для автоматичного встановлення фокусу після додавання до сцени
         pane.sceneProperty().addListener((obs, oldScene, newScene) -> {
             if (newScene != null) {
-                System.out.println("Pane додано до сцени");
-
-                // Встановлюємо фокус з затримкою
                 Timeline focusTimeline = new Timeline(new KeyFrame(Duration.millis(100), e -> {
                     ensureFocus();
                 }));
                 focusTimeline.play();
-
-                // Додатковий слухач для вікна
                 newScene.getWindow().showingProperty().addListener((showObs, wasShowing, isShowing) -> {
                     if (isShowing) {
-                        System.out.println("Вікно показано");
                         Timeline windowFocusTimeline = new Timeline(new KeyFrame(Duration.millis(200), e -> {
                             ensureFocus();
                         }));
@@ -227,12 +234,8 @@ public class CodeLockPuzzle extends Puzzle {
                 });
             }
         });
-
-        // Слухач для отримання/втрати фокусу
         pane.focusedProperty().addListener((obs, wasFocused, isFocused) -> {
-            System.out.println("Pane focus changed: " + isFocused);
             if (!isFocused) {
-                // Якщо фокус втрачено, спробуємо його повернути через короткий час
                 Timeline refocusTimeline = new Timeline(new KeyFrame(Duration.millis(50), e -> {
                     if (!pane.isFocused()) {
                         ensureFocus();
@@ -241,14 +244,10 @@ public class CodeLockPuzzle extends Puzzle {
                 refocusTimeline.play();
             }
         });
-
-        // Додатковий механізм для гарантії фокусу
         Timeline initialFocusTimeline = new Timeline(new KeyFrame(Duration.millis(50), e -> {
             ensureFocus();
         }));
         initialFocusTimeline.play();
-
         return pane;
     }
-
 }

@@ -536,24 +536,6 @@ public class Menu implements UIWindow {
         // НЕ очищуємо children - це може пошкодити UI!
     }
 
-    // ДОДАТКОВИЙ МЕТОД ДЛЯ ПОВЕРНЕННЯ З МАГАЗИНУ
-    public void returnFromShop() {
-        System.out.println("Returning from shop to menu");
-
-        // Повністю скидаємо стан
-        showingSplash = false;
-        menuVisible = true;
-        levelSelectionVisible = false;
-
-        // Показуємо правильні панелі
-        splashPane.setVisible(false);
-        menuPane.setVisible(true);
-        levelSelectPane.setVisible(false);
-
-        // Показуємо меню
-        show();
-    }
-
 
     @Override
     public Node getRoot() {

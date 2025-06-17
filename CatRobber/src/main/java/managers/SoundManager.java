@@ -8,7 +8,13 @@ import java.io.File;
 import java.util.EnumMap;
 import java.util.Map;
 
+/**
+ * Клас для управління звуками та музикою в грі. Реалізує патерн Singleton.
+ */
 public class SoundManager {
+    /**
+     * Перелік типів звукових ефектів у грі.
+     */
     public enum SoundType {
         BUTTON_CLICK, CODE_LOCK_CLICK, CODE_LOCK_CLOSED, CODE_LOCK_OPEN,
         COLLECT_MONEY, DOOR_OPEN, FAIL_GAME, HIT, HITTED,
@@ -16,16 +22,51 @@ public class SoundManager {
         TAKE_NOTE, VICTORY_GAME, WIRE_CUT
     }
 
+    /**
+     * Колекція звукових ефектів, прив’язаних до їх типів.
+     */
     private Map<SoundType, AudioClip> sounds;
+
+    /**
+     * Поточний об’єкт для відтворення фонової музики.
+     */
     private MediaPlayer currentMusic;
+
+    /**
+     * Поточний об’єкт для відтворення звуку бігу.
+     */
     private MediaPlayer currentSound;
+
+    /**
+     * Загальна гучність для всіх звуків і музики.
+     */
     private double masterVolume = 1;
+
+    /**
+     * Гучність звукових ефектів.
+     */
     private double soundVolume = 1;
+
+    /**
+     * Гучність фонової музики.
+     */
     private double musicVolume = 1;
+
+    /**
+     * Прапорець, що вказує, чи відтворюється звук бігу.
+     */
     private boolean isRunningSoundPlay = false;
 
+    /**
+     * Єдиний екземпляр класу SoundManager (патерн Singleton).
+     */
     private static SoundManager instance;
 
+    /**
+     * Повертає єдиний екземпляр класу SoundManager.
+     *
+     * @return екземпляр SoundManager
+     */
     public static SoundManager getInstance() {
         if (instance == null) {
             instance = new SoundManager();
@@ -33,21 +74,29 @@ public class SoundManager {
         return instance;
     }
 
+    /**
+     * Приватний конструктор для ініціалізації звукових ефектів і бігу.
+     */
     private SoundManager() {
         sounds = new EnumMap<>(SoundType.class);
         loadSounds();
         initRunSound();
     }
 
+    /**
+     * Ініціалізує звук бігу для безперервного відтворення.
+     */
     public void initRunSound() {
-        String path = getFilePath("assets\\music\\sounds\\run.mp3" );
-        System.out.println("Спроба завантажити музику з: " + path);
+        String path = getFilePath("assets\\music\\sounds\\run.mp3");
         Media media = new Media(path);
         currentSound = new MediaPlayer(media);
         currentSound.setCycleCount(MediaPlayer.INDEFINITE);
         currentSound.setVolume(masterVolume * soundVolume);
     }
 
+    /**
+     * Запускає відтворення звуку бігу, якщо він ще не відтворюється.
+     */
     public void startRunSound() {
         if (!isRunningSoundPlay && currentSound != null) {
             currentSound.play();
@@ -55,6 +104,9 @@ public class SoundManager {
         }
     }
 
+    /**
+     * Зупиняє відтворення звуку бігу, якщо він відтворюється.
+     */
     public void stopRunSound() {
         if (isRunningSoundPlay && currentSound != null) {
             currentSound.pause();
@@ -62,6 +114,9 @@ public class SoundManager {
         }
     }
 
+    /**
+     * Завантажує всі звукові ефекти, визначені в SoundType.
+     */
     private void loadSounds() {
         loadSound(SoundType.BUTTON_CLICK, "assets/music/sounds/button_click.mp3");
         loadSound(SoundType.CODE_LOCK_CLICK, "assets/music/sounds/code_lock_click.mp3");
@@ -84,6 +139,12 @@ public class SoundManager {
         loadSound(SoundType.WIRE_CUT, "assets/music/sounds/wire_cut.mp3");
     }
 
+    /**
+     * Отримує повний шлях до файлу відносно директорії проекту.
+     *
+     * @param relativePath відносний шлях до файлу
+     * @return повний шлях до файлу у форматі URI
+     */
     private String getFilePath(String relativePath) {
         try {
             File file = new File(System.getProperty("user.dir"), relativePath);
@@ -94,6 +155,12 @@ public class SoundManager {
         }
     }
 
+    /**
+     * Завантажує звуковий ефект і додає його до колекції.
+     *
+     * @param type         тип звукового ефекту
+     * @param relativePath відносний шлях до файлу звуку
+     */
     private void loadSound(SoundType type, String relativePath) {
         try {
             File file = new File(System.getProperty("user.dir"), relativePath);
@@ -105,6 +172,11 @@ public class SoundManager {
         }
     }
 
+    /**
+     * Відтворює звуковий ефект за його типом.
+     *
+     * @param type тип звукового ефекту
+     */
     public void playSound(SoundType type) {
         AudioClip clip = sounds.get(type);
         if (clip != null) {
@@ -113,12 +185,15 @@ public class SoundManager {
         }
     }
 
-
+    /**
+     * Відтворює фонову музику за назвою треку.
+     *
+     * @param trackName ім’я файлу треку
+     */
     public void playMusic(String trackName) {
-        stopMusic(); // зупинити поточну
+        stopMusic();
         try {
             String path = getFilePath("assets\\music\\background\\" + trackName);
-            System.out.println("Спроба завантажити музику з: " + path);
             Media media = new Media(path);
             currentMusic = new MediaPlayer(media);
             currentMusic.setVolume(masterVolume * musicVolume);
@@ -130,6 +205,9 @@ public class SoundManager {
         }
     }
 
+    /**
+     * Зупиняє відтворення фонової музики.
+     */
     public void stopMusic() {
         if (currentMusic != null) {
             currentMusic.stop();
@@ -137,13 +215,19 @@ public class SoundManager {
         }
     }
 
+    /**
+     * Зупиняє всі звукові ефекти, включаючи звук бігу.
+     */
     public void stopSoundEffects() {
         for (AudioClip clip : sounds.values()) {
             clip.stop();
         }
-        stopRunSound(); // якщо біжить звук бігу — теж зупиняємо
+        stopRunSound();
     }
 
+    /**
+     * Зупиняє всі звуки та музику в грі.
+     */
     public void stopAllSounds() {
         for (AudioClip clip : sounds.values()) {
             clip.stop();
@@ -151,33 +235,4 @@ public class SoundManager {
         stopMusic();
     }
 
-    public void pauseMusic() {
-        if (currentMusic != null) {
-            currentMusic.pause();
-        }
-    }
-
-    public void resumeMusic() {
-        if (currentMusic != null) {
-            currentMusic.play();
-        }
-    }
-
-    public void setMasterVolume(double volume) {
-        masterVolume = volume;
-        if (currentMusic != null) {
-            currentMusic.setVolume(masterVolume * musicVolume);
-        }
-    }
-
-    public void setSoundVolume(double volume) {
-        soundVolume = volume;
-    }
-
-    public void setMusicVolume(double volume) {
-        musicVolume = volume;
-        if (currentMusic != null) {
-            currentMusic.setVolume(masterVolume * musicVolume);
-        }
-    }
 }

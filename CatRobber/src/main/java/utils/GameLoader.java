@@ -19,11 +19,16 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
-// Завантажує ресурси гри (JSON, зображення, звуки, об’єкти)
+/**
+ * Клас для завантаження ресурсів гри, створення об’єктів та обробки карт колізій.
+ */
 public class GameLoader {
-    // --- Завантаження ресурсів ---
-
-    // Завантажує JSON-файл
+    /**
+     * Завантажує JSON-файл із зазначеного шляху.
+     *
+     * @param filename шлях до JSON-файлу
+     * @return JSONObject із вмістом файлу або null у разі помилки
+     */
     public JSONObject loadJSON(String filename) {
         try (FileReader reader = new FileReader(filename)) {
             StringBuilder text = new StringBuilder();
@@ -34,12 +39,16 @@ public class GameLoader {
             return new JSONObject(text.toString());
         } catch (IOException e) {
             System.err.println("Не можу прочитати файл: " + filename + ", помилка: " + e.getMessage());
-            System.out.println(System.getProperty("user.dir"));
             return null;
         }
     }
 
-    // Завантажує зображення
+    /**
+     * Завантажує зображення із зазначеного шляху, перевіряючи кілька можливих шляхів.
+     *
+     * @param path шлях до зображення
+     * @return об’єкт Image або null, якщо зображення не знайдено
+     */
     public Image loadImage(String path) {
         try {
             String[] possiblePaths = {"assets/images/" + path, "assets/" + path, path};
@@ -57,7 +66,12 @@ public class GameLoader {
         }
     }
 
-    // Завантажує звук
+    /**
+     * Завантажує звуковий файл із зазначеного шляху.
+     *
+     * @param path шлях до звукового файлу
+     * @return об’єкт AudioClip або null, якщо звук не знайдено
+     */
     public AudioClip loadAudio(String path) {
         try {
             return new AudioClip(new File("assets/sounds/" + path).toURI().toString());
@@ -67,7 +81,13 @@ public class GameLoader {
         }
     }
 
-    // Розбиває спрайт-лист на кадри
+    /**
+     * Розбиває спрайт-лист на окремі кадри анімації.
+     *
+     * @param path шлях до спрайт-листа
+     * @param frameCount кількість кадрів у спрайт-листі
+     * @return масив Image із кадрами або порожній масив у разі помилки
+     */
     public Image[] splitSpriteSheet(String path, int frameCount) {
         Image spriteSheet = loadImage(path);
         if (spriteSheet == null) {
@@ -101,19 +121,25 @@ public class GameLoader {
         return frames;
     }
 
-    // --- Створення об’єктів ---
-
-    // Парсить JSON у список об’єктів
+    /**
+     * Парсить JSON у список ігрових об’єктів.
+     *
+     * @param tiledData JSON-дані у форматі Tiled
+     * @return список ігрових об’єктів
+     */
     public List<GameObject> parseTiledJSON(JSONObject tiledData) {
         return createObjectsFromJSON(tiledData);
     }
 
-    // Створює об’єкти з JSON
+    /**
+     * Створює ігрові об’єкти та головоломки з JSON-даних.
+     *
+     * @param data JSON-об’єкт із даними
+     * @return список створених ігрових об’єктів
+     */
     public List createObjectsFromJSON(JSONObject data) {
         List objects = new ArrayList<>();
         List puzzles = new ArrayList<>();
-
-        // Перевіряємо, чи JSON є Tiled-форматом (має "layers")
         if (data.has("layers")) {
             JSONArray layers = data.getJSONArray("layers");
             for (int i = 0; i < layers.length(); i++) {
@@ -137,15 +163,10 @@ public class GameLoader {
                 }
             }
         } else {
-            // Якщо JSON не має "layers", обробляємо як набір об'єктів (наприклад, збереження)
             for (String key : data.keySet()) {
                 Object value = data.get(key);
-
-                // Перевіряємо, чи значення є JSONObject
                 if (value instanceof JSONObject) {
                     JSONObject obj = (JSONObject) value;
-
-                    // Перевіряємо, чи об'єкт має поле "type"
                     if (obj.has("type")) {
                         if (obj.getString("type").equals("Puzzle")) {
                             Puzzle puzzle = createSinglePuzzle(obj);
@@ -162,38 +183,32 @@ public class GameLoader {
                 }
             }
         }
-
-        // Додаємо головоломки до GameManager
         GameManager.getInstance().getPuzzles().addAll(puzzles);
         return objects;
     }
-    // Створює окремий об’єкт із JSON
+
+    /**
+     * Створює окремий ігровий об’єкт із JSON-даних.
+     *
+     * @param obj JSON-об’єкт із даними об’єкта
+     * @return створений ігровий об’єкт або null, якщо тип невідомий
+     */
     private GameObject createSingleObject(JSONObject obj) {
         String type = obj.getString("type");
         float x = obj.optFloat("x", 0.0f);
         float y = obj.optFloat("y", 0.0f);
-
-        // Створюємо properties і копіюємо ВСІ поля з оригінального об'єкта
         JSONObject properties = new JSONObject();
-
-        // Копіюємо всі існуючі поля
         for (String key : obj.keySet()) {
             properties.put(key, obj.get(key));
         }
-
-        // Додаємо/перезаписуємо координати
         properties.put("x", x);
         properties.put("y", y);
-
-        // Додаємо розміри, якщо є
         if (obj.has("width")) {
             properties.put("width", obj.getDouble("width"));
         }
         if (obj.has("height")) {
             properties.put("height", obj.getDouble("height"));
         }
-
-        // Обробляємо додаткові properties (якщо є)
         if (obj.has("properties")) {
             JSONArray props = obj.getJSONArray("properties");
             for (int i = 0; i < props.length(); i++) {
@@ -201,7 +216,6 @@ public class GameLoader {
                 properties.put(prop.getString("name"), prop.get("value"));
             }
         }
-
         switch (type) {
             case "Player":
                 return new Player(new Vector2D(x, y), properties);
@@ -218,10 +232,17 @@ public class GameLoader {
                 return null;
         }
     }
+
+    /**
+     * Створює головоломку з JSON-даних.
+     *
+     * @param obj JSON-об’єкт із даними головоломки
+     * @return створена головоломка або null, якщо тип невідомий
+     */
     public Puzzle createSinglePuzzle(JSONObject obj) {
         String type = obj.getString("type");
         if (!type.equals("Puzzle")) {
-            return null; // Пропускаємо, якщо не головоломка
+            return null;
         }
         JSONObject properties = new JSONObject();
         if (obj.has("properties")) {
@@ -259,9 +280,12 @@ public class GameLoader {
         }
     }
 
-    // --- Створення дефолтних файлів ---
-
-    // Створює дефолтні файли для рівня (викликається з LevelManager.createDefaultFiles())
+    /**
+     * Створює дефолтні файли для рівня на основі JSON-даних.
+     *
+     * @param levelData JSON-об’єкт із даними рівня
+     * @param levelId ідентифікатор рівня
+     */
     public void createDefaultFiles(JSONObject levelData, int levelId) {
         String basePath = "data/defaults/";
         JSONObject playerData = new JSONObject();
@@ -269,8 +293,7 @@ public class GameLoader {
         JSONObject doorData = new JSONObject();
         JSONObject cameraData = new JSONObject();
         JSONObject interactableData = new JSONObject();
-        JSONObject puzzleData = new JSONObject(); // Додаємо для головоломок
-
+        JSONObject puzzleData = new JSONObject();
         JSONArray layers = levelData.getJSONArray("layers");
         for (int i = 0; i < layers.length(); i++) {
             JSONObject layer = layers.getJSONObject(i);
@@ -303,8 +326,6 @@ public class GameLoader {
                 }
             }
         }
-
-        // Оновлюємо масив шляхів до файлів, додаючи файл для головоломок
         String[] filePaths = {
                 basePath + "player/player_level_" + levelId + ".json",
                 basePath + "police/police_level_" + levelId + ".json",
@@ -313,48 +334,48 @@ public class GameLoader {
                 basePath + "interactiveObjects/interactiveObjects_level_" + levelId + ".json",
                 basePath + "puzzles/puzzles_level_" + levelId + ".json"
         };
-
-        // Видаляємо старі файли
         for (String filePath : filePaths) {
             File file = new File(filePath);
             if (file.exists()) {
-                if (file.delete()) {
-                    System.out.println("Видалено старий файл: " + filePath);
-                } else {
+                if (!file.delete()) {
                     System.err.println("Не вдалося видалити старий файл: " + filePath);
                 }
             }
         }
-
-        // Створюємо директорії
         createDirectoryIfNotExists(basePath + "player/");
         createDirectoryIfNotExists(basePath + "police/");
         createDirectoryIfNotExists(basePath + "doors/");
         createDirectoryIfNotExists(basePath + "cameras/");
         createDirectoryIfNotExists(basePath + "interactiveObjects/");
-        createDirectoryIfNotExists(basePath + "puzzles/"); // Додаємо директорію для головоломок
-
-        // Зберігаємо файли
+        createDirectoryIfNotExists(basePath + "puzzles/");
         saveJSON(playerData, basePath + "player/player_level_" + levelId + ".json");
         saveJSON(policeData, basePath + "police/police_level_" + levelId + ".json");
         saveJSON(doorData, basePath + "doors/door_level_" + levelId + ".json");
         saveJSON(cameraData, basePath + "cameras/cameras_level_" + levelId + ".json");
         saveJSON(interactableData, basePath + "interactiveObjects/interactiveObjects_level_" + levelId + ".json");
-        saveJSON(puzzleData, basePath + "puzzles/puzzles_level_" + levelId + ".json"); // Зберігаємо головоломки
+        saveJSON(puzzleData, basePath + "puzzles/puzzles_level_" + levelId + ".json");
     }
-    // Створює директорію, якщо не існує
+
+    /**
+     * Створює директорію за вказаним шляхом, якщо вона не існує.
+     *
+     * @param path шлях до директорії
+     */
     private void createDirectoryIfNotExists(String path) {
         File directory = new File(path);
         if (!directory.exists()) {
-            if (directory.mkdirs()) {
-                System.out.println("Створено директорію: " + path);
-            } else {
+            if (!directory.mkdirs()) {
                 System.err.println("Не вдалося створити директорію: " + path);
             }
         }
     }
 
-    // Зберігає JSON у файл
+    /**
+     * Зберігає JSON-об’єкт у файл.
+     *
+     * @param data JSON-об’єкт для збереження
+     * @param filename шлях до файлу
+     */
     private void saveJSON(JSONObject data, String filename) {
         try (FileWriter writer = new FileWriter(filename)) {
             writer.write(data.toString(2));
@@ -363,9 +384,12 @@ public class GameLoader {
         }
     }
 
-    // --- Карта колізій ---
-
-    // Завантажує карту колізій із JSON
+    /**
+     * Завантажує карту колізій із JSON-даних рівня.
+     *
+     * @param levelData JSON-об’єкт із даними рівня
+     * @return список кімнат із межами колізій
+     */
     public List<GameManager.Room> loadCollisionMap(JSONObject levelData) {
         List<GameManager.Room> rooms = new ArrayList<>();
         if (levelData == null || !levelData.has("layers")) {

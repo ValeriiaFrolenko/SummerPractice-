@@ -19,48 +19,58 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-// Керує збереженням і завантаженням стану гри
+/**
+ * Клас для управління збереженням і завантаженням стану гри.
+ */
 public class SaveManager {
-    // Поля
-    private String saveDirectory; // Директорія для збережень (/data/saves/)
-    private GameLoader gameLoader; // Завантажувач JSON і ресурсів
+    /** Директорія для зберігання файлів збереження. */
+    private String saveDirectory;
+
+    /** Завантажувач JSON-файлів і ресурсів гри. */
+    private GameLoader gameLoader;
+
+    /** Назва файлу для збереження прогресу гри. */
     private static final String PROGRESS_FILE = "game_progress.json";
 
-    // Конструктор: ініціалізує менеджер збереження
+    /**
+     * Конструктор для ініціалізації менеджера збереження.
+     */
     public SaveManager() {
         saveDirectory = "data/saves/";
         gameLoader = new GameLoader();
         File dir = new File(saveDirectory);
         if (!dir.exists()) {
-            dir.mkdirs(); // Створюємо директорію, якщо вона не існує
+            dir.mkdirs();
         }
     }
 
-    // --- Збереження ---
-
-    // Зберігає стан гри (викликається з GameManager.saveGame())
+    /**
+     * Зберігає поточний стан гри у файл.
+     *
+     * @param gameState поточний стан гри
+     */
     public void saveGame(GameManager.GameState gameState) {
         JSONObject saveData = new JSONObject();
-        // Основні дані гри
         saveData.put("completedLevels", GameManager.getInstance().getCompletedLevels());
         saveData.put("currentLevelId", GameManager.getInstance().getCurrentLevelId());
         saveData.put("totalMoney", GameManager.getInstance().getTotalMoney());
         saveData.put("gameState", gameState.toString());
         saveData.put("code", GameManager.getInstance().getCode());
         saveData.put("temporaryMoney", GameManager.getInstance().getTemporaryMoney());
-        // Збереження об'єктів гри
         savePlayer(GameManager.getInstance().getPlayer());
         savePolice(GameManager.getInstance().getPolice());
         saveCameras(GameManager.getInstance().getCameras());
         saveDoors(GameManager.getInstance().getDoors());
         saveInteractiveObjects(GameManager.getInstance().getInteractables());
         savePuzzles(GameManager.getInstance().getPuzzles());
-
-        // Збереження всіх даних в один файл
         saveJSON(saveData, saveDirectory + PROGRESS_FILE);
     }
 
-    // Зберігає гравця
+    /**
+     * Зберігає дані гравця у файл.
+     *
+     * @param player об’єкт гравця
+     */
     public void savePlayer(Player player) {
         if (player == null) return;
         JSONObject data = new JSONObject();
@@ -68,7 +78,11 @@ public class SaveManager {
         saveJSON(data, saveDirectory + "player_current.json");
     }
 
-    // Зберігає поліцейських
+    /**
+     * Зберігає дані поліцейських у файл.
+     *
+     * @param police список поліцейських
+     */
     public void savePolice(List<Police> police) {
         JSONObject data = new JSONObject();
         for (int i = 0; i < police.size(); i++) {
@@ -77,7 +91,11 @@ public class SaveManager {
         saveJSON(data, saveDirectory + "police_current.json");
     }
 
-    // Зберігає камери
+    /**
+     * Зберігає дані камер спостереження у файл.
+     *
+     * @param cameras список камер
+     */
     public void saveCameras(List<SecurityCamera> cameras) {
         JSONObject data = new JSONObject();
         for (int i = 0; i < cameras.size(); i++) {
@@ -86,6 +104,11 @@ public class SaveManager {
         saveJSON(data, saveDirectory + "cameras_current.json");
     }
 
+    /**
+     * Зберігає дані дверей у файл.
+     *
+     * @param doors список дверей
+     */
     public void saveDoors(List<Door> doors) {
         JSONObject data = new JSONObject();
         for (int i = 0; i < doors.size(); i++) {
@@ -94,7 +117,11 @@ public class SaveManager {
         saveJSON(data, saveDirectory + "doors_current.json");
     }
 
-    // Зберігає інтерактивні об’єкти
+    /**
+     * Зберігає дані інтерактивних об’єктів у файл.
+     *
+     * @param interactables список інтерактивних об’єктів
+     */
     public void saveInteractiveObjects(List<Interactable> interactables) {
         JSONObject data = new JSONObject();
         int index = 0;
@@ -107,7 +134,11 @@ public class SaveManager {
         saveJSON(data, saveDirectory + "interactiveObjects_current.json");
     }
 
-    // Зберігає головоломки
+    /**
+     * Зберігає дані головоломок у файл.
+     *
+     * @param puzzles список головоломок
+     */
     public void savePuzzles(List<Puzzle> puzzles) {
         JSONObject data = new JSONObject();
         for (int i = 0; i < puzzles.size(); i++) {
@@ -116,11 +147,16 @@ public class SaveManager {
             puzzleData.put("puzzleType", getPuzzleType(puzzle));
             puzzleData.put("type", "Puzzle");
             data.put("puzzle_" + i, puzzleData);
-
         }
         saveJSON(data, saveDirectory + "puzzles_current.json");
     }
 
+    /**
+     * Визначає тип головоломки для збереження.
+     *
+     * @param puzzle об’єкт головоломки
+     * @return рядок із типом головоломки
+     */
     private String getPuzzleType(Puzzle puzzle) {
         if (puzzle instanceof CodeLockPuzzle) return "CodeLockPuzzle";
         if (puzzle instanceof LockPickPuzzle) return "LockPickPuzzle";
@@ -128,18 +164,25 @@ public class SaveManager {
         return "UNKNOWN";
     }
 
-    // Зберігає JSON у файл
+    /**
+     * Зберігає JSON-дані у вказаний файл.
+     *
+     * @param data JSON-об’єкт для збереження
+     * @param filename шлях до файлу
+     */
     private void saveJSON(JSONObject data, String filename) {
         try (FileWriter writer = new FileWriter(filename)) {
             writer.write(data.toString(2));
         } catch (IOException e) {
-            System.out.println("Не можу зберегти файл: " + filename);
+            System.err.println("Не можу зберегти файл: " + filename);
         }
     }
 
-    // --- Завантаження ---
-
-    // Завантажує гру з файлу (викликається з LevelManager.loadFromSave())
+    /**
+     * Завантажує стан гри з файлу.
+     *
+     * @param filename шлях до файлу збереження
+     */
     public void loadGame(String filename) {
         JSONObject saveData = gameLoader.loadJSON(filename);
         if (saveData == null) {
@@ -183,15 +226,4 @@ public class SaveManager {
         GameManager.getInstance().setCurrentLevelId(saveData.getInt("currentLevelId"));
     }
 
-    // --- Геттери ---
-
-    // Повертає список файлів збереження для меню
-    public List<String> getSaveFiles() {
-        List<String> filenames = new ArrayList<>();
-        File progressFile = new File(saveDirectory + PROGRESS_FILE);
-        if (progressFile.exists()) {
-            filenames.add(saveDirectory + PROGRESS_FILE);
-        }
-        return filenames;
-    }
 }
