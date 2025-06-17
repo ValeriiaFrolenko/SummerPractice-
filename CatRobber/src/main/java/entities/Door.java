@@ -168,6 +168,7 @@ public class Door implements GameObject, Interactable {
         }
     }
 
+
     public void unlock() {
         this.isLocked = false;
         this.isOpen = true;
