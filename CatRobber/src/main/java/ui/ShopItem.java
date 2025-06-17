@@ -9,11 +9,18 @@ public class ShopItem {
     private final ItemType itemType; // Тип предмета
     private final String spritePath; // Шлях до зображення (/assets/images/)
 
-    // Енум для типів предметів
+    /** Типи предметів **/
     public enum ItemType { KEY, GUN, SPEED_BOOST, INVISIBILITY }
 
-    // Конструктор
-    // Ініціалізує предмет
+    /**
+     * Створює новий об'єкт ShopItem з вказаними параметрами
+     * @param name назва предмета
+     * @param price ціна предмета
+     * @param description опис предмета
+     * @param itemType тип предмета
+     * @param spritePath шлях до зображення предмета
+     * @throws IllegalArgumentException якщо будь-який параметр є недійсним
+     */
     public ShopItem(String name, int price, String description, ItemType itemType, String spritePath) {
         if (name == null || name.trim().isEmpty()) {
             throw new IllegalArgumentException("Назва предмета не може бути null або порожньою");
@@ -38,32 +45,42 @@ public class ShopItem {
         this.spritePath = spritePath.trim();
     }
 
-    // Повертає назву предмета
-    // Використовується в Shop.createShopUI
+    /**
+     * Повертає назву предмета
+     * @return назва предмета
+     */
     public String getName() {
         return name;
     }
 
-    // Повертає ціну предмета
-    // Використовується в Shop.buyItem
+    /**
+     * Повертає ціну предмета
+     * @return ціна предмета
+     */
     public int getPrice() {
         return price;
     }
 
-    // Повертає опис предмета
-    // Використовується в Shop.createShopUI
+    /**
+     * Повертає опис предмета
+     * @return опис предмета
+     */
     public String getDescription() {
         return description;
     }
 
-    // Повертає тип предмета
-    // Використовується в Player.inventory
+    /**
+     * Повертає тип предмета
+     * @return тип предмета
+     */
     public ItemType getItemType() {
         return itemType;
     }
 
-    // Повертає шлях до зображення
-    // Використовується в Shop.createShopUI
+    /**
+     * Повертає шлях до зображення предмета
+     * @return шлях до зображення
+     */
     public String getSpritePath() {
         return spritePath;
     }

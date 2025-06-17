@@ -23,22 +23,31 @@ import utils.GameLoader;
 
 import java.util.Random;
 
+/**
+ * Клас, який представляє вікно з інтерактивним об'єктом у грі.
+ * Відповідає за створення UI, обробку подій та навігацію вмістом.
+ */
 public class InteractiveObjectWindow {
-    private JSONObject config;
-    private Pane root;
-    private UIManager.WindowType windowType;
+    private JSONObject config; //об’єкт конфігурації у форматі JSON, що містить налаштування вікна або браузера
+    private Pane root; //кореневий контейнер цього інтерфейсного вікна
+    private UIManager.WindowType windowType; //тип вікна, що визначається через UIManager.WindowType (наприклад, TERMINAL, COMPUTER тощо)
 
     // Змінні для браузера
-    private int currentPage = 0;
-    private final int totalPages = 2;
-    private Pane browserContentArea;
-    private Label pageIndicator;
-    private Button prevButton;
-    private Button nextButton;
-    private String vaultCode;
-    private GameLoader gameLoader;
-    private final SoundManager soundManager = SoundManager.getInstance();
+    private int currentPage = 0; //поточна сторінка, яка відображається в браузері
+    private final int totalPages = 2; //загальна кількість сторінок у браузері
+    private Pane browserContentArea; //область, у якій відображається вміст поточної сторінки браузера
+    private Label pageIndicator; //позначка індикації номера сторінки (наприклад, "1 з 2")
+    private Button prevButton; //кнопка для переходу на попередню сторінку
+    private Button nextButton; //кнопка для переходу на наступну сторінку
+    private String vaultCode; //код сейфу, який може бути зчитаний або введений користувачем
+    private GameLoader gameLoader; //завантажувач ресурсів
+    private final SoundManager soundManager = SoundManager.getInstance(); //менеджер звуків, що відповідає за відтворення аудіо-ефектів
 
+    /**
+     * Конструктор створює вікно заданого типу з налаштуваннями з JSON-конфігурації
+     * @param windowType тип вікна
+     * @param config конфігурація у форматі JSON
+     */
     public InteractiveObjectWindow(UIManager.WindowType windowType, JSONObject config) {
         this.config = config;
         this.windowType = windowType;
@@ -48,6 +57,10 @@ public class InteractiveObjectWindow {
         initializeUI(config);
     }
 
+    /**
+     * Ініціалізує графічний інтерфейс вікна залежно від типу вікна та конфігурації
+     * @param config JSON-об'єкт з налаштуваннями для вікна
+     */
     private void initializeUI(JSONObject config) {
         if (windowType == UIManager.WindowType.COMPUTER) {
             root.setPrefSize(800, 600);
@@ -92,6 +105,10 @@ public class InteractiveObjectWindow {
         root.setOnKeyPressed(this::handleKeyPress);
     }
 
+    /**
+     * Обробляє натискання клавіш у вікні
+     * @param event подія натискання клавіші
+     */
     private void handleKeyPress(KeyEvent event) {
         if (windowType == UIManager.WindowType.COMPUTER) {
             switch (event.getCode()) {
@@ -114,6 +131,13 @@ public class InteractiveObjectWindow {
         }
     }
 
+    /**
+     * Створює вміст вікна залежно від його типу
+     * Викликає відповідний метод для формування контенту:
+     * - для NOTE і PICTURE — створює нотатки або зображення,
+     * - для COMPUTER — створює інтерфейс комп’ютера,
+     * - для VICTORY і GAME_OVER — створює вміст кінця гри.
+     */
     private void createWindowContent() {
         switch (windowType) {
             case NOTE:
@@ -130,6 +154,11 @@ public class InteractiveObjectWindow {
         }
     }
 
+    /**
+     * Створює інтерфейс вмісту вікна типу COMPUTER
+     * Додає панель браузера з кнопками керування, адресний рядок,
+     * область відображення контенту, кнопки навігації, індикатор сторінки та кнопку закриття вікна.
+     */
     private void createComputerContent() {
         // Заголовок браузера
         Pane browserBar = new Pane();
@@ -182,6 +211,13 @@ public class InteractiveObjectWindow {
         updateBrowserPage();
     }
 
+    /**
+     * Додає кольорову кнопку до панелі браузера
+     * @param parent Панель, до якої додається кнопка
+     * @param x Горизонтальна позиція кнопки в панелі
+     * @param y Вертикальна позиція кнопки в панелі
+     * @param color Колір кнопки.
+     */
     private void addBrowserButton(Pane parent, double x, double y, Color color) {
         Pane button = new Pane();
         button.setBackground(new Background(new BackgroundFill(
@@ -192,6 +228,11 @@ public class InteractiveObjectWindow {
         parent.getChildren().add(button);
     }
 
+    /**
+     * Створює кнопки навігації "Назад" і "Вперед" для браузера
+     * Кнопки розташовуються внизу вікна, мають стиль і обробники подій для переходу між сторінками
+     * При наведенні кнопки змінюють колір, а при натисканні відтворюють звук і викликають навігацію
+     */
     private void createNavigationButtons() {
         prevButton = new Button("◀ Назад");
         prevButton.setFont(FontManager.getInstance().getFont("Hardpixel", 14));
@@ -229,6 +270,9 @@ public class InteractiveObjectWindow {
         root.getChildren().addAll(prevButton, nextButton);
     }
 
+    /**
+     * Створює кнопку закриття вікна комп'ютера
+     */
     private void createComputerCloseButton() {
         Button closeButton = new Button("✖");
         closeButton.setFont(FontManager.getInstance().getFont("Hardpixel", 18));
@@ -250,6 +294,10 @@ public class InteractiveObjectWindow {
         root.getChildren().add(closeButton);
     }
 
+    /**
+     * Змінює поточну сторінку браузера на основі напрямку навігації
+     * @param direction Напрямок навігації: -1 для попередньої сторінки, +1 для наступної
+     */
     private void navigatePage(int direction) {
         int newPage = currentPage + direction;
         if (newPage >= 0 && newPage < totalPages) {
@@ -258,6 +306,10 @@ public class InteractiveObjectWindow {
         }
     }
 
+    /**
+     * Оновлює контент браузера залежно від поточної сторінки, оновлює індикатор сторінки та активність кнопок навігації
+     * Відповідає за візуальне відображення сторінок і керування кнопками "Назад" та "Вперед"
+     */
     private void updateBrowserPage() {
         browserContentArea.getChildren().clear();
 
@@ -286,6 +338,10 @@ public class InteractiveObjectWindow {
         }
     }
 
+    /**
+     * Створює контент сторінки з імітацією пошукової сторінки Google
+     * Елементи додаються у контейнер browserContentArea
+     */
     private void createGoogleSearchPage() {
         // Білий фон Google
         Rectangle background = new Rectangle(760, 500);
@@ -354,6 +410,11 @@ public class InteractiveObjectWindow {
         }
     }
 
+    /**
+     * Створює інтерфейс сторінки "Vault Code" — банківської системи безпеки
+     * Всі елементи додаються до browserContentArea
+     * Код сховища також зберігається в GameManager для подальшого використання
+     */
     private void createVaultCodePage() {
         // Темно-синій фон для банківської системи
         Rectangle background = new Rectangle(760, 500);
@@ -476,6 +537,9 @@ public class InteractiveObjectWindow {
         GameManager.getInstance().setCode(vaultCode);
     }
 
+    /**
+     * Створює вміст нотатки з фоновим зображенням і відображенням коду сховища
+     */
     private void createNoteContent() {
         // Set background image
         root.setBackground(new Background(new BackgroundImage(
@@ -500,38 +564,10 @@ public class InteractiveObjectWindow {
         createCloseButton();
     }
 
-    private void createPictureContent() {
-        Label pictureTitle = new Label(config.optString("title", "Зображення"));
-        pictureTitle.setFont(FontManager.getInstance().getFont("Hardpixel", 20));
-        pictureTitle.setStyle("-fx-font-weight: bold;");
-        pictureTitle.setTextFill(Color.WHITE);
-        pictureTitle.setLayoutX(20);
-        pictureTitle.setLayoutY(20);
-        root.getChildren().add(pictureTitle);
-
-        // Заміна зображення на емодзі
-        String pictureEmoji = config.optString("emoji", "🖼️");
-        Label pictureDisplay = new Label(pictureEmoji);
-        pictureDisplay.setFont(FontManager.getInstance().getFont("Hardpixel", 80));
-        pictureDisplay.setLayoutX(160);
-        pictureDisplay.setLayoutY(100);
-        root.getChildren().add(pictureDisplay);
-
-        String description = config.optString("description", "");
-        if (!description.isEmpty()) {
-            Label pictureDescription = new Label(description);
-            pictureDescription.setFont(FontManager.getInstance().getFont("Hardpixel", 14));
-            pictureDescription.setTextFill(Color.LIGHTGRAY);
-            pictureDescription.setLayoutX(20);
-            pictureDescription.setLayoutY(220);
-            pictureDescription.setWrapText(true);
-            pictureDescription.setPrefWidth(360);
-            root.getChildren().add(pictureDescription);
-        }
-
-        createCloseButton();
-    }
-
+    /**
+     * Створює вікно кінця гри з інтерфейсом для перемоги або поразки
+     * Відображає відповідні повідомлення, кнопки та запускає звуки
+     */
     private void createEndGameContent() {
         boolean isVictory = (windowType == UIManager.WindowType.VICTORY);
 
@@ -680,6 +716,10 @@ public class InteractiveObjectWindow {
         }
     }
 
+    /**
+     * Відображає повідомлення про проходження всіх рівнів та кнопку повернення в меню
+     * Очищає попередній контент і налаштовує інтерфейс фінального екрану
+     */
     private void showAllLevelsCompleted() {
         Label completedLabel = new Label("🏆 ВСІ РІВНІ ПРОЙДЕНО! 🏆");
         completedLabel.setFont(FontManager.getInstance().getFont("Hardpixel", 24));
@@ -720,6 +760,11 @@ public class InteractiveObjectWindow {
         root.getChildren().add(menuButton);
     }
 
+    /**
+     * Конвертує колір у шістнадцятковий рядок у форматі #RRGGBB
+     * @param color Колір для конвертації
+     * @return Шістнадцятковий рядок кольору
+     */
     private String toHexString(Color color) {
         return String.format("#%02X%02X%02X",
                 (int) (color.getRed() * 255),
@@ -727,6 +772,12 @@ public class InteractiveObjectWindow {
                 (int) (color.getBlue() * 255));
     }
 
+    /**
+     * Створює стилізовану кнопку з заданим текстом і кольором рамки
+     * @param text  Текст кнопки
+     * @param color Колір рамки та фону при наведенні
+     * @return Стилізована кнопка з ефектами наведення
+     */
     private Button createStyledButton(String text, Color color) {
         Button button = new Button(text);
         button.setFont(FontManager.getInstance().getFont("Hardpixel", 16));
@@ -787,7 +838,10 @@ public class InteractiveObjectWindow {
         return button;
     }
 
-
+    /**
+     * Створює кнопку закриття вікна
+     * Кнопка з'являється у верхньому правому куті та закриває вікно при натисканні
+     */
     private void createCloseButton() {
         Button closeButton = new Button("✖");
         closeButton.setFont(FontManager.getInstance().getFont("Hardpixel", 14));
@@ -811,10 +865,18 @@ public class InteractiveObjectWindow {
         root.getChildren().add(closeButton);
     }
 
+    /**
+     * Повертає кореневий вузол інтерфейсу
+     * @return кореневий вузол (root) типу Node
+     */
     public Node getUI() {
         return root;
     }
 
+    /**
+     * Закриває поточне вікно UI, прибираючи його з батьківського контейнера,
+     * та відновлює стан гри до PLAYING. Також викликає метод UIManager для приховування UI
+     */
     private void closeWindow() {
         try {
             UIManager.getInstance().hideInteractiveObjectUI();

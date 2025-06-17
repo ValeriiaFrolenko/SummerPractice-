@@ -24,20 +24,25 @@ import utils.GameLoader;
 import main.GameWindow;
 
 public class Menu implements UIWindow {
-    private VBox menuPane;
-    private VBox splashPane;
-    private VBox levelSelectPane;
-    private StackPane rootPane;
-    private boolean showingSplash = true;
-    private boolean menuVisible = false;
-    private boolean levelSelectionVisible = false;
-    private ComboBox<String> locationChoice;
-    private GameLoader gameLoader = new GameLoader();
-    private UIManager uiManager;
-    private final SoundManager soundManager = SoundManager.getInstance();
+    private VBox menuPane; //панель головного меню.
+    private VBox splashPane; //панель-заставка, що відображається перед головним меню
+    private VBox levelSelectPane; //панель вибору рівня
+    private StackPane rootPane; //кореневий контейнер, який об'єднує всі панелі
+    private boolean showingSplash = true; //прапорець, що вказує, чи наразі відображається заставка
+    private boolean menuVisible = false; //прапорець, що вказує, чи головне меню відображається.
+    private boolean levelSelectionVisible = false; //прапорець, що вказує, чи панель вибору рівня відображається
+    private ComboBox<String> locationChoice; //випадаючий список для вибору локації
+    private GameLoader gameLoader = new GameLoader(); //завантажувач ресурсів гри
+    private UIManager uiManager; //менеджер інтерфейсу користувача, відповідальний за перемикання вікон
+    private final SoundManager soundManager = SoundManager.getInstance(); //менеджер звуків, використовується для програвання аудіо-ефектів
 
+    /**
+     * Створює об'єкт меню з початковими даними та ініціалізує інтерфейс
+     * @param defaultData Об'єкт JSON з початковими налаштуваннями гри
+     */
     public Menu(JSONObject defaultData) {
         uiManager = GameWindow.getInstance().getUIManager();
+        soundManager.playMusic("menu.mp3");
         createSplashScreen();
         createMainMenuUI();
         createLevelSelectUI();
@@ -45,6 +50,9 @@ public class Menu implements UIWindow {
         startSplashSequence();
     }
 
+    /**
+     * Створює заставку, яка показується при запуску гри
+     */
     private void createSplashScreen() {
         splashPane = new VBox();
         splashPane.setAlignment(Pos.CENTER);
@@ -102,6 +110,9 @@ public class Menu implements UIWindow {
         splashPane.setVisible(true);
     }
 
+    /**
+     * Створює головне меню з кнопками: продовжити, обрати рівень, крамниця, вихід
+     */
     private void createMainMenuUI() {
         menuPane = new VBox(30);
         menuPane.setAlignment(Pos.CENTER);
@@ -158,6 +169,9 @@ public class Menu implements UIWindow {
         menuPane.getChildren().addAll(title, subtitle, continueButton, selectLevelButton, shopButton, exitButton);
     }
 
+    /**
+     * Створює інтерфейс вибору рівня, де гравець може обрати одну з доступних локацій
+     */
     private void createLevelSelectUI() {
         levelSelectPane = new VBox(30);
         levelSelectPane.setAlignment(Pos.CENTER);
@@ -187,7 +201,6 @@ public class Menu implements UIWindow {
         subtitle.setTextFill(Color.web("#D4A76A"));
 
         locationChoice = new ComboBox<>();
-        JSONObject progress = gameLoader.loadJSON("data/saves/game_progress.json");
         locationChoice.getItems().add("🏠 БУДИНОК — Легко: Почни свою грабіжницьку кар’єру з дрібної крадіжки. Шкарпетки не рахуються");
         locationChoice.getItems().add("🏛️ МУЗЕЙ — Середньо: Увірвися до галереї вночі, щоб таємно повернути кошачий діамант — і зберегти честь гільдії");
         locationChoice.getItems().add("🏦 БАНК — Важко: Проникни в опечатане сховище, де корпорація «Віскас» зберігає стратегічні запаси корму");
@@ -258,6 +271,9 @@ public class Menu implements UIWindow {
         levelSelectPane.getChildren().addAll(levelTitle, subtitle, locationChoice, confirmButton, backButton);
     }
 
+    /**
+     * Створює головну панель гри, куди додаються заставка, головне меню та меню вибору рівня
+     */
     private void createRootPane() {
         rootPane = new StackPane();
         rootPane.setPrefSize(1280, 640);
@@ -270,8 +286,10 @@ public class Menu implements UIWindow {
         rootPane.getChildren().addAll(splashPane, menuPane, levelSelectPane);
     }
 
+    /**
+     * Запускає анімацію збільшення лапки на заставці
+     */
     private void startSplashSequence() {
-        soundManager.playMusic("menu.mp3");
         Label catPaw = (Label) splashPane.getChildren().get(1);
         ScaleTransition logoScale = new ScaleTransition(Duration.seconds(1.2), catPaw);
         logoScale.setFromX(0.5);
@@ -282,6 +300,9 @@ public class Menu implements UIWindow {
         logoScale.play();
     }
 
+    /**
+     * Плавно приховує заставку та показує головне меню
+     */
     private void transitionToMenu() {
         if (!showingSplash) return;
         showingSplash = false;
@@ -306,6 +327,10 @@ public class Menu implements UIWindow {
         transition.play();
     }
 
+
+    /**
+     * Приховує головне меню та показує меню вибору рівня
+     */
     private void showLevelSelect() {
         menuPane.setVisible(false);
         menuVisible = false;
@@ -323,6 +348,9 @@ public class Menu implements UIWindow {
         levelFadeIn.play();
     }
 
+    /**
+     * Приховує меню вибору рівня та показує головне меню
+     */
     private void showMainMenu() {
         levelSelectPane.setVisible(false);
         levelSelectionVisible = false;
@@ -339,6 +367,13 @@ public class Menu implements UIWindow {
         });
         menuFadeIn.play();
     }
+
+    /**
+     * Створює стилізовану кнопку з заданим текстом і кольором фону
+     * @param text текст кнопки
+     * @param color колір фону кнопки
+     * @return новий об'єкт Button зі стилем
+     */
     private Button createCuteButton(String text, Color color) {
         Button button = new Button(text);
         button.setFont(FontManager.getInstance().getFont("Hardpixel", 22));
@@ -397,6 +432,9 @@ public class Menu implements UIWindow {
         return button;
     }
 
+    /**
+     * Продовжує гру, завантажуючи останній збережений рівень
+     */
     private void continueGame() {
         soundManager.playMusic("game.mp3");
         GameManager.getInstance().setGameState(GameManager.GameState.PLAYING);
@@ -420,6 +458,10 @@ public class Menu implements UIWindow {
         GameManager.getInstance().loadLevel(currentLevel, false);
     }
 
+    /**
+     * Починає гру з обраного рівня.
+     * @param levelId ідентифікатор рівня для запуску
+     */
     private void startLevel(int levelId) {
         soundManager.playMusic("game.mp3");
         GameManager.getInstance().setGameState(GameManager.GameState.PLAYING);
@@ -441,13 +483,20 @@ public class Menu implements UIWindow {
 
     }
 
-
+    /**
+     * Відкриває вікно крамниці
+     */
     private void openShop() {
         GameManager.getInstance().loadProgress();
         uiManager.createWindow(UIManager.WindowType.SHOP, new JSONObject());
         hide();
     }
 
+    /**
+     * Повертає номер рівня, обраного у випадаючому списку
+     * Визначає рівень за текстом вибраного пункту
+     * @return ідентифікатор обраного рівня (1, 2 або 3)
+     */
     private int getSelectedLevel() {
         String selected = locationChoice.getValue();
         if (selected.contains("БУДИНОК")) return 1;
@@ -456,6 +505,11 @@ public class Menu implements UIWindow {
         return 1;
     }
 
+    /**
+     * Конвертує об'єкт Color у шістнадцятковий рядок кольору у форматі "#RRGGBB"
+     * @param color колір для конвертації
+     * @return рядок із шістнадцятковим кодом кольору
+     */
     private String toHexString(Color color) {
         return String.format("#%02X%02X%02X",
                 (int) (color.getRed() * 255),
@@ -463,7 +517,9 @@ public class Menu implements UIWindow {
                 (int) (color.getBlue() * 255));
     }
 
-    // In Menu.java
+    /**
+     * Відображає головне меню одразу, без показу заставки.
+     */
     public void showWithoutSplash() {
         showingSplash = false;
         splashPane.setVisible(false);
@@ -485,6 +541,11 @@ public class Menu implements UIWindow {
         });
     }
 
+    /**
+     * Відображає головний контейнер меню
+     * Якщо контейнер ще не доданий до UIManager, додає його
+     * Відновлює видимість та стан панелей залежно від того, чи показується заставка, чи ні
+     */
     @Override
     public void show() {
         // Додаємо до UIManager якщо ще не додано
@@ -494,7 +555,7 @@ public class Menu implements UIWindow {
 
         // Відновлюємо всі властивості
         rootPane.setVisible(true);
-        rootPane.setMouseTransparent(false); // ❗ ВАЖЛИВО!
+        rootPane.setMouseTransparent(false);
         rootPane.setFocusTraversable(true);
 
         // Відновлюємо обробник подій
@@ -519,6 +580,10 @@ public class Menu implements UIWindow {
         });
     }
 
+    /**
+     * Ховає головний контейнер меню та відключає взаємодію з ним
+     * Очищує обробники подій та скидає стани видимості панелей
+     */
     @Override
     public void hide() {
         // Ховаємо rootPane
@@ -532,35 +597,22 @@ public class Menu implements UIWindow {
         showingSplash = false;
         menuVisible = false;
         levelSelectionVisible = false;
-
-        // НЕ очищуємо children - це може пошкодити UI!
     }
 
-    // ДОДАТКОВИЙ МЕТОД ДЛЯ ПОВЕРНЕННЯ З МАГАЗИНУ
-    public void returnFromShop() {
-        System.out.println("Returning from shop to menu");
-
-        // Повністю скидаємо стан
-        showingSplash = false;
-        menuVisible = true;
-        levelSelectionVisible = false;
-
-        // Показуємо правильні панелі
-        splashPane.setVisible(false);
-        menuPane.setVisible(true);
-        levelSelectPane.setVisible(false);
-
-        // Показуємо меню
-        show();
-    }
-
-
+    /**
+     * Повертає кореневий вузол UI для відображення
+     * @return rootPane — головний контейнер панелі
+     */
     @Override
     public Node getRoot() {
         return rootPane;
     }
-    public void handleInput(KeyEvent event) {
 
+    /**
+     * Обробляє натискання клавіш на клавіатурі
+     * @param event подія натискання клавіші
+     */
+    public void handleInput(KeyEvent event) {
         if (showingSplash) {
             transitionToMenu();
             event.consume();
@@ -573,5 +625,4 @@ public class Menu implements UIWindow {
             event.consume();
         }
     }
-
 }

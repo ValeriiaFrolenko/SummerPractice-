@@ -23,15 +23,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ShopPane implements UIWindow {
-    private StackPane rootPane;
-    private GridPane shopPane;
-    private static List<ShopItem> items;
-    private int money;
-    private Button[] itemButtons;
-    private Label moneyLabel;
-    private Button backButton;
-    private GameLoader gameLoader;
+    private StackPane rootPane; //кореневий контейнер вікна магазину
+    private GridPane shopPane; //контейнер для елементів магазину (товари, кнопки, заголовки)
+    private static List<ShopItem> items; //список доступних товарів у магазині
+    private int money; //кількість монет у гравця
+    private Button[] itemButtons; //масив кнопок для покупки товарів
+    private Label moneyLabel; //мітка, що показує кількість монет гравця
+    private Button backButton; //кнопка для повернення до головного меню
+    private GameLoader gameLoader; //завантажувач ресурсів, зокрема зображень товарів
 
+    /**
+     * Конструктор класу ShopPane. Ініціалізує товари, створює інтерфейс магазину та кореневий контейнер
+     */
     public ShopPane() {
         gameLoader = new GameLoader();
         this.money = GameManager.getInstance().getTotalMoney();
@@ -40,6 +43,10 @@ public class ShopPane implements UIWindow {
         createRootPane();
     }
 
+    /**
+     * Повертає список товарів магазину
+     * @return копія списку товарів магазину
+     */
     public static List<ShopItem> getItems() {
         if (items == null) {
             ShopPane shop = new ShopPane();
@@ -48,6 +55,9 @@ public class ShopPane implements UIWindow {
         return new ArrayList<>(items);
     }
 
+    /**
+     * Ініціалізує список доступних для купівлі товарів
+     */
     private void initializeItems() {
         items = new ArrayList<>();
         items.add(new ShopItem("Невидимість", 100, "Стаєш невидимим на 10 секунд.\nЗастосовується автоматично після купівлі.", ShopItem.ItemType.INVISIBILITY, "UI/invisibility.png"));
@@ -56,6 +66,9 @@ public class ShopPane implements UIWindow {
         items.add(new ShopItem("Пістолет", 150, "Дозволяє стріляти по ворогах.\nВикористовується кнопкою F.", ShopItem.ItemType.GUN, "UI/gun.png"));
     }
 
+    /**
+     * Створює основний інтерфейс магазину, включаючи товари, заголовки та кнопку повернення
+     */
     private void createShopUI() {
         shopPane = new GridPane();
         shopPane.setAlignment(Pos.CENTER);
@@ -167,6 +180,9 @@ public class ShopPane implements UIWindow {
         });
     }
 
+    /**
+     * Створює кореневий контейнер магазину (StackPane) і додає до нього інтерфейс
+     */
     private void createRootPane() {
         rootPane = new StackPane();
         rootPane.setPrefSize(1280, 640);
@@ -175,6 +191,12 @@ public class ShopPane implements UIWindow {
         rootPane.setOnKeyPressed(this::handleInput);
     }
 
+    /**
+     * Створює кнопку з кастомним стилем і поведінкою при наведенні
+     * @param text текст кнопки
+     * @param color основний колір обводки і фону
+     * @return стилізована кнопка
+     */
     private Button createCuteButton(String text, Color color) {
         Button button = new Button(text);
         button.setFont(FontManager.getInstance().getFont("Hardpixel", 14));
@@ -234,6 +256,10 @@ public class ShopPane implements UIWindow {
         return button;
     }
 
+    /**
+     * Обробляє натискання клавіш. ESC закриває магазин
+     * @param event подія клавіатури
+     */
     private void handleInput(KeyEvent event) {
         if (event.getCode() == KeyCode.ESCAPE) {
             UIManager.getInstance().hideCurrentWindowToMenu();
@@ -241,22 +267,32 @@ public class ShopPane implements UIWindow {
         }
     }
 
+    /**
+     * Обробляє купівлю товару. Якщо купівля успішна — оновлює баланс грошей
+     * @param item товар для купівлі
+     */
     private void buyItem(ShopItem item) {
         if (GameManager.getInstance().buyItem(item)) {
             updateMoney(GameManager.getInstance().getTotalMoney());
         }
     }
 
+    /**
+     * Оновлює поточну кількість грошей у відображенні магазину
+     * @param newAmount нове значення грошей
+     */
     private void updateMoney(int newAmount) {
         money = newAmount;
         moneyLabel.setText("Гроші: " + money + " монет");
     }
 
+    /**
+     * Відображає вікно магазину та фокусує його
+     */
     @Override
     public void show() {
-        // Обов'язково відновлюємо всі властивості
         rootPane.setVisible(true);
-        rootPane.setMouseTransparent(false); // ❗ ВАЖЛИВО!
+        rootPane.setMouseTransparent(false);
         rootPane.setFocusTraversable(true);
 
         // Відновлюємо обробник клавіш
@@ -265,33 +301,36 @@ public class ShopPane implements UIWindow {
         // Оновлюємо гроші
         updateMoney(GameManager.getInstance().getTotalMoney());
 
-        // Запитуємо фокус через Platform.runLater
         javafx.application.Platform.runLater(() -> {
             rootPane.requestFocus();
         });
     }
 
+    /**
+     * Ховає вікно магазину та відключає обробку клавіш
+     */
     @Override
     public void hide() {
-        // НЕ очищуємо children - це руйнує кнопки!
         rootPane.setVisible(false);
         rootPane.setMouseTransparent(true);
 
-        // Очищуємо тільки обробник подій
         rootPane.setOnKeyPressed(null);
-
-        // НЕ робимо clear() - це головна проблема:
-        // rootPane.getChildren().clear(); // ❌ НЕ РОБИТИ!
-        // shopPane.getChildren().clear(); // ❌ НЕ РОБИТИ!
     }
 
-
-
+    /**
+     * Повертає кореневий елемент інтерфейсу магазину
+     * @return кореневий вузол
+     */
     @Override
     public Node getRoot() {
         return rootPane;
     }
 
+    /**
+     * Перетворює колір JavaFX Color у рядок HEX (наприклад, #FF0000)
+     * @param color колір
+     * @return рядок кольору у форматі HEX
+     */
     private String toHexString(Color color) {
         return String.format(
                 "#%02X%02X%02X",
