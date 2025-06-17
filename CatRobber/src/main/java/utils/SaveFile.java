@@ -2,23 +2,37 @@ package utils;
 
 import org.json.JSONObject;
 
-// Представляє метадані файлу збереження
+/**
+ * Клас для представлення метаданих файлу збереження гри.
+ */
 public class SaveFile {
-    // Поля
-    private String fileName; // Шлях до файлу збереження
-    private int levelId; // ID рівня
-    private String timestamp; // Час створення збереження
+    /** Шлях до файлу збереження. */
+    private String fileName;
 
-    // Конструктор: ініціалізує файл збереження
+    /** Ідентифікатор рівня гри. */
+    private int levelId;
+
+    /** Час створення файлу збереження. */
+    private String timestamp;
+
+    /**
+     * Конструктор для ініціалізації об’єкта збереження.
+     *
+     * @param fileName шлях до файлу збереження
+     * @param levelId ідентифікатор рівня гри
+     * @param timestamp час створення збереження
+     */
     public SaveFile(String fileName, int levelId, String timestamp) {
         this.fileName = fileName;
         this.levelId = levelId;
         this.timestamp = timestamp;
     }
 
-    // --- Серіалізація ---
-
-    // Повертає JSON-метадані збереження
+    /**
+     * Серіалізує метадані збереження у JSON-об’єкт.
+     *
+     * @return JSON-об’єкт із метаданими збереження
+     */
     public JSONObject toJSON() {
         JSONObject json = new JSONObject();
         json.put("fileName", fileName);
@@ -27,26 +41,40 @@ public class SaveFile {
         return json;
     }
 
-    // Ініціалізує з JSON
+    /**
+     * Ініціалізує об’єкт із JSON-даних.
+     *
+     * @param data JSON-об’єкт із метаданими збереження
+     */
     public void fromJSON(JSONObject data) {
         this.fileName = data.getString("fileName");
         this.levelId = data.getInt("levelId");
         this.timestamp = data.getString("timestamp");
     }
 
-    // --- Геттери ---
-
-    // Повертає назву файлу
+    /**
+     * Повертає шлях до файлу збереження.
+     *
+     * @return шлях до файлу
+     */
     public String getFileName() {
         return fileName;
     }
 
-    // Повертає ID рівня
+    /**
+     * Повертає ідентифікатор рівня гри.
+     *
+     * @return ID рівня
+     */
     public int getLevelId() {
         return levelId;
     }
 
-    // Повертає час створення
+    /**
+     * Повертає час створення збереження.
+     *
+     * @return час створення у вигляді рядка
+     */
     public String getTimestamp() {
         return timestamp;
     }
