@@ -20,6 +20,12 @@ import utils.Vector2D;
 
 import java.util.Random;
 
+
+/**
+ * Представляє інтерактивний об'єкт у грі, з яким гравець може взаємодіяти:
+ * наприклад, записки, картини, комп'ютери, електрощити тощо.
+ * Реалізує інтерфейси {@link GameObject} та {@link Interactable}.
+ */
 public class InteractiveObject implements GameObject, Interactable {
     private final String path = "interactiveObjects/";
     private double imageX, imageY, imageWidth, imageHeight;
@@ -32,8 +38,25 @@ public class InteractiveObject implements GameObject, Interactable {
     private double targetImageX;
     private final SoundManager soundManager = SoundManager.getInstance();
 
-    public enum Type { NOTE, PICTURE, COMPUTER, ELECTRICAL_PANEL, WITH_MONEY, FINAL_PRIZE }
+    /**
+     * Типи інтерактивних об'єктів.
+     */
+    public enum Type {
+        NOTE,              // Записка з кодом
+        PICTURE,           // Картина, яку можна посунути
+        COMPUTER,          // Комп'ютер для взаємодії
+        ELECTRICAL_PANEL,  // Панель з головоломкою (лазер)
+        WITH_MONEY,        // Об'єкт із грошима
+        FINAL_PRIZE        // Кінцева нагорода
+    }
 
+
+    /**
+     * Створює інтерактивний об'єкт на основі позиції та властивостей.
+     *
+     * @param position   Початкова позиція об'єкта
+     * @param properties JSON-об'єкт з властивостями (включно з ім'ям файлу, типом тощо)
+     */
     public InteractiveObject(Vector2D position, JSONObject properties) {
         if (type == Type.WITH_MONEY||type == Type.FINAL_PRIZE) {
             this.isMoneyGiven = properties.getBoolean("isMoneyGiven");
@@ -58,12 +81,23 @@ public class InteractiveObject implements GameObject, Interactable {
         }
     }
 
+    /**
+     * Генерує випадковий 4-значний код для об'єктів типу NOTE, PICTURE або COMPUTER.
+     *
+     * @return Рядок з 4 цифрами
+     */
     private String generateRandomCode() {
         Random random = new Random();
         int code = random.nextInt(9000) + 1000;
         return String.valueOf(code);
     }
 
+
+    /**
+     * Визначає логіку взаємодії гравця з об'єктом, залежно від типу.
+     *
+     * @param player Об'єкт гравця, що ініціює взаємодію
+     */
     @Override
     public void interact(Player player) {
         UIManager uiManager = GameWindow.getInstance().getUIManager();
@@ -136,6 +170,12 @@ public class InteractiveObject implements GameObject, Interactable {
                 break;
         }
     }
+
+    /**
+     * Анімує зсув картини вліво на 50 пікселів і відкриває відповідне вікно.
+     *
+     * @param uiManager Менеджер UI для створення вікон
+     */
     private void animatePicture(UIManager uiManager) {
         targetImageX = imageX - 50; // Цільова позиція X (зміщення вліво)
         TranslateTransition transition = new TranslateTransition(Duration.millis(500));
@@ -149,6 +189,12 @@ public class InteractiveObject implements GameObject, Interactable {
         transition.play();
     }
 
+
+    /**
+     * Повертає об'єкт збережених даних, які можна серіалізувати у файл.
+     *
+     * @return JSON-об'єкт з усіма властивостями об'єкта
+     */
     @Override
     public JSONObject getSerializableData() {
         JSONObject data = new JSONObject();
@@ -169,6 +215,12 @@ public class InteractiveObject implements GameObject, Interactable {
         return data;
     }
 
+
+    /**
+     * Встановлює стан об'єкта з JSON-даних, які були збережені раніше.
+     *
+     * @param data JSON-дані, що описують стан об'єкта
+     */
     @Override
     public void setFromData(JSONObject data) {
         this.imageX = data.optDouble("x", imageX);
@@ -200,6 +252,13 @@ public class InteractiveObject implements GameObject, Interactable {
         }
     }
 
+
+
+    /**
+     * Малює об'єкт на вказаному графічному контексті.
+     *
+     * @param gc GraphicsContext для малювання
+     */
     @Override
     public void render(GraphicsContext gc) {
         if (sprite != null) {
@@ -222,6 +281,14 @@ public class InteractiveObject implements GameObject, Interactable {
         }
     }
 
+
+
+    /**
+     * Визначає, чи може гравець взаємодіяти з об'єктом (перевірка колізій).
+     *
+     * @param player Об'єкт гравця
+     * @return true, якщо взаємодія можлива
+     */
     @Override
     public boolean canInteract(Player player) {
         Bounds playerBounds = player.getBounds();
@@ -236,20 +303,46 @@ public class InteractiveObject implements GameObject, Interactable {
         return extendedBounds.intersects(objectBounds);
     }
 
+    /**
+     * Повертає тип об'єкта у вигляді рядка.
+     *
+     * @return Назва типу
+     */
+
     @Override
     public String getType() {
         return type.toString();
     }
 
+
+    /**
+     * Повертає позицію об'єкта.
+     *
+     * @return Вектор позиції
+     */
     @Override
     public Vector2D getPosition() {
         return new Vector2D(imageX, imageY);
     }
 
+
+    /**
+     * Повертає позицію для рендеру зображення.
+     *
+     * @return Вектор позиції зображення
+     */
+
     @Override
     public Vector2D getImagePosition() {
         return new Vector2D(imageX, imageY);
     }
+
+
+    /**
+     * Встановлює нову позицію об'єкта.
+     *
+     * @param position нова позиція
+     */
 
     @Override
     public void setPosition(Vector2D position) {
@@ -258,6 +351,12 @@ public class InteractiveObject implements GameObject, Interactable {
         this.targetImageX = isPictureMoved ? imageY - 50 : imageY;
     }
 
+    /**
+     * Встановлює нову позицію для зображення об'єкта.
+     *
+     * @param position нова позиція
+     */
+
     @Override
     public void setImagePosition(Vector2D position) {
         this.imageX = position.x;
@@ -265,31 +364,65 @@ public class InteractiveObject implements GameObject, Interactable {
         this.targetImageX = isPictureMoved ? imageY - 50 : imageY;
     }
 
+
+    /**
+     * Повертає межі об'єкта для логіки колізій.
+     *
+     * @return Об'єкт Bounds
+     */
     @Override
     public Bounds getBounds() {
         return new BoundingBox(imageX, imageY, imageWidth, imageHeight);
     }
 
+    /**
+     * Повертає межі зображення об'єкта.
+     *
+     * @return Об'єкт Bounds
+     */
     @Override
     public Bounds getImageBounds() {
         return new BoundingBox(imageX, imageY, imageWidth, imageHeight);
     }
 
+    /**
+     * Повертає відстань, на якій гравець може взаємодіяти з об'єктом.
+     *
+     * @return Довжина у пікселях
+     */
     @Override
     public double getInteractionRange() {
         return 50.0;
     }
 
+
+    /**
+     * Повертає текст-підказку для гравця щодо взаємодії.
+     *
+     * @return Рядок-підказка
+     */
     @Override
     public String getInteractionPrompt() {
         return "Натисніть Е, щоб взаємодіяти з об'єктом";
     }
 
+
+    /**
+     * Повертає шар рендерингу для правильного порядку малювання.
+     *
+     * @return 0 — базовий шар
+     */
     @Override
     public int getRenderLayer() {
         return 0;
     }
 
+
+    /**
+     * Повертає, чи об'єкт видимий для рендеру.
+     *
+     * @return true, якщо об'єкт видно
+     */
     @Override
     public boolean isVisible() {
         return true;

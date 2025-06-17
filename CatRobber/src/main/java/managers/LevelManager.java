@@ -11,16 +11,28 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-// Керує завантаженням рівнів гри
+/**
+ * Клас для управління завантаженням рівнів гри, включаючи дані рівня, об’єкти та збереження.
+ */
 public class LevelManager {
-    // Поля
-    private Map<Integer, JSONObject> levels; // Кеш рівнів у форматі JSON
-    private int currentLevelId; // ID поточного рівня
-    private GameLoader gameLoader; // Завантажувач JSON і об’єктів
-    private SaveManager saveManager; // Менеджер збереження
-    private List<GameManager.Room> collisionMap; // Карта колізій (кімнати)
+    /** Кеш рівнів у форматі JSON, де ключ — ID рівня. */
+    private Map<Integer, JSONObject> levels;
 
-    // Конструктор: ініціалізує менеджер рівнів
+    /** ID поточного рівня. */
+    private int currentLevelId;
+
+    /** Завантажувач JSON-файлів і об’єктів гри. */
+    private GameLoader gameLoader;
+
+    /** Менеджер збереження гри. */
+    private SaveManager saveManager;
+
+    /** Карта колізій, що містить список кімнат. */
+    private List<GameManager.Room> collisionMap;
+
+    /**
+     * Конструктор для ініціалізації менеджера рівнів.
+     */
     public LevelManager() {
         levels = new HashMap<>();
         gameLoader = new GameLoader();
@@ -29,9 +41,12 @@ public class LevelManager {
         currentLevelId = 1;
     }
 
-    // --- Завантаження ---
-
-    // Завантажує рівень (викликається з GameManager.loadLevel())
+    /**
+     * Завантажує рівень гри за його ID.
+     *
+     * @param id ID рівня для завантаження
+     * @param isNewGame чи є це новою грою
+     */
     public void loadLevel(int id, boolean isNewGame) {
         currentLevelId = id;
         String levelFile = "data/levels/level" + id + "/level" + id + ".tmj";
@@ -41,14 +56,11 @@ public class LevelManager {
             return;
         }
         levels.put(id, levelData);
-        // Завантажуємо карту колізій
         collisionMap = gameLoader.loadCollisionMap(levelData);
-        // Встановлюємо фон
         String backgroundPath = "background/level" + id + "/rooms.png";
         GameManager.getInstance().setBackgroundImage(backgroundPath);
-        // Завантажуємо об’єкти
         if (isNewGame) {
-            createDefaultFiles(levelData); // Генеруємо дефолтні файли
+            createDefaultFiles(levelData);
             loadFromDefaults();
             String saveFile = "data/saves/game_progress.json";
             File file = new File(saveFile);
@@ -61,16 +73,21 @@ public class LevelManager {
         } else {
             loadFromSave();
         }
-        // Встановлюємо карту колізій
         GameManager.getInstance().setCollisionMap(collisionMap);
     }
 
-    // Створює дефолтні файли для нового рівня
+    /**
+     * Створює дефолтні файли для нового рівня.
+     *
+     * @param tiledData JSON-дані рівня
+     */
     public void createDefaultFiles(JSONObject tiledData) {
         gameLoader.createDefaultFiles(tiledData, currentLevelId);
     }
 
-    // Завантажує збереження
+    /**
+     * Завантажує збережені дані гри.
+     */
     private void loadFromSave() {
         String saveFile = "data/saves/game_progress.json";
         File file = new File(saveFile);
@@ -80,7 +97,10 @@ public class LevelManager {
             loadFromDefaults();
         }
     }
-    // Завантажує дефолтні об’єкти
+
+    /**
+     * Завантажує дефолтні об’єкти для рівня.
+     */
     private void loadFromDefaults() {
         List<GameObject> objects = new ArrayList<>();
         // Гравець
@@ -98,10 +118,10 @@ public class LevelManager {
         if (cameraData != null) {
             objects.addAll(gameLoader.parseTiledJSON(cameraData));
         }
+        // Двері
         JSONObject doorData = gameLoader.loadJSON("data/defaults/doors/door_level_" + currentLevelId + ".json");
         if (doorData != null) {
             objects.addAll(gameLoader.parseTiledJSON(doorData));
-
         }
         // Інтерактивні об’єкти
         JSONObject interactiveData = gameLoader.loadJSON("data/defaults/interactiveObjects/interactiveObjects_level_" + currentLevelId + ".json");
@@ -110,8 +130,6 @@ public class LevelManager {
         }
         // Головоломки
         JSONObject puzzleData = gameLoader.loadJSON("data/defaults/puzzles/puzzles_level_" + currentLevelId + ".json");
-        if (puzzleData != null) {
-        }
         if (puzzleData != null) {
             for (String key : puzzleData.keySet()) {
                 JSONObject puzzleObj = puzzleData.getJSONObject(key);
@@ -124,20 +142,29 @@ public class LevelManager {
         GameManager.getInstance().setGameObjects(objects);
     }
 
-
-    // --- Геттери ---
-
-    // Повертає JSON-даних рівня
+    /**
+     * Повертає JSON-дані поточного рівня.
+     *
+     * @return JSON-об’єкт із даними рівня або null, якщо рівень не завантажено
+     */
     public JSONObject getLevelData() {
         return levels.get(currentLevelId);
     }
 
-    // Повертає ID поточного рівня
+    /**
+     * Повертає ID поточного рівня.
+     *
+     * @return ID поточного рівня
+     */
     public int getCurrentLevelId() {
         return currentLevelId;
     }
 
-    // Повертає карту колізій
+    /**
+     * Повертає карту колізій (список кімнат).
+     *
+     * @return список кімнат
+     */
     public List<GameManager.Room> getCollisionMap() {
         return collisionMap;
     }

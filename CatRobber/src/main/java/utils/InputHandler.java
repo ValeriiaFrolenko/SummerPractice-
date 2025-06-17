@@ -8,16 +8,27 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.HashMap;
 
-// Обробляє ввід із клавіатури та миші
+/**
+ * Клас для обробки вводу з клавіатури та миші в грі.
+ */
 public class InputHandler {
-    // Поля
-    private Scene scene; // Сцена для обробки подій
-    private Set<KeyCode> pressedKeys; // Набір натиснутих клавіш
-    private Point2D mousePosition; // Позиція миші
-    private Map<KeyCode, Runnable> inputCallbacks; // Колбеки для клавіш
+    /** Сцена для обробки подій вводу. */
+    private Scene scene;
 
-    // Конструктор
-    // Отримує scene з GameWindow.initializeManagers
+    /** Набір натиснутих клавіш. */
+    private Set<KeyCode> pressedKeys;
+
+    /** Поточна позиція миші. */
+    private Point2D mousePosition;
+
+    /** Мапа колбеків для клавіш. */
+    private Map<KeyCode, Runnable> inputCallbacks;
+
+    /**
+     * Конструктор для ініціалізації обробника вводу.
+     *
+     * @param scene сцена, до якої прив’язуються обробники подій
+     */
     public InputHandler(Scene scene) {
         this.scene = scene;
         this.pressedKeys = new HashSet<>();
@@ -25,8 +36,10 @@ public class InputHandler {
         this.inputCallbacks = new HashMap<>();
     }
 
-    // Налаштовує обробники клавіатури
-    // Додає слухачі для scene
+    /**
+     * Налаштовує обробники подій для клавіатури.
+     * Додає слухачі для подій натискання та відпускання клавіш.
+     */
     public void setupKeyHandlers() {
         scene.setOnKeyPressed(event -> {
             KeyCode key = event.getCode();
@@ -35,34 +48,51 @@ public class InputHandler {
                 inputCallbacks.get(key).run();
             }
         });
-
         scene.setOnKeyReleased(event -> {
             KeyCode key = event.getCode();
             pressedKeys.remove(key);
         });
     }
 
-    // Налаштовує обробники миші
-    // Додає слухачі для scene
+    /**
+     * Налаштовує обробники подій для миші.
+     * Додає слухачі для подій руху та кліку миші.
+     */
     public void setupMouseHandlers() {
         scene.setOnMouseMoved(event -> {
             mousePosition = new Point2D(event.getX(), event.getY());
         });
-
         scene.setOnMouseClicked(event -> {
             mousePosition = new Point2D(event.getX(), event.getY());
         });
     }
 
-    // Перевіряє, чи натиснута клавіша
-    // Отримує key, повертає boolean в GameManager, UIManager
-    public boolean isKeyPressed(KeyCode key) { return pressedKeys.contains(key);}
+    /**
+     * Перевіряє, чи натиснута вказана клавіша.
+     *
+     * @param key код клавіші для перевірки
+     * @return true, якщо клавіша натиснута, інакше false
+     */
+    public boolean isKeyPressed(KeyCode key) {
+        return pressedKeys.contains(key);
+    }
 
-    // Повертає позицію миші
-    // Передає в UIManager для UI-елементів
-    public Point2D getMousePosition() { return mousePosition; }
+    /**
+     * Повертає поточну позицію миші.
+     *
+     * @return координати миші у вигляді Point2D
+     */
+    public Point2D getMousePosition() {
+        return mousePosition;
+    }
 
-    // Реєструє колбек для клавіші
-    // Отримує key і callback, зберігає в inputCallbacks
-    public void registerCallback(KeyCode key, Runnable callback) {inputCallbacks.put(key, callback);}
+    /**
+     * Реєструє колбек для певної клавіші.
+     *
+     * @param key код клавіші
+     * @param callback дія, яка виконується при натисканні клавіші
+     */
+    public void registerCallback(KeyCode key, Runnable callback) {
+        inputCallbacks.put(key, callback);
+    }
 }
